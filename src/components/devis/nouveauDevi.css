@@ -1,0 +1,26 @@
+.body-devi {
+  display: flex;
+  flex-wrap: wrap;
+}
+.devi-component {
+  display: flex;
+  width: 500px !important;
+  min-width: auto !important;
+  flex-direction: column;
+  align-items: center;
+}
+.devi-component .component-title {
+  margin-bottom: 0;
+}
+.devi-component .search-component {
+  /* margin-left: 24px; */
+  margin-bottom: 24px;
+}
+
+.devi-component svg {
+  margin: 6px;
+  cursor: pointer;
+}
+.devi-component p {
+  font-weight: 500;
+}

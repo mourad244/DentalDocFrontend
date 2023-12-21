@@ -1,0 +1,21 @@
+.boolean-component {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  width: 420px;
+  /* justify-content: space-between; */
+}
+
+.boolean-component label {
+  line-height: 36px;
+  text-align: end;
+  width: 110px;
+  font-weight: bold;
+  color: #72757c;
+
+  margin-right: 12px;
+}
+.boolean-component svg {
+  margin-top: 6px;
+  cursor: pointer;
+}

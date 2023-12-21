@@ -1,0 +1,14 @@
+.report-form .form-container {
+  width: 1100px;
+}
+
+.report-form .form {
+  width: 1000px;
+  display: flex;
+  justify-content: center;
+}
+
+.report-form .render-button {
+  justify-content: center;
+  margin: 12px;
+}

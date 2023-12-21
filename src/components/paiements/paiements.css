@@ -1,0 +1,38 @@
+.paiements-component .selected-time {
+  margin: auto;
+}
+.paiements-component .component-title {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 24px;
+}
+.paiements-component .component-title h1 {
+  font-size: 28px;
+}
+.paiements-component .component-title .paiement-total {
+  background-color: #455a94;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+}
+.paiements-component .impression {
+  display: flex;
+  margin-left: 12px;
+  margin-right: 24px;
+  justify-content: space-between;
+}
+.paiements-component .impression-paiements {
+  display: flex;
+  align-items: center;
+}
+.paiements-component .impression-recette {
+  display: flex;
+  align-items: center;
+}
+.paiements-component .impression p {
+  font-weight: bold;
+}
+.paiements-component .impression-paiements .print-content svg,
+.paiements-component .impression-recette .print-content svg {
+  margin-left: 12px;
+}

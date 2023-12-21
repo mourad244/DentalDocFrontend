@@ -1,0 +1,11 @@
+.recettes-liste .table-liste-recette .table-paiement {
+  width: 100%;
+}
+.recettes-liste .table-liste-recette .table-paiement .total-recette {
+  width: 100px;
+  border: 3px solid black;
+  font-weight: bold;
+}
+.recettes-liste .titreDoc {
+  text-decoration: underline;
+}

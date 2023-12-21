@@ -1,0 +1,9 @@
+.title-in-middle {
+  text-align: center;
+}
+.calculate-total {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  background-color: #ccceff;
+}

@@ -1,0 +1,29 @@
+.table-acte-effectue {
+  width: 1200px;
+  margin-top: 24px;
+}
+.table-acte-effectue .table-component {
+  width: 800px;
+  height: fit-content;
+  border: 2px solid rgb(233, 226, 226);
+  border-radius: 12px;
+  background: #f6f8ff;
+}
+.table-acte-effectue .table-header tr {
+  overflow: hidden;
+  box-shadow: 0px 0px 0px 0px rgb(0 0 0 / 34%);
+  background: transparent;
+  border-radius: 10px;
+}
+.table-acte-effectue .item-line {
+  background: #caecff;
+  font-size: 12px;
+  font-weight: 420;
+}
+.component-body {
+  display: flex;
+}
+.component-body svg {
+  margin-left: 24px;
+  margin-bottom: 24px;
+}

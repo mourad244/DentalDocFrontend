@@ -1,0 +1,20 @@
+.rdvs-component {
+  width: 800px;
+}
+
+.rdvs-component .component-title {
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+.rdvs-component .rdvs-total {
+  background-color: #455a94;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-right: 12px;
+}
+
+.selected-time svg {
+  cursor: pointer;
+}

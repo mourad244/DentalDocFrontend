@@ -1,0 +1,36 @@
+.paiements-list {
+}
+
+@page {
+  /* size: A4; */
+  margin-top: 30px;
+  margin-bottom: 80px;
+
+  /* change to landscape */
+}
+.paiements-list .attache {
+  font-size: 12px;
+}
+.paiements-list .titreDoc {
+  font-size: 1.5em;
+  margin-top: 12px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #d1d1d1 !important;
+  padding: 12px;
+  border-radius: 6px;
+}
+.paiements-list .image-doc {
+  width: 300px;
+}
+.paiements-list .table-paiement {
+  text-align: center;
+  border-collapse: collapse;
+
+  /* border for each line */
+}
+.paiements-list .table-paiement th,
+.paiements-list .table-paiement td {
+  padding: 0 6px;
+  border: 1px solid rgb(0, 0, 0);
+}

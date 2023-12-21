@@ -1,0 +1,187 @@
+.form-container {
+  width: 100%;
+  height: fit-content;
+  margin-top: 24px;
+
+  margin-bottom: 24px;
+  background-color: #ffffff;
+  box-shadow: 6px 13px 9px rgba(0, 0, 0, 0.25);
+  border-radius: 0px 10px 0px 0px;
+  border: 1px solid #ffffff;
+}
+.form {
+  display: flex;
+  width: 1290px;
+  margin-left: 36px;
+  margin-top: 36px;
+  margin-bottom: 24px;
+  margin-right: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.form-file {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+.display-image {
+  display: flex;
+  flex-direction: row;
+  margin-top: 12px;
+}
+
+.upload-file {
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
+  /* width: 500px; */
+}
+.upload-file-label {
+  font-family: Roboto;
+  line-height: 36px;
+  width: 160px;
+  margin-right: 24px;
+}
+.image-file-form {
+  display: flex;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  margin-left: 185px;
+}
+.image-display {
+  /* overflow: hidden; */
+  display: flex;
+  flex-wrap: wrap;
+}
+img.hover-zoom {
+  transition: all 0.3s ease 0s;
+  width: 100%;
+}
+img.hover-zoom:hover {
+  transform: scale(6);
+}
+.image-file-form img,
+.image-display img {
+  width: 120px;
+  margin: 2px;
+  height: auto;
+
+  box-shadow: 0px 4px 4px rgba(34, 55, 75, 0.5);
+}
+
+input[type="file"]::file-selector-button {
+  padding-left: 12px;
+  padding-right: 12px;
+  line-height: 36px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #406aa1;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+}
+.add-file-button {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.date-input-component {
+  display: flex;
+  flex-wrap: wrap;
+  width: 420px;
+  margin-top: 24px;
+}
+
+.date-input-component label {
+  line-height: 36px;
+  width: 110px;
+  font-weight: bold;
+  color: #72757c;
+  text-align: end;
+  margin-right: 12px;
+}
+
+.input-object {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.input-object label {
+  font-family: Roboto;
+  height: 36px;
+  line-height: 36px;
+  width: 60px;
+  margin-right: 12px;
+}
+.input-object p {
+  margin: 0;
+  font-family: Roboto;
+  height: 36px;
+  line-height: 36px;
+  width: 160px;
+  margin-right: 24px;
+}
+.input-object input {
+  margin-right: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  background: white;
+  box-shadow: inset 0px 4px 4px rgb(0 0 0 / 25%);
+  border-radius: 5px;
+  color: #1f2037;
+  font-weight: bold;
+  border-width: 0px;
+}
+
+.input-object-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  flex-direction: column;
+  margin-left: 24px;
+}
+.input-object-list p {
+  margin: 0;
+  font-family: Roboto;
+  height: 36px;
+  line-height: 36px;
+  width: 160px;
+  margin-right: 24px;
+}
+.input-object-list label {
+  font-family: Roboto;
+  height: 36px;
+  line-height: 36px;
+  width: 60px;
+  margin-right: 12px;
+}
+/* .input-object input {
+  margin-right: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  background: white;
+  box-shadow: inset 0px 4px 4px rgb(0 0 0 / 25%);
+  border-radius: 5px;
+  color: #1f2037;
+  font-weight: bold;
+  border-width: 0px;
+} */
+.input-object-item {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.text-list-item {
+  display: flex;
+  /* margin-top: 12px; */
+  align-items: center;
+  height: 36px;
+  font-weight: bold;
+}
+.text-list-item svg {
+  margin-left: 12px;
+  height: 100%;
+  cursor: pointer;
+}

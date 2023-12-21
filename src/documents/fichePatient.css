@@ -1,0 +1,158 @@
+.print-content {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+.print-content svg {
+  margin-left: 180px;
+  cursor: pointer;
+}
+@page {
+  /* size: A4; */
+  margin-top: 30px;
+  margin-bottom: 80px;
+}
+.doc {
+  display: flex;
+  flex-direction: column;
+  width: 1180px;
+
+  /* height: 1510px; */
+  flex-wrap: wrap;
+}
+
+.attache {
+  position: absolute;
+  padding-right: 24px;
+  align-self: flex-end;
+  text-align: center;
+  width: fit-content;
+  text-decoration-line: underline;
+}
+.image-doc {
+  width: 400px;
+}
+
+.titreDoc {
+  margin-top: 100px;
+  align-self: center;
+  text-align: center;
+  margin-left: 200px;
+  margin-right: 200px;
+  font-size: 36px;
+}
+.doc .table-doc1 {
+  margin: auto;
+  margin-bottom: 24px;
+}
+.doc .table-doc1 table,
+.doc .table-doc1 td,
+.doc .table-doc1 th {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.doc .table-doc1 table {
+  border: 3px solid black;
+}
+.doc .table-doc1 th {
+  /* font-weight: bold; */
+  font-size: 24px;
+  background-color: rgb(219, 219, 219);
+}
+.doc .table-doc1 th,
+.doc .table-doc1 td {
+  width: 400px;
+  height: 50px;
+}
+.doc .table-doc2 td {
+  border: none;
+}
+.objetNds {
+  margin: 0;
+  padding-top: 36px;
+  padding-left: 240px;
+}
+.paragraphe {
+  text-indent: 120px;
+  padding-top: 36px;
+  line-height: 40px;
+  margin: 0;
+}
+.doc p {
+  padding-left: 240px;
+  text-align: justify;
+  padding-right: 80px;
+  font-size: 20px;
+}
+.item-paragraphe {
+  margin: 0;
+  line-height: 40px;
+  padding-top: 15px;
+}
+.date-doc {
+  position: absolute;
+  padding-left: 24px;
+}
+.footer {
+  display: flex;
+  width: 950px;
+  margin-top: auto;
+
+  align-self: flex-end;
+  /* flex-direction: column; */
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+@page :last-child {
+}
+@media print {
+  .footer {
+    position: static; /* <-- Key line */
+    margin-top: auto;
+
+    /* margin-top: 160px; */
+    /* left: 0px; */
+    /* width: 100%; */
+  }
+}
+.date-bas-doc {
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.signature-autorite {
+  /* width: 300px; */
+  /* align-self: flex-end; */
+  padding: 0 !important;
+  padding-right: 80px !important;
+  /* padding-right: 30px !important; */
+  font-weight: bold;
+}
+.destinataires {
+  display: flex;
+  width: 400px;
+  flex-direction: column;
+}
+.title-destinataire {
+  font-weight: bold;
+  /* width: 100%; */
+  padding-left: 0 !important;
+}
+.item-destinataire {
+  margin: 0;
+  padding-top: 10px;
+  padding-left: 0 !important;
+  padding-right: 10px !important;
+}
+.signature {
+  margin-left: auto;
+}
+/* 
+
+210  ------>  323     ----> 1217     // ration *1.538095238
+297  ------>  456.8   -----> 1726.5
+
+
+*/

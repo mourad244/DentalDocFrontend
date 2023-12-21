@@ -1,0 +1,53 @@
+.menuDevi {
+  width: fit-content;
+  margin-top: 24px;
+}
+.menuDevi-menu {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  flex-direction: row;
+}
+.menuDevi-item {
+  display: flex;
+  height: 32px;
+  margin-right: 24px;
+  list-style-type: none;
+  font-weight: bold;
+  font-size: 1rem;
+  color: black;
+}
+.menuDevi-link {
+  display: flex;
+  color: white;
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-left: 12px;
+  text-align: center;
+  background: #455a94;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+}
+
+.menuDevi-link-active {
+  color: #455a94;
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-left: 12px;
+  background-color: white;
+  background: #ffffff;
+
+  text-decoration: none;
+  box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+}
+.menuDevi-link a,
+.menuDevi-link-active a {
+  text-decoration: none;
+  color: inherit;
+}
+.menuDevi-link-active:hover,
+.menuDevi-link:hover a {
+  text-decoration: none;
+}
