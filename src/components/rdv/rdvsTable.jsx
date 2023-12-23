@@ -2,7 +2,6 @@ import React from "react";
 import Table from "../../common/table";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { AiFillDelete } from "react-icons/ai";
-import "./rdvs.css";
 
 function RdvsTable(props) {
   const columns = [
@@ -36,10 +35,10 @@ function RdvsTable(props) {
       path: "patientId.telephone",
       label: "Télephone",
     },
-    {
-      path: "medecinId.nom",
-      label: "Medecin",
-    },
+    // {
+    //   path: "medecinId.nom",
+    //   label: "Medecin",
+    // },
     //           isHonnore: false,
     {
       path: "isHonnore",

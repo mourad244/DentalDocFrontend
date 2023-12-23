@@ -25,6 +25,8 @@ module.exports = {
         none: "none",
         custom: "0px 4px 4px rgba(0, 0, 0, 0.25)",
         component: "6px 13px 9px rgb(0 0 0 / 25%)",
+        dayFull: "inset 0px 4px 4px rgba(0, 0, 0, 0.25)",
+        daySelected: "0px 4px 4px rgba(0, 0, 0, 0.25)",
       },
       backgroundImage: {
         "gradient-radial":

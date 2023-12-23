@@ -1,41 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { withRouter } from "react-router-dom";
+
+import ReactPaginate from "react-paginate";
+import { withRouter, useHistory } from "react-router-dom";
 
 import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
 
 import RdvsTable from "./rdvsTable";
-import ReactPaginate from "react-paginate";
-
-import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
-import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import SearchBox from "../../common/searchBox";
 
 import _ from "lodash";
 import { toast } from "react-toastify";
-import { BsPersonAdd } from "react-icons/bs";
 import ClipLoader from "react-spinners/ClipLoader";
+import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 
 function Rdvs() {
   // const date = new Date();
   const [rdvs, setRdvs] = useState([]);
-  const [time, setTime] = useState(new Date());
+  const [filteredRdvs, setFilteredRdvs] = useState([]);
   const [selectedRdv, setSelectedRdv] = useState(null);
   const [selectedRdvs, setSelectedRdvs] = useState([]);
-  const [showDetails, setShowDetails] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const [filteredRdvs, setFilteredRdvs] = useState([]);
+  const [dataUpdated, setDataUpdated] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [sortColumn, setSortColumn] = useState({
-    path: "patientId.gradeId.nom",
+    path: "datePrevu",
     order: "asc",
   });
-
-  const [itemOffset, setItemOffset] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [itemOffset, setItemOffset] = useState(0);
   const pageSize = 15;
   const history = useHistory();
+
+  const [time, setTime] = useState(new Date());
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,7 +97,7 @@ function Rdvs() {
         newRdvs[index].isHonnore = !newRdvs[index].isHonnore;
         await saveRdv({
           _id: e._id,
-          medecinId: e.medecinId._id,
+          // medecinId: e.medecinId._id,
           patientId: e.patientId._id,
           datePrevu: e.datePrevu,
           isHonnore: e.isHonnore,
@@ -123,7 +123,6 @@ function Rdvs() {
     setSelectedRdvs(newSelectedRdvs);
     setSelectedRdv(newSelectedRdvs.length === 1 ? selectedRdv : null);
   };
-
   const handleSelectRdvs = () => {
     let newSelectedRdvs =
       selectedRdvs.length === filteredRdvs.length ? [] : [...filteredRdvs];
@@ -133,12 +132,25 @@ function Rdvs() {
   const handleEdit = () => {
     history.push(`/rdvs/${selectedRdv._id}`);
   };
-  const handleDelete = async (rdv) => {
+  const handleDelete = async (rdvs) => {
     const originalRdvs = rdvs;
-    setRdvs(rdvs.filter((m) => m._id !== rdv._id));
-
+    setRdvs(
+      rdvs.filter((p) => {
+        let founded = selectedRdvs.find(
+          (c) => c._id.toString() === p._id.toString(),
+        );
+        if (founded) return false;
+        return true;
+      }),
+    );
+    setDataUpdated(true);
+    setSelectedRdv(null);
+    setSelectedRdvs([]);
     try {
-      await deleteRdv(rdv._id);
+      rdvs.forEach(async (item) => {
+        await deleteRdv(item._id);
+      });
+      toast.success("Rendez-vous supprimé avec succés");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         toast.error("Rendez-vous déja supprimé");
@@ -155,7 +167,7 @@ function Rdvs() {
         <button
           className="no-underlin mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           onClick={() => {
-            history.push("/ajouterrdv");
+            history.push("/rdvs/new");
           }}
         >
           Nouveau Rendez-Vous

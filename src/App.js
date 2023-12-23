@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Route, /*  Redirect, */ Switch } from "react-router-dom";
-import Devis from "./components/devis/devis";
-import NouveauDevi from "./components/devis/nouveauDevi";
-import Patients from "./components/patients/patients";
-import PatientForm from "./components/patients/patientForm";
-import Paiements from "./components/paiements/paiements";
-import NouveauPaiement from "./components/paiements/nouveauPaiement";
-import Rdvs from "./components/rdv/rdvs";
-import NouveauRdv from "./components/rdv/nouveauRdv";
+
+import { getRoles } from "./services/roleService";
+
+import NavBar from "./common/navBar";
 
 import auth from "./services/authService";
-import LoginForm from "./components/loginForm";
-import Accueil from "./components/accueil/accueil";
-import { logout } from "./components/logout";
+import Rdvs from "./components/rdv/rdvs";
 import NotFound from "./components/notFound";
-import NavBar from "./common/navBar";
+import { logout } from "./components/logout";
+import Devis from "./components/devis/devis";
+import LoginForm from "./components/loginForm";
+import RdvForm from "./components/rdv/rdvForm";
+import Accueil from "./components/accueil/accueil";
+import Patients from "./components/patients/patients";
+import Settings from "./components/settings/settings";
+import NouveauDevi from "./components/devis/nouveauDevi";
+import Paiements from "./components/paiements/paiements";
+import PatientForm from "./components/patients/patientForm";
+import NouveauReport from "./components/reports/nouveauReport";
+import NouveauPaiement from "./components/paiements/nouveauPaiement";
+
 import { ToastContainer } from "react-toastify";
 
-import logo from "./assets/images/logo-dental-doc.png";
-import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import NouveauReport from "./components/reports/nouveauReport";
-import { getRoles } from "./services/roleService";
-import Settings from "./components/settings/settings";
+import "react-toastify/dist/ReactToastify.css";
+import logo from "./assets/images/logo-dental-doc.png";
 
 function App() {
   const [user, setUser] = useState();
@@ -137,7 +140,7 @@ function App() {
             )}
             {/* rdvs */}
             {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/ajouterrdv" exact component={NouveauRdv} />
+              <Route path="/rdvs/:id" exact component={RdvForm} />
             ) : (
               ""
             )}

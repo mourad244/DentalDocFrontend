@@ -145,12 +145,10 @@ function PatientsTable({
                 </td>
               );
             case "provinceId":
-              console.log("datas", datas);
               let province = datas.provinces.find(
                 (p) =>
                   p._id === patient.provinceId && patient.provinceId.toString(),
               );
-              console.log("patient", patient);
               if (!province) return <td key={uuidv4()} />;
               return (
                 <td

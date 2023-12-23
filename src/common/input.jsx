@@ -13,7 +13,7 @@ const Input = ({
     <div className=" flex flex-col">
       <div className="flex w-fit flex-wrap">
         <label
-          className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
+          className={`mr-3  text-right text-xs font-bold leading-[${height}px] text-[#72757c]`}
           htmlFor={name}
           style={{ width: widthLabel }}
         >

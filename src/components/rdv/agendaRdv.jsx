@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
+
+import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
+
+// import _ from "lodash";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
-// import _ from "lodash";
-import { withRouter } from "react-router-dom";
-import "./agendaRdv.css";
-import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
 
 const AgendaRdv = (props) => {
   const mois = [
@@ -30,7 +31,7 @@ const AgendaRdv = (props) => {
     "Samedi",
     "Dimanche",
   ];
-  const { selectedMedecin, selectedPatient } = props;
+  const { /* selectedMedecin, */ selectedPatient } = props;
   const date = new Date();
   const [rdvs, setRdvs] = useState([]);
   const [filteredRdvs, setFilteredRdvs] = useState([]);
@@ -53,8 +54,8 @@ const AgendaRdv = (props) => {
       rdvs
         .filter((e) => {
           return (
-            (e.medecinId._id === selectedMedecin._id ||
-              e.medecinId._id === selectedMedecin) &&
+            /* (e.medecinId._id === selectedMedecin._id ||
+              e.medecinId._id === selectedMedecin) && */
             new Date(e.datePrevu).getFullYear() === time.getFullYear() &&
             new Date(e.datePrevu).getMonth() === time.getMonth()
           );
@@ -62,7 +63,7 @@ const AgendaRdv = (props) => {
 
         .map((e) => {
           let date = `${new Date(e.datePrevu).getMonth() + 1}-${new Date(
-            e.datePrevu
+            e.datePrevu,
           ).getDate()}-${new Date(e.datePrevu).getFullYear()}`;
           if (e.patientId._id === selectedPatient._id) {
             newfilteredRdvs.push(e);
@@ -77,13 +78,13 @@ const AgendaRdv = (props) => {
       setFilteredRdvs(newfilteredRdvs);
     };
     filterRdvs();
-  }, [rdvs, selectedMedecin, selectedPatient, time]);
+  }, [rdvs /* , selectedMedecin */, selectedPatient, time]);
   useEffect(() => {
     const daysInMonth = () => {
       const newNombreDays = new Date(
         time.getFullYear(),
         time.getMonth() + 1,
-        0
+        0,
       ).getDate();
       setNombreDays(newNombreDays);
     };
@@ -103,7 +104,7 @@ const AgendaRdv = (props) => {
       (e) =>
         new Date(e.datePrevu).getFullYear() === date.getFullYear() &&
         new Date(e.datePrevu).getMonth() === date.getMonth() &&
-        new Date(e.datePrevu).getDate() === date.getDate()
+        new Date(e.datePrevu).getDate() === date.getDate(),
     );
     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
       await deleteRdv(deletedDate._id);
@@ -112,11 +113,11 @@ const AgendaRdv = (props) => {
     } else if (window.confirm("Confirmer l'ajour du rdv")) {
       await saveRdv({
         patientId: selectedPatient._id,
-        medecinId: selectedMedecin._id ? selectedMedecin._id : selectedMedecin,
+        // medecinId: selectedMedecin._id ? selectedMedecin._id : selectedMedecin,
         datePrevu: date,
       });
       setReload(true);
-      props.history.push("/ajouterrdv");
+      props.history.push("/rdvs");
     }
   };
   const displayDates = () => {
@@ -148,21 +149,25 @@ const AgendaRdv = (props) => {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="button-day button-day-selected"
+                  className="shadow-daySelected m-2 flex h-10 w-10  cursor-pointer rounded-3xl bg-[#455a94] text-white"
                   onClick={() => handleSelectedDate(t)}
                 >
-                  <label>{countTotal + 1}</label>
-                </div>
+                  <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                    {countTotal + 1}
+                  </label>
+                </div>,
               );
             else
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="button-day button-day-selected-old"
+                  className=" m-2 flex h-10 w-10 rounded-3xl bg-[#d6d7ed]"
                   // onClick={() => handleSelectedDate(t)}
                 >
-                  <label>{countTotal + 1}</label>
-                </div>
+                  <label className="m-auto cursor-auto align-middle text-sm font-bold">
+                    {countTotal + 1}
+                  </label>
+                </div>,
               );
           } else if (!found || found.nombre < 10) {
             if (
@@ -176,31 +181,37 @@ const AgendaRdv = (props) => {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="button-day button-day-active"
+                  className="m-2 flex h-10 w-10 cursor-pointer rounded-3xl bg-[#caecff]"
                   onClick={() => handleSelectedDate(t)}
                 >
-                  <label>{countTotal + 1}</label>
-                </div>
+                  <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                    {countTotal + 1}
+                  </label>
+                </div>,
               );
             else
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="button-day button-day-active-old"
+                  className=" m-2 flex h-10 w-10 rounded-3xl bg-[#f0faff]"
                   // onClick={() => handleSelectedDate(t)}
                 >
-                  <label>{countTotal + 1}</label>
-                </div>
+                  <label className="m-auto cursor-auto align-middle text-sm font-bold">
+                    {countTotal + 1}
+                  </label>
+                </div>,
               );
           } else if (found.nombre >= 10) {
             arrayDiv.push(
               <div
                 key={"date-active" + countTotal}
-                className="button-day button-day-full"
+                className="shadow-dayFull pointer-events-none  m-2 flex h-10 w-10 rounded-3xl bg-[#eaeaea]"
                 onClick={() => handleSelectedDate(t)}
               >
-                <label>{countTotal + 1}</label>
-              </div>
+                <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                  {countTotal + 1}
+                </label>
+              </div>,
             );
           }
 
@@ -209,16 +220,16 @@ const AgendaRdv = (props) => {
           arrayDiv.push(
             <div
               key={"date-inactif" + j}
-              className="button-day button-day-inactif"
-            ></div>
+              className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
+            ></div>,
           );
           countTotal++;
         } else {
           arrayDiv.push(
             <div
               key={"date-inactif" + j}
-              className="button-day button-day-inactif"
-            ></div>
+              className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
+            ></div>,
           );
         }
       }
@@ -227,32 +238,41 @@ const AgendaRdv = (props) => {
     return totalDiv;
   };
   return (
-    <div className="component rdv-component">
-      <div className="selected-time">
+    <div className="m-auto my-2 flex h-fit w-fit min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+      <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
         <PrecedentButton
+          className="cursor-pointer"
           onClick={() => {
             navigateDate(-1);
           }}
         />
-        <p>{displayDate()}</p>
+        <p className="text-md m-auto mx-3 font-bold leading-5">
+          {displayDate()}
+        </p>
+
         <SuivantButton
           onClick={() => {
             navigateDate(1);
           }}
+          className="cursor-pointer"
         />
       </div>
-      <div className="name-dates">
+      <div className="mb-3 ml-14 mt-6 flex">
         {days.map((e) =>
           e !== "Dimanche" ? (
-            <label key={e} htmlFor={e}>
+            <label
+              className="w-14 text-center text-xs font-bold text-[#3d3d3d]"
+              key={e}
+              htmlFor={e}
+            >
               {e}
             </label>
           ) : (
             ""
-          )
+          ),
         )}
       </div>
-      <div className="table-dates">{displayDates()}</div>
+      <div className="flex w-[420px] flex-wrap">{displayDates()}</div>
     </div>
   );
 };
