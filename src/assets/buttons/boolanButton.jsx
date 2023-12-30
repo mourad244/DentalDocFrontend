@@ -1,15 +1,22 @@
 import { React } from "react";
-const BooleanButton = ({ label, index, value, handleChangeBoolean }) => {
+const BooleanButton = ({
+  label,
+  width = 100,
+  height = 28,
+  index,
+  value,
+  handleChangeBoolean,
+}) => {
   return (
     <svg
       className="mt-2 cursor-pointer"
-      width="100"
-      height="28"
+      width={width}
+      height={height}
       onClick={() => {
         if (index === "0") return handleChangeBoolean(true);
         if (index === "1") return handleChangeBoolean(false);
       }}
-      viewBox="0 0 100 28"
+      viewBox={`0 0 ${width} ${height}`}
       fill="none"
     >
       <text

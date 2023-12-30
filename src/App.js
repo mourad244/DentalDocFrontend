@@ -4,7 +4,6 @@ import { Route, /*  Redirect, */ Switch } from "react-router-dom";
 import { getRoles } from "./services/roleService";
 
 import NavBar from "./common/navBar";
-
 import auth from "./services/authService";
 import Rdvs from "./components/rdv/rdvs";
 import NotFound from "./components/notFound";
@@ -17,6 +16,7 @@ import Patients from "./components/patients/patients";
 import Settings from "./components/settings/settings";
 import NouveauDevi from "./components/devis/nouveauDevi";
 import Paiements from "./components/paiements/paiements";
+import DeviForm from "./components/devis/deviForm";
 import PatientForm from "./components/patients/patientForm";
 import NouveauReport from "./components/reports/nouveauReport";
 import NouveauPaiement from "./components/paiements/nouveauPaiement";
@@ -103,7 +103,7 @@ function App() {
             )}
             {/* Devis */}
             {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/ajouterdevi" exact component={NouveauDevi} />
+              <Route path="/devis/:id" exact component={DeviForm} />
             ) : (
               ""
             )}

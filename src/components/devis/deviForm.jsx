@@ -1,37 +1,44 @@
 import React from "react";
+import { withRouter } from "react-router-dom";
+import { getDents } from "../../services/dentService";
+import { getPatients } from "../../services/patientService";
+import { getMedecins } from "../../services/medecinService";
+import { saveDevi, getDevi } from "../../services/deviService";
+import { getNatureActes } from "../../services/natureActeService";
+import { getActeDentaires } from "../../services/acteDentaireService";
+
 import Joi from "joi-browser";
 import Form from "../../common/form";
-import { saveDevi } from "../../services/deviService";
-import { getMedecins } from "../../services/medecinService";
-import { getCabinets } from "../../services/cabinetService";
-import { getActeDentaires } from "../../services/acteDentaireService";
-import { getNatureActes } from "../../services/natureActeService";
-import { getDents } from "../../services/dentService";
-import { colorsNatureActe } from "../../utils/colorsNatureActe";
-import Select from "../../common/select";
 import Input from "../../common/input";
-import { withRouter } from "react-router-dom";
+import Select from "../../common/select";
+import SearchBox from "../../common/searchBox";
+import ActesEffectuesTable from "./actesEffectuesTable";
 
 import _ from "lodash";
-import "./deviForm.css";
+import { IoChevronBackCircleSharp } from "react-icons/io5";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
+import { colorsNatureActe } from "../../utils/colorsNatureActe";
 
 class DeviForm extends Form {
   state = {
     data: {
-      patientId: this.props.selectedPatient._id,
+      patientId: "",
       medecinId: "",
-      cabinetId: "",
       dateDevi: "",
-      isHygieneDent: true,
       acteEffectues: [],
     },
     errors: {},
     medecins: [],
-    cabinets: [],
+    patients: [],
+    selectedPatient: {},
+    filteredPatients: [],
+    searchQuery: "",
     acteDentaires: [],
     natureActes: [],
     dents: [],
+    sortColumn: { path: "date", order: "desc" },
+    devis: [],
+    acteEffectues: [],
     nombreActes: 1,
     selectedNatureActes: [],
     selectedActes: [],
@@ -44,41 +51,86 @@ class DeviForm extends Form {
     _id: Joi.string(),
     patientId: Joi.string().allow("").label("Patient"),
     medecinId: Joi.string().allow("").label("Medecin"),
-    cabinetId: Joi.string().allow("").label("Cabinet"),
     dateDevi: Joi.date().label("Date"),
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
-    isHygieneDent: Joi.boolean().allow(null).label("Hygiène Bucco Dentaire?"),
   };
-  async populateDents() {
+  async populateDatas() {
     const { data: dents } = await getDents();
-    this.setState({ dents });
-  }
-
-  async populateMedecins() {
     const { data: medecins } = await getMedecins();
-    this.setState({ medecins });
-  }
-
-  async populateCabinets() {
-    const { data: cabinets } = await getCabinets();
-    this.setState({ cabinets });
-  }
-
-  async populateActeDentaires() {
     const { data: acteDentaires } = await getActeDentaires();
-    this.setState({ acteDentaires });
-  }
-  async populateNatureActes() {
     const { data: natureActes } = await getNatureActes();
-    this.setState({ natureActes });
+    const { data: patients } = await getPatients();
+    this.setState({ dents, medecins, acteDentaires, natureActes, patients });
   }
 
   async componentDidMount() {
-    await this.populateMedecins();
-    await this.populateCabinets();
-    await this.populateActeDentaires();
-    await this.populateNatureActes();
-    await this.populateDents();
+    await this.populateDatas();
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    // if searchQuery change filteredPatients
+    if (prevState.searchQuery !== this.state.searchQuery) {
+      const newFilteredPatients = this.state.patients.filter((patient) => {
+        return (
+          patient.nom
+            .toLowerCase()
+            .includes(this.state.searchQuery.toLowerCase()) ||
+          patient.prenom
+            .toLowerCase()
+            .includes(this.state.searchQuery.toLowerCase())
+        );
+      });
+      this.state.searchQuery === ""
+        ? this.setState({ filteredPatients: [] })
+        : this.setState({ filteredPatients: newFilteredPatients });
+    }
+    if (prevState.devis !== this.state.devis) {
+      let actes = [];
+      this.state.devis.map((itemDevi) => {
+        //----------in array inside acteId -------
+        if (itemDevi.acteEffectues !== undefined)
+          itemDevi.acteEffectues.map((itemActe) => {
+            let acte = {
+              date: "",
+              medecin: "",
+              nature: "",
+              code: "",
+              nom: "",
+              dents: [],
+            };
+            //       date
+            acte.date = itemDevi.dateDevi;
+            //       medecinId
+            acte.medecin = `${
+              itemDevi.medecinId && itemDevi.medecinId.gradeId
+                ? itemDevi.medecinId.gradeId.nom
+                : ""
+            } ${itemDevi.medecinId.nom} ${
+              itemDevi.medecinId.prenom ? itemDevi.medecinId.prenom : ""
+            } `;
+            //       nature Acte
+            acte.nature = itemActe.acteId.natureId
+              ? itemActe.acteId.natureId.nom
+              : "";
+            //       code acte
+            acte.code = itemActe.acteId.code;
+            //       description
+            acte.nom = itemActe.acteId.nom;
+
+            //       Num Acte
+            //       dent
+            let dents = "-";
+            itemActe.dentIds.map((e) => {
+              return (dents += e.numeroFDI + "-");
+            });
+            acte.dents = dents;
+            actes.push(acte);
+            return true;
+          });
+        return true;
+      });
+      this.setState({ actesEffectues: actes });
+    }
   }
 
   doSubmit = async () => {
@@ -86,30 +138,37 @@ class DeviForm extends Form {
     let selectedActes = [...this.state.selectedActes];
     let prixSoins = 0;
     let prixProtheses = 0;
+    let montant = 0;
 
-    selectedNatureActes.map((natureItem, index) => {
-      if (natureItem) {
-        if (natureItem.nom === "Prothèses") {
-          return this.props.selectedPatient.adherenceId.nom === "A"
-            ? (prixProtheses += selectedActes[index].FA)
-            : (prixProtheses +=
-                selectedActes[index][
-                  this.props.selectedPatient.adherenceId.nom
-                ]);
-        } else {
-          return this.props.selectedPatient.adherenceId.nom === "A"
-            ? (prixSoins += selectedActes[index].FA)
-            : (prixSoins +=
-                selectedActes[index][
-                  this.props.selectedPatient.adherenceId.nom
-                ]);
-        }
-      } else return "";
+    selectedActes.map((acteItem, index) => {
+      // ajouter acteItem.prix to prix
+      montant += acteItem.prix;
     });
 
+    // selectedNatureActes.map((natureItem, index) => {
+    //   if (natureItem) {
+    //     if (natureItem.nom === "Prothèses") {
+    //       return this.props.selectedPatient.adherenceId.nom === "A"
+    //         ? (prixProtheses += selectedActes[index].FA)
+    //         : (prixProtheses +=
+    //             selectedActes[index][
+    //               this.props.selectedPatient.adherenceId.nom
+    //             ]);
+    //     } else {
+    //       return this.props.selectedPatient.adherenceId.nom === "A"
+    //         ? (prixSoins += selectedActes[index].FA)
+    //         : (prixSoins +=
+    //             selectedActes[index][
+    //               this.props.selectedPatient.adherenceId.nom
+    //             ]);
+    //     }
+    //   } else return "";
+    // });
+
     let newData = { ...this.state.data };
-    newData.montantSoins = prixSoins;
-    newData.montantProtheses = prixProtheses;
+    // newData.montantSoins = prixSoins;
+    // newData.montantProtheses = prixProtheses;
+    newData.montant = montant;
 
     await saveDevi(newData);
     this.props.history.push("/devis");
@@ -132,7 +191,7 @@ class DeviForm extends Form {
 
     let selectedNatureActe = { ...selectedNatureActes[index] };
     const selected = this.state.natureActes.find(
-      (item) => item._id === e.target.value
+      (item) => item._id === e.target.value,
     );
     selectedNatureActe = selected;
     /* if (!selected) {
@@ -158,9 +217,9 @@ class DeviForm extends Form {
 
     // set filtered actes dentaires
     let filteredActeDentaire = { ...filteredActeDentaires[index] };
-    filteredActeDentaire = this.state.acteDentaires.filter((e) =>
-      selected ? e.natureId === selected._id : ""
-    );
+    filteredActeDentaire = this.state.acteDentaires.filter((e) => {
+      return selected ? e.natureId && e.natureId._id === selected._id : "";
+    });
     filteredActeDentaires[index] = filteredActeDentaire;
 
     // reset selectedActe
@@ -214,11 +273,46 @@ class DeviForm extends Form {
     this.setState({ nombreDentsPerActe });
   };
 
+  handleSort = (sortColumn) => {
+    this.setState({ sortColumn });
+  };
+  onSelectPatient = (patient) => {
+    let data = { ...this.state.data };
+
+    if (
+      patient.deviIds !== undefined &&
+      patient.deviIds !== null &&
+      patient.deviIds.length !== 0
+    ) {
+      let newSelectedDevis = [];
+      patient.deviIds.map(async (item) => {
+        const { data: devi } = await getDevi(item.deviId._id || item.deviId);
+        newSelectedDevis.push(devi);
+      });
+      return this.setState({
+        devis: [...newSelectedDevis],
+        selectedPatient: patient,
+        searchQuery: "",
+        data: {
+          ...data,
+          patientId: patient._id,
+        },
+      });
+    } else
+      this.setState({
+        selectedPatient: patient,
+        searchQuery: "",
+        data: {
+          ...data,
+          patientId: patient._id,
+        },
+      });
+  };
   handleSelectedDent = (e, indexActe, indexDent) => {
     let selectedDents = [...this.state.selectedDents];
     let selectedDent = { ...selectedDents[indexActe] };
     const selected = this.state.dents.find(
-      (item) => item._id === e.target.value
+      (item) => item._id === e.target.value,
     );
     selectedDent[indexDent] = selected;
     selectedDents[indexActe] = selectedDent;
@@ -238,7 +332,6 @@ class DeviForm extends Form {
 
   render() {
     const {
-      cabinets,
       medecins,
       nombreActes,
       nombreDentsPerActe,
@@ -249,187 +342,278 @@ class DeviForm extends Form {
       colors,
       selectedActes,
       dents,
+      filteredPatients,
+      searchQuery,
+      selectedPatient,
     } = this.state;
     let colorDents = {};
     selectedDents.map((acteDentItems, indexActeDents) => {
       for (const dentItem in acteDentItems) {
         if (acteDentItems[dentItem])
-          colorDents[acteDentItems[dentItem]["numero"]] =
+          colorDents[acteDentItems[dentItem]["numeroFDI"]] =
             colors[selectedNatureActes[indexActeDents]["nom"]];
       }
       return "";
     });
     return (
-      <div className="devi-form">
-        <div className="form-container">
-          <h1 className="titre-form">Actes à éffectués</h1>
-          <form className="form" onSubmit={this.handleSubmit}>
-            <Input
-              type="text"
-              name="nombreActe"
-              value={nombreActes}
-              label="Nombre des actes"
-              onChange={this.defineActeLines}
-              width={20}
-            />
-            {this.renderDate("dateDevi", "Date")}
-            <div className="inline-form-devi">
-              {this.renderSelect("cabinetId", "Cabinet", cabinets)}
-              {this.renderSelect("medecinId", "Medecin", medecins)}
-              {this.renderBoolean(
-                "isHygieneDent",
-                "Hygiène Bucco Dentaire",
-                "oui",
-                "non"
-              )}
+      <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+        <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+          Formulaire du devis
+        </p>
+        <div className="ml-2  flex justify-start">
+          <button
+            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            onClick={() => {
+              this.props.history.push("/devis");
+            }}
+          >
+            <IoChevronBackCircleSharp className="mr-1 " />
+            Retour à la Liste
+          </button>
+        </div>
+        {this.props.match.params.id === "new" && (
+          <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
+            <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
+              Chercher un patient
             </div>
-            <div className="component-body">
-              <table className="table-component">
-                <thead className="table-header">
-                  <tr>
-                    {/* <th>N° Acte</th> */}
-                    <th>Nature Acte</th>
-                    <th>Code Acte</th>
-                    <th>Description</th>
-                    <th>Nombre Dent</th>
-                    <th>Dent</th>
-                  </tr>
-                </thead>
+            <div className="flex w-fit items-start ">
+              <SearchBox
+                value={searchQuery}
+                onChange={(e) => {
+                  this.setState({
+                    searchQuery: e,
+                  });
+                }}
+              />
+              <div className="flex flex-wrap">
+                {filteredPatients.map((patient) => (
+                  <div
+                    className=" w-fit cursor-pointer  items-center justify-between pl-2  hover:bg-[#e6e2d613]"
+                    key={patient._id}
+                    onClick={() => {
+                      this.onSelectPatient(patient);
+                    }}
+                  >
+                    <p className=" mb-1 rounded-md bg-slate-400 p-2 text-xs font-bold leading-4">
+                      {`${patient.nom} ${patient.prenom}`}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        {Object.keys(selectedPatient).length !== 0 && (
+          <>
+            <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
+              <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
+            </div>
+            <ActesEffectuesTable
+              actesEffectuees={this.state.acteEffectues}
+              onSort={this.handleSort}
+              sortColumn={this.state.sortColumn}
+            />
+            <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+              Actes à éffectués
+            </p>
+            <form onSubmit={this.handleSubmit}>
+              <div className="flex flex-wrap">
+                <div className="mt-3">
+                  <Input
+                    type="text"
+                    name="nombreActe"
+                    value={nombreActes}
+                    label="Nombre des actes"
+                    onChange={this.defineActeLines}
+                    width={170}
+                    height={35}
+                    widthLabel={140}
+                  />
+                </div>
+                <div className="mt-3">
+                  {this.renderDate("dateDevi", "Date", 170, 35, 140)}
+                </div>
+                <div className="mt-3">
+                  {this.renderSelect(
+                    "medecinId",
+                    "Medecin",
+                    medecins,
+                    170,
+                    35,
+                    140,
+                  )}
+                </div>
+              </div>
+              <div className="flex">
+                <table className="my-0 h-fit w-full">
+                  <thead className="h-12  text-[#4f5361]">
+                    <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
+                      {/* <th>N° Acte</th> */}
+                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        Nature Acte
+                      </th>
+                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        Code Acte
+                      </th>
+                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        Description
+                      </th>
+                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        Nombre Dent
+                      </th>
+                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        Dent
+                      </th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {_.times(nombreActes, (indexActe) => {
-                    return (
-                      <tr
-                        key={"acte" + indexActe}
-                        style={
-                          selectedNatureActes[indexActe]
-                            ? {
-                                background:
-                                  colors[selectedNatureActes[indexActe].nom],
-                              }
-                            : {}
-                        }
-                      >
-                        <td>
-                          <Select
-                            name="natureActe"
-                            options={natureActes}
-                            onChange={(e) =>
-                              this.handleSelectedNature(e, indexActe)
-                            }
-                          />
-                        </td>
-                        <td>
-                          {filteredActeDentaires[indexActe] &&
-                          filteredActeDentaires[indexActe].length !== 0 ? (
-                            <div className="select-component">
-                              <select
-                                name="codeActe"
-                                id="codeActe"
-                                onChange={(e) =>
-                                  this.handleSelectedActe(e, indexActe)
+                  <tbody>
+                    {_.times(nombreActes, (indexActe) => {
+                      return (
+                        <tr
+                          key={"acte" + indexActe}
+                          className="h-12 bg-[#dedcf1]  text-center"
+                          style={
+                            selectedNatureActes[indexActe]
+                              ? {
+                                  background:
+                                    colors[selectedNatureActes[indexActe].nom],
                                 }
-                              >
-                                <option value="" />
-                                {filteredActeDentaires[indexActe].map(
-                                  (option) => {
-                                    return (
-                                      <option
-                                        key={indexActe + option._id}
-                                        value={option._id}
-                                      >
-                                        {option.code}
-                                      </option>
-                                    );
-                                  }
-                                )}
-                              </select>
-                            </div>
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                        <td className="item-nom">
-                          {selectedActes[indexActe]
-                            ? selectedActes[indexActe].nom
-                            : ""}
-                        </td>
-                        <td>
-                          <Input
-                            type="text"
-                            name="nombreDent"
-                            value={
-                              nombreDentsPerActe[indexActe]
-                                ? nombreDentsPerActe[indexActe]
-                                : 0
-                            }
-                            onChange={(e) =>
-                              this.defineNombreDentsPerActe(e, indexActe)
-                            }
-                            width={20}
-                          />
-                        </td>
-
-                        {selectedActes[indexActe] ? (
-                          <td className="item-dent">
-                            {_.times(
-                              nombreDentsPerActe[indexActe],
-                              (indexDent) => {
-                                return (
-                                  <div
-                                    className="select-component"
-                                    key={indexActe + indexDent}
-                                  >
-                                    <select
-                                      name="dent"
-                                      key={
-                                        "acte" + indexActe + "dent" + indexDent
-                                      }
-                                      onChange={(e) =>
-                                        this.handleSelectedDent(
-                                          e,
-                                          indexActe,
-                                          indexDent
-                                        )
-                                      }
-                                    >
-                                      <option value="" />
-                                      {dents.map((option) => {
-                                        return (
-                                          <option
-                                            key={
-                                              "acte" +
-                                              indexActe +
-                                              "dent" +
-                                              indexDent +
-                                              option._id
-                                            }
-                                            value={option._id}
-                                          >
-                                            {option.numero}
-                                          </option>
-                                        );
-                                      })}
-                                    </select>
-                                  </div>
-                                );
+                              : {}
+                          }
+                        >
+                          <td>
+                            <Select
+                              name="natureActe"
+                              options={natureActes}
+                              onChange={(e) =>
+                                this.handleSelectedNature(e, indexActe)
                               }
+                              width={170}
+                              height={35}
+                            />
+                          </td>
+                          <td>
+                            {filteredActeDentaires[indexActe] &&
+                            filteredActeDentaires[indexActe].length !== 0 ? (
+                              <div className="flex w-fit flex-wrap">
+                                <select
+                                  name="codeActe"
+                                  id="codeActe"
+                                  className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                  onChange={(e) =>
+                                    this.handleSelectedActe(e, indexActe)
+                                  }
+                                  style={{
+                                    height: 35,
+                                  }}
+                                >
+                                  <option value="" />
+                                  {filteredActeDentaires[indexActe].map(
+                                    (option) => {
+                                      return (
+                                        <option
+                                          key={indexActe + option._id}
+                                          value={option._id}
+                                        >
+                                          {option.code}
+                                        </option>
+                                      );
+                                    },
+                                  )}
+                                </select>
+                              </div>
+                            ) : (
+                              ""
                             )}
                           </td>
-                        ) : (
-                          <td></td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <SchemaDent dents={colorDents} />
-            </div>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {selectedActes[indexActe]
+                              ? selectedActes[indexActe].nom
+                              : ""}
+                          </td>
+                          <td>
+                            <Input
+                              type="number"
+                              name="nombreDent"
+                              value={
+                                nombreDentsPerActe[indexActe]
+                                  ? nombreDentsPerActe[indexActe]
+                                  : 0
+                              }
+                              onChange={(e) =>
+                                this.defineNombreDentsPerActe(e, indexActe)
+                              }
+                              width={60}
+                              height={35}
+                            />
+                          </td>
 
-            {this.renderButton("Sauvegarder")}
-          </form>
-        </div>
+                          {selectedActes[indexActe] ? (
+                            <td className="item-dent">
+                              {_.times(
+                                nombreDentsPerActe[indexActe],
+                                (indexDent) => {
+                                  return (
+                                    <div
+                                      className="flex w-fit flex-wrap"
+                                      key={indexActe + indexDent}
+                                    >
+                                      <select
+                                        name="dent"
+                                        key={
+                                          "acte" +
+                                          indexActe +
+                                          "dent" +
+                                          indexDent
+                                        }
+                                        className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                        onChange={(e) =>
+                                          this.handleSelectedDent(
+                                            e,
+                                            indexActe,
+                                            indexDent,
+                                          )
+                                        }
+                                        style={{ height: 35 }}
+                                      >
+                                        <option value="" />
+                                        {dents.map((option) => {
+                                          return (
+                                            <option
+                                              key={
+                                                "acte" +
+                                                indexActe +
+                                                "dent" +
+                                                indexDent +
+                                                option._id
+                                              }
+                                              value={option._id}
+                                            >
+                                              {option.numeroFDI}
+                                            </option>
+                                          );
+                                        })}
+                                      </select>
+                                    </div>
+                                  );
+                                },
+                              )}
+                            </td>
+                          ) : (
+                            <td></td>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <SchemaDent dents={colorDents} />
+              </div>
+              {this.renderButton("Sauvegarder")}
+            </form>
+          </>
+        )}
       </div>
     );
   }

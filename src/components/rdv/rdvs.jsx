@@ -6,7 +6,6 @@ import { withRouter, useHistory } from "react-router-dom";
 import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
 
 import RdvsTable from "./rdvsTable";
-import SearchBox from "../../common/searchBox";
 
 import _ from "lodash";
 import { toast } from "react-toastify";
@@ -158,7 +157,7 @@ function Rdvs() {
     }
   };
   return (
-    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
       <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
         Liste des rdvs
         {/* <h1 className="rdvs-total total-table">Total: {totalCount} patients</h1> */}

@@ -6,7 +6,6 @@ import { getPatients } from "../../services/patientService";
 import { useHistory } from "react-router-dom";
 
 import AgendaRdv from "./agendaRdv";
-import SearchPatient from "../searchPatient";
 
 import SearchBox from "../../common/searchBox";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
@@ -15,6 +14,7 @@ import Input from "../../common/input";
 function RdvForm(props) {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState({});
+  const [selectedRdv, setSelectedRdv] = useState({});
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const history = useHistory();
@@ -24,6 +24,7 @@ function RdvForm(props) {
       if (props.match.params.id !== "new") {
         const { data: rdvData } = await getRdv(props.match.params.id);
         setSelectedPatient(rdvData.patientId);
+        setSelectedRdv(rdvData);
       } else {
         const { data: patientsData } = await getPatients();
         setPatients(patientsData);
@@ -66,7 +67,7 @@ function RdvForm(props) {
       {/* get the params.id */}
 
       {props.match.params.id === "new" ? (
-        <div className="m-2 flex rounded-sm bg-[#aab9d1] pb-2 pt-2  shadow-md ">
+        <div className="m-2 flex min-w-fit  rounded-sm bg-[#aab9d1] pb-2  pt-2 shadow-md ">
           <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
             Chercher un patient
           </div>
@@ -109,11 +110,10 @@ function RdvForm(props) {
           />
         </div>
       )}
-      {console.log("selectedPatient", selectedPatient)}
       {Object.keys(selectedPatient).length !== 0 ? (
         <AgendaRdv
           selectedPatient={selectedPatient}
-          setSelectedPatient={setSelectedPatient}
+          selectedRdv={selectedRdv}
         />
       ) : (
         ""

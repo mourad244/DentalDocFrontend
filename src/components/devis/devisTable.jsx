@@ -28,9 +28,9 @@ function DevisTable(props) {
       },
     },
     {
-      path: "prix",
-      label: "Prix",
-      content: (devi) => (devi.prix ? `${devi.prix} Dh` : ""),
+      path: "montant",
+      label: "Montant",
+      content: (devi) => (devi.montant ? `${devi.montant} Dh` : ""),
     },
     {
       path: "medecinId",
@@ -43,7 +43,6 @@ function DevisTable(props) {
           : "";
       },
     },
-    { path: "cabinetId.nom", label: "Cabinet" },
   ];
 
   const { devis, onSort, sortColumn } = props;

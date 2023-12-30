@@ -4,13 +4,13 @@ const ButtonType = (text, isActive) => {
   return isActive ? (
     <svg
       width="110"
-      height="24"
+      height="20"
       className="date-button"
-      viewBox="0 0 120 24"
+      viewBox="0 0 100 24"
       fill="none"
     >
       <g id="button-date-active" filter="url(#filterButtonDate)">
-        <text fill="#455a94" fontSize="13" fontWeight="bold">
+        <text fill="#455a94" fontSize="12" fontWeight="bold">
           <tspan x="27" y="17.6523">
             {text.toLocaleUpperCase()}
           </tspan>
@@ -106,13 +106,13 @@ const ButtonType = (text, isActive) => {
   ) : (
     <svg
       width="110"
-      height="24"
+      height="20"
       className="date-button"
-      viewBox="0 0 120 24"
+      viewBox="0 0 100 24"
       fill="none"
     >
       <g id="button-date">
-        <text fill="#455a94" fontSize="13" fontWeight="bold">
+        <text fill="#455a94" fontSize="12" fontWeight="bold">
           <tspan x="27" y="17.6523">
             {text.toLocaleUpperCase()}
           </tspan>

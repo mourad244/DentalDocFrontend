@@ -101,7 +101,7 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/ajouterdevi"
+                to="/devis"
                 onClick={() => {
                   resetIcon();
                   setActiveDevi(true);

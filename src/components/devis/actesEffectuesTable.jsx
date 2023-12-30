@@ -42,9 +42,11 @@ function ActesEffectuesTable(props) {
     return true;
   });
   return (
-    <div className="table-acte-effectue component">
-      <h1 className="component-title">Historique des actes effectués</h1>
-      <div className="component-body">
+    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
+      <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
+        Historique des actes effectués
+      </div>
+      <div className="m-2">
         <Table
           columns={columns}
           data={actesEffectuees}

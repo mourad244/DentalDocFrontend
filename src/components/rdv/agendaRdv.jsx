@@ -109,7 +109,7 @@ const AgendaRdv = (props) => {
     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
       await deleteRdv(deletedDate._id);
       setReload(true);
-      props.history.push("/ajouterrdv");
+      props.history.push("/rdvs");
     } else if (window.confirm("Confirmer l'ajour du rdv")) {
       await saveRdv({
         patientId: selectedPatient._id,

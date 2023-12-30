@@ -56,11 +56,6 @@
   width: fit-content;
   /* justify-content: center; */
 }
-.devi-form .item-nom {
-  font-size: 14px;
-  font-weight: 450;
-  /* width: 400px; */
-}
 
 .inline-form-devi {
   display: flex;

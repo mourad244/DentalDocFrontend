@@ -21,9 +21,9 @@ const BooleanSelect = ({
     return (
       <div className=" flex w-fit flex-wrap">
         <label
-          className="mr-3 w-24 text-right text-xs font-bold leading-[36px] text-[#72757c]"
+          className="mr-3  text-right text-xs font-bold leading-[36px] text-[#72757c]"
           htmlFor={name}
-          style={{ widthLabel }}
+          style={{ width: widthLabel }}
         >
           {label}
         </label>
@@ -49,8 +49,9 @@ const BooleanSelect = ({
     return (
       <div className="flex w-fit flex-wrap">
         <label
-          className="mr-3 w-24 text-right text-xs font-bold leading-[36px] text-[#72757c]"
+          className="mr-3 text-right text-xs font-bold leading-[36px] text-[#72757c]"
           htmlFor={name}
+          style={{ width: widthLabel }}
         >
           {label}
         </label>
