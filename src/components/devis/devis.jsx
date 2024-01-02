@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { withRouter, useHistory } from "react-router-dom";
 
-import { getDevis } from "../../services/deviService";
+import { getDevis, deleteDevi } from "../../services/deviService";
 import { getMedecins } from "../../services/medecinService";
-import { getCabinets } from "../../services/cabinetService";
 
 import DevisTable from "./devisTable";
 
 import _ from "lodash";
+import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
 import ClipLoader from "react-spinners/ClipLoader";
-
-import "./devis.css";
 
 function Devis() {
   const date = new Date();
@@ -39,23 +37,32 @@ function Devis() {
   const [selectedFilterItems, setSelectedFilterItems] = useState({
     medecinId: "",
   });
-  const [selectedMedecin, setSelectedMedecin] = useState();
+  const [selectedDevi, setSelectedDevi] = useState(null);
+  const [selectedDevis, setSelectedDevis] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
-  const [sortColumn, setSortColumn] = useState({ path: "prix", order: "asc" });
+  const [sortColumn, setSortColumn] = useState({
+    path: "montant",
+    order: "asc",
+  });
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const history = useHistory();
 
   const [devis, setDevis] = useState([]);
   const [filteredDevis, setFilteredDevis] = useState([]);
   const pageSize = 15;
-
+  const history = useHistory();
+  const fields = [
+    { order: 1, name: "select", label: "Select" },
+    { order: 2, name: "numOrdre", label: "N° ordre" },
+    { order: 3, name: "patientId", label: "Patient" },
+    { order: 6, name: "medecinId", label: "Medecin" },
+    { order: 7, name: "montant", label: "Montant" },
+  ];
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await getMedecins();
-      const medecins = [{ _id: "", nom: "Tous" }, ...data];
+      const { data: medecinsData } = await getMedecins();
       setDatas({
-        medecins,
+        medecins: medecinsData,
       });
     };
     fetchData();
@@ -64,8 +71,8 @@ function Devis() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: devis } = await getDevis();
-      setDevis(devis);
+      const { data: devisData } = await getDevis();
+      setDevis(devisData);
       setLoading(false);
     };
     if (dataUpdated) fetchData();
@@ -108,7 +115,6 @@ function Devis() {
           break;
       }
       const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
       const endOffset = itemOffset + pageSize;
       setFilteredDevis(sorted.slice(itemOffset, endOffset));
       setCurrentPage(Math.ceil(sorted.length / pageSize));
@@ -117,20 +123,70 @@ function Devis() {
     setTotalCount(filtered.length);
   }, [currentPage, itemOffset, devis, sortColumn.order, sortColumn.path, time]);
 
+  const handleDelete = async (items) => {
+    const originalDevis = devis;
+    setDevis(
+      devis.filter((c) => {
+        let founded = items.find((p) => p._id.toString() === c._id.toString());
+        if (founded) return false;
+        return true;
+      }),
+    );
+    setSelectedDevi(null);
+    setSelectedDevis([]);
+    try {
+      items.forEach(async (item) => {
+        await deleteDevi(item._id);
+      });
+      toast.success("devis supprimé");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error("devi déja supprimé");
+      setDevis(originalDevis);
+    }
+  };
+  const handleSelectDevi = (devi) => {
+    let newSelectedDevis = [...selectedDevis];
+
+    const index = newSelectedDevis.findIndex(
+      (c) => c._id.toString() === devi._id.toString(),
+    );
+    if (index === -1) newSelectedDevis.push(devi);
+    else newSelectedDevis.splice(index, 1);
+    let selectedDevi = null;
+    let founded = devis.find((p) => p._id.toString() === devi._id.toString());
+    if (founded && newSelectedDevis.length === 1) selectedDevi = founded;
+    setSelectedDevis(newSelectedDevis);
+    setSelectedDevi(newSelectedDevis.length === 1 ? selectedDevi : null);
+  };
+  const handleSelectDevis = () => {
+    let newSelectedDevis =
+      selectedDevis.length === filteredDevis.length ? [] : [...filteredDevis];
+    setSelectedDevis(newSelectedDevis);
+    setSelectedDevi(newSelectedDevis.length === 1 ? newSelectedDevis[0] : null);
+  };
   const onFilterChange = (name, e) => {
     let newDevis = [...devis];
     let newSelectedFilterItems = { ...selectedFilterItems };
     if (name === "medecinId") {
       if (e.target.value === "") {
-        newSelectedFilterItems[name] = [...devis];
+        newDevis = filteredDevis;
       } else {
-        newDevis = devis.filter((devi) => {
-          return devi.medecinId === e.target.value;
+        newDevis = filteredDevis.filter((devi) => {
+          return devi.medecinId._id.toString() === e.target.value.toString();
         });
       }
+
+      newSelectedFilterItems[name] = e.target.value;
+      setFilteredDevis(newDevis);
     }
+    setSelectedFilterItems(newSelectedFilterItems);
+    setCurrentPage(1);
   };
 
+  const handleEdit = () => {
+    history.push(`/devis/${selectedDevi._id}`);
+  };
   const updateTimeChanged = (index) => (e) => {
     let newArray = [...times];
     newArray.map((data) => (data.active = false));
@@ -210,12 +266,7 @@ function Devis() {
     const newOffset = (event.selected * pageSize) % totalCount;
     setItemOffset(newOffset);
   };
-
-  const handleMedecinSelect = (e) => {
-    setSelectedMedecin(e.target.value);
-    setCurrentPage(1);
-  };
-
+  console.log("filteredDevis", filteredDevis);
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
       {/* <MenuDevi /> */}
@@ -272,7 +323,7 @@ function Devis() {
             </text>
           </svg> */}
       </div>
-      <div className="m-2 flex w-fit flex-wrap">
+      {/* <div className="m-2 flex w-fit flex-wrap">
         <select
           id="classification-medecins"
           onClick={handleMedecinSelect}
@@ -289,35 +340,53 @@ function Devis() {
             );
           })}
         </select>
-      </div>
+      </div> */}
       {loading ? (
         <div className="spinner">
           <ClipLoader loading={loading} size={70} />
         </div>
       ) : (
-        <DevisTable
-          devis={filteredDevis}
-          sortColumn={sortColumn}
-          onSort={handleSort}
-          // datas, selectedFilterItems, onFilterChange,
-          datas={datas}
-
-          //  totalItems, onItemSelect, onItemsSelect, selectedItems,
-          //  selectItem, onPrint, onEdit, onDelete
-        />
+        <div className="m-2">
+          <DevisTable
+            devis={filteredDevis}
+            sortColumn={sortColumn}
+            onSort={handleSort}
+            // datas, selectedFilterItems, onFilterChange,
+            datas={datas}
+            selectedFilterItems={selectedFilterItems}
+            onValueChange={onFilterChange}
+            //  totalItems, onItemSelect, onItemsSelect, selectedItems,
+            headers={fields}
+            totalItems={filteredDevis.length}
+            onItemSelect={handleSelectDevi}
+            onItemsSelect={handleSelectDevis}
+            selectedItems={selectedDevis}
+            selectedItem={selectedDevi}
+            onPrint={() => {
+              console.log("print");
+            }}
+            onEdit={selectedDevi ? handleEdit : undefined}
+            onDelete={
+              selectedDevi !== null || selectedDevis.length !== 0
+                ? handleDelete
+                : undefined
+            }
+            //  selectItem, onPrint, onEdit, onDelete
+          />
+          <ReactPaginate
+            breakLabel={"..."}
+            nextLabel={"Suivant"}
+            breakClassName={"break-me"}
+            pageCount={Math.ceil(totalCount / pageSize)}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            previousLabel={"Précédent"}
+            renderOnZeroPageCount={null}
+            containerClassName={"pagination"}
+          />
+        </div>
       )}
-      <ReactPaginate
-        breakLabel={"..."}
-        nextLabel={"Suivant"}
-        breakClassName={"break-me"}
-        pageCount={Math.ceil(totalCount / pageSize)}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageClick}
-        previousLabel={"Précédent"}
-        renderOnZeroPageCount={null}
-        containerClassName={"pagination"}
-      />
     </div>
   );
 }

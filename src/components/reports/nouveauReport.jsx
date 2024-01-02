@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import MenuReport from "./menuReport";
-import "../devis/nouveauDevi.css";
 import ReportForm from "./reportForm";
 import SearchPatient from "../searchPatient";
 

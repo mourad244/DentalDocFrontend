@@ -11,10 +11,6 @@ function PaiementsTable(props) {
       label: "Adherence",
     },
     {
-      path: "patientId.gradeId.nom",
-      label: "Grade",
-    },
-    {
       path: "patientId.nom",
       label: "Nom",
     },

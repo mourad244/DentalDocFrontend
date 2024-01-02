@@ -101,11 +101,7 @@ class DeviForm extends Form {
             //       date
             acte.date = itemDevi.dateDevi;
             //       medecinId
-            acte.medecin = `${
-              itemDevi.medecinId && itemDevi.medecinId.gradeId
-                ? itemDevi.medecinId.gradeId.nom
-                : ""
-            } ${itemDevi.medecinId.nom} ${
+            acte.medecin = `${itemDevi.medecinId.nom} ${
               itemDevi.medecinId.prenom ? itemDevi.medecinId.prenom : ""
             } `;
             //       nature Acte
@@ -367,7 +363,7 @@ class DeviForm extends Form {
               this.props.history.push("/devis");
             }}
           >
-            <IoChevronBackCircleSharp className="mr-1 " />
+            <IoChevronBackCircleSharp className="mr-1" />
             Retour à la Liste
           </button>
         </div>

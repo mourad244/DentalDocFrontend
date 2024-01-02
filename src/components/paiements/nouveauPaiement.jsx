@@ -8,7 +8,6 @@ import PaiementForm from "./paiementForm";
 import PatientPaiementsTable from "./patientPaiementsTable";
 import PatientPaiementsReste from "./patientPaiementsReste";
 import SearchPatient from "../searchPatient";
-import "../devis/nouveauDevi.css";
 
 function NouveauPaiement() {
   const [natureActes, setNatureActes] = useState([]);
@@ -64,7 +63,7 @@ function NouveauPaiement() {
         } else
           selectedPatient.paiementIds.map(async (item) => {
             const { data: devi } = await getPaiement(
-              item.paiementId._id || item.paiementId
+              item.paiementId._id || item.paiementId,
             );
             newSelectedPaiements.push(devi);
             return setPaiements([...newSelectedPaiements]);
@@ -79,7 +78,7 @@ function NouveauPaiement() {
           if (paiement.isSoins === false) return acc + paiement.montant;
           else return acc;
         },
-        0
+        0,
       );
       setMontantPayeSoins(newPayeSoins);
       setMontantPayeProtheses(newPayeProtheses);
@@ -117,11 +116,7 @@ function NouveauPaiement() {
               ? itemActe.acteId.natureId.nom
               : "";
             //       medecinId
-            acte.medecin = `${
-              itemDevi.medecinId && itemDevi.medecinId.gradeId
-                ? itemDevi.medecinId.gradeId.nom
-                : ""
-            } ${itemDevi.medecinId.nom} ${
+            acte.medecin = `${itemDevi.medecinId.nom} ${
               itemDevi.medecinId.prenom ? itemDevi.medecinId.prenom : ""
             } `;
             //       dent

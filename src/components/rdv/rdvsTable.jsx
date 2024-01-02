@@ -24,7 +24,6 @@ function RdvsTable(props) {
       content: (rdv) => {
         return (
           <label key={rdv._id}>
-            {rdv.patientId.gradeId ? rdv.patientId.gradeId.nom : " "}
             {rdv.patientId.nom} {rdv.patientId.prenom}
           </label>
         );

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+
+import Select from "../../common/select";
+import CustomeTable from "../../common/CustomeTable";
+
+import Moment from "react-moment";
+import { v4 as uuidv4 } from "uuid";
+import { FaPrint } from "react-icons/fa";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { AiFillDelete } from "react-icons/ai";
-import { FaPrint } from "react-icons/fa";
-import { v4 as uuidv4 } from "uuid";
-import Moment from "react-moment";
-import Select from "../../common/select";
-
-import CustomeTable from "../../common/CustomeTable";
 
 function PatientsTable({
   datas,
@@ -267,7 +268,7 @@ function PatientsTable({
   );
 
   const itemActions = (
-    <div className="m-1 mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""

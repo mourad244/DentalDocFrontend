@@ -14,7 +14,6 @@ import RdvForm from "./components/rdv/rdvForm";
 import Accueil from "./components/accueil/accueil";
 import Patients from "./components/patients/patients";
 import Settings from "./components/settings/settings";
-import NouveauDevi from "./components/devis/nouveauDevi";
 import Paiements from "./components/paiements/paiements";
 import DeviForm from "./components/devis/deviForm";
 import PatientForm from "./components/patients/patientForm";

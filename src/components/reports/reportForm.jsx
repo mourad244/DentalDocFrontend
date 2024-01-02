@@ -38,7 +38,6 @@ class ReportForm extends Form {
     newPatient.report.recetteProtheses = this.state.data.recetteProtheses;
     newPatient.report.isAJour = true;
     newPatient.adherenceId = newPatient.adherenceId._id;
-    newPatient.gradeId = newPatient.gradeId._id;
     if (newPatient.serviceArmeId)
       newPatient.serviceArmeId = newPatient.serviceArmeId._id;
     delete newPatient.__v;

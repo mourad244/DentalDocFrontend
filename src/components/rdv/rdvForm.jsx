@@ -66,7 +66,7 @@ function RdvForm(props) {
       </div>
       {/* get the params.id */}
 
-      {props.match.params.id === "new" ? (
+      {props.match.params.id === "new" && (
         <div className="m-2 flex min-w-fit  rounded-sm bg-[#aab9d1] pb-2  pt-2 shadow-md ">
           <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
             Chercher un patient
@@ -85,6 +85,8 @@ function RdvForm(props) {
                   key={patient._id}
                   onClick={() => {
                     setSelectedPatient(patient);
+                    setFilteredPatients([]);
+                    setSearchQuery("");
                   }}
                 >
                   <p className=" mb-1 rounded-md bg-slate-400 p-2 text-xs font-bold leading-4">
@@ -95,28 +97,17 @@ function RdvForm(props) {
             </div>
           </div>
         </div>
-      ) : (
-        <div className="mt-3 flex flex-row">
-          <Input
-            type="text"
-            name="patient"
-            value={`${selectedPatient.nom} ${selectedPatient.prenom}`}
-            label="Patient"
-            width={180}
-            disabled={true}
-            onChange={() => {}}
-            height={35}
-            widthLabel={96}
-          />
-        </div>
       )}
-      {Object.keys(selectedPatient).length !== 0 ? (
-        <AgendaRdv
-          selectedPatient={selectedPatient}
-          selectedRdv={selectedRdv}
-        />
-      ) : (
-        ""
+      {Object.keys(selectedPatient).length !== 0 && (
+        <>
+          <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
+            <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
+          </div>
+          <AgendaRdv
+            selectedPatient={selectedPatient}
+            selectedRdv={selectedRdv}
+          />
+        </>
       )}
     </div>
   );
