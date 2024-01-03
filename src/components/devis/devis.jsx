@@ -266,7 +266,6 @@ function Devis() {
     const newOffset = (event.selected * pageSize) % totalCount;
     setItemOffset(newOffset);
   };
-  console.log("filteredDevis", filteredDevis);
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
       {/* <MenuDevi /> */}

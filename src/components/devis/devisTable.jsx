@@ -116,7 +116,6 @@ function DevisTable({
       </tr>
     );
   });
-  console.log("selectedFilterItems", selectedFilterItems);
   const filterFunctions = (
     <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
       <div className="m-2">

@@ -46,13 +46,15 @@ function ActesEffectuesTable(props) {
       <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
         Historique des actes effectués
       </div>
-      <div className="m-2">
-        <Table
-          columns={columns}
-          data={actesEffectuees}
-          sortColumn={sortColumn}
-          onSort={onSort}
-        />
+      <div className="m-2 flex">
+        <div className="mr-2">
+          <Table
+            columns={columns}
+            data={actesEffectuees}
+            sortColumn={sortColumn}
+            onSort={onSort}
+          />
+        </div>
         <SchemaDent dents={colorDents} />
       </div>
     </div>

@@ -38,7 +38,7 @@ class DeviForm extends Form {
     dents: [],
     sortColumn: { path: "date", order: "desc" },
     devis: [],
-    acteEffectues: [],
+    actesEffectues: [],
     nombreActes: 1,
     selectedNatureActes: [],
     selectedActes: [],
@@ -130,48 +130,17 @@ class DeviForm extends Form {
   }
 
   doSubmit = async () => {
-    let selectedNatureActes = [...this.state.selectedNatureActes];
     let selectedActes = [...this.state.selectedActes];
-    let prixSoins = 0;
-    let prixProtheses = 0;
     let montant = 0;
-
     selectedActes.map((acteItem, index) => {
-      // ajouter acteItem.prix to prix
       montant += acteItem.prix;
     });
 
-    // selectedNatureActes.map((natureItem, index) => {
-    //   if (natureItem) {
-    //     if (natureItem.nom === "Prothèses") {
-    //       return this.props.selectedPatient.adherenceId.nom === "A"
-    //         ? (prixProtheses += selectedActes[index].FA)
-    //         : (prixProtheses +=
-    //             selectedActes[index][
-    //               this.props.selectedPatient.adherenceId.nom
-    //             ]);
-    //     } else {
-    //       return this.props.selectedPatient.adherenceId.nom === "A"
-    //         ? (prixSoins += selectedActes[index].FA)
-    //         : (prixSoins +=
-    //             selectedActes[index][
-    //               this.props.selectedPatient.adherenceId.nom
-    //             ]);
-    //     }
-    //   } else return "";
-    // });
-
     let newData = { ...this.state.data };
-    // newData.montantSoins = prixSoins;
-    // newData.montantProtheses = prixProtheses;
     newData.montant = montant;
 
     await saveDevi(newData);
     this.props.history.push("/devis");
-    // if (this.props.match) this.props.history.push("/devis");
-    // else {
-    //   window.location.reload();
-    // }
   };
   defineActeLines = (e) => {
     e.preventDefault();
@@ -272,7 +241,7 @@ class DeviForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-  onSelectPatient = (patient) => {
+  onSelectPatient = async (patient) => {
     let data = { ...this.state.data };
 
     if (
@@ -281,10 +250,10 @@ class DeviForm extends Form {
       patient.deviIds.length !== 0
     ) {
       let newSelectedDevis = [];
-      patient.deviIds.map(async (item) => {
-        const { data: devi } = await getDevi(item.deviId._id || item.deviId);
-        newSelectedDevis.push(devi);
-      });
+      const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
+      const devisResults = await Promise.all(promises);
+      newSelectedDevis = devisResults.map(({ data: devi }) => devi);
+
       return this.setState({
         devis: [...newSelectedDevis],
         selectedPatient: patient,
@@ -405,209 +374,213 @@ class DeviForm extends Form {
               <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
             </div>
             <ActesEffectuesTable
-              actesEffectuees={this.state.acteEffectues}
+              actesEffectuees={this.state.actesEffectues}
               onSort={this.handleSort}
               sortColumn={this.state.sortColumn}
             />
-            <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-              Actes à éffectués
-            </p>
-            <form onSubmit={this.handleSubmit}>
-              <div className="flex flex-wrap">
-                <div className="mt-3">
-                  <Input
-                    type="text"
-                    name="nombreActe"
-                    value={nombreActes}
-                    label="Nombre des actes"
-                    onChange={this.defineActeLines}
-                    width={170}
-                    height={35}
-                    widthLabel={140}
-                  />
+            <div>
+              <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+                Actes à éffectués
+              </p>
+              <form onSubmit={this.handleSubmit}>
+                <div className="flex flex-wrap">
+                  <div className="mt-3">
+                    <Input
+                      type="text"
+                      name="nombreActe"
+                      value={nombreActes}
+                      label="Nombre des actes"
+                      onChange={this.defineActeLines}
+                      width={170}
+                      height={35}
+                      widthLabel={140}
+                    />
+                  </div>
+                  <div className="mt-3">
+                    {this.renderDate("dateDevi", "Date", 170, 35, 140)}
+                  </div>
+                  <div className="mt-3">
+                    {this.renderSelect(
+                      "medecinId",
+                      "Medecin",
+                      medecins,
+                      170,
+                      35,
+                      140,
+                    )}
+                  </div>
                 </div>
-                <div className="mt-3">
-                  {this.renderDate("dateDevi", "Date", 170, 35, 140)}
-                </div>
-                <div className="mt-3">
-                  {this.renderSelect(
-                    "medecinId",
-                    "Medecin",
-                    medecins,
-                    170,
-                    35,
-                    140,
-                  )}
-                </div>
-              </div>
-              <div className="flex">
-                <table className="my-0 h-fit w-full">
-                  <thead className="h-12  text-[#4f5361]">
-                    <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
-                      {/* <th>N° Acte</th> */}
-                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                        Nature Acte
-                      </th>
-                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                        Code Acte
-                      </th>
-                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                        Description
-                      </th>
-                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                        Nombre Dent
-                      </th>
-                      <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                        Dent
-                      </th>
-                    </tr>
-                  </thead>
+                <div className="m-2 flex">
+                  <table className="my-0 mr-2 h-fit w-full">
+                    <thead className="h-12  text-[#4f5361]">
+                      <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
+                        {/* <th>N° Acte</th> */}
+                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                          Nature Acte
+                        </th>
+                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                          Code Acte
+                        </th>
+                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                          Description
+                        </th>
+                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                          Nombre Dent
+                        </th>
+                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                          Dent
+                        </th>
+                      </tr>
+                    </thead>
 
-                  <tbody>
-                    {_.times(nombreActes, (indexActe) => {
-                      return (
-                        <tr
-                          key={"acte" + indexActe}
-                          className="h-12 bg-[#dedcf1]  text-center"
-                          style={
-                            selectedNatureActes[indexActe]
-                              ? {
-                                  background:
-                                    colors[selectedNatureActes[indexActe].nom],
-                                }
-                              : {}
-                          }
-                        >
-                          <td>
-                            <Select
-                              name="natureActe"
-                              options={natureActes}
-                              onChange={(e) =>
-                                this.handleSelectedNature(e, indexActe)
-                              }
-                              width={170}
-                              height={35}
-                            />
-                          </td>
-                          <td>
-                            {filteredActeDentaires[indexActe] &&
-                            filteredActeDentaires[indexActe].length !== 0 ? (
-                              <div className="flex w-fit flex-wrap">
-                                <select
-                                  name="codeActe"
-                                  id="codeActe"
-                                  className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                                  onChange={(e) =>
-                                    this.handleSelectedActe(e, indexActe)
+                    <tbody>
+                      {_.times(nombreActes, (indexActe) => {
+                        return (
+                          <tr
+                            key={"acte" + indexActe}
+                            className="h-12 bg-[#dedcf1]  text-center"
+                            style={
+                              selectedNatureActes[indexActe]
+                                ? {
+                                    background:
+                                      colors[
+                                        selectedNatureActes[indexActe].nom
+                                      ],
                                   }
-                                  style={{
-                                    height: 35,
-                                  }}
-                                >
-                                  <option value="" />
-                                  {filteredActeDentaires[indexActe].map(
-                                    (option) => {
-                                      return (
-                                        <option
-                                          key={indexActe + option._id}
-                                          value={option._id}
-                                        >
-                                          {option.code}
-                                        </option>
-                                      );
-                                    },
-                                  )}
-                                </select>
-                              </div>
-                            ) : (
-                              ""
-                            )}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {selectedActes[indexActe]
-                              ? selectedActes[indexActe].nom
-                              : ""}
-                          </td>
-                          <td>
-                            <Input
-                              type="number"
-                              name="nombreDent"
-                              value={
-                                nombreDentsPerActe[indexActe]
-                                  ? nombreDentsPerActe[indexActe]
-                                  : 0
-                              }
-                              onChange={(e) =>
-                                this.defineNombreDentsPerActe(e, indexActe)
-                              }
-                              width={60}
-                              height={35}
-                            />
-                          </td>
-
-                          {selectedActes[indexActe] ? (
-                            <td className="item-dent">
-                              {_.times(
-                                nombreDentsPerActe[indexActe],
-                                (indexDent) => {
-                                  return (
-                                    <div
-                                      className="flex w-fit flex-wrap"
-                                      key={indexActe + indexDent}
-                                    >
-                                      <select
-                                        name="dent"
-                                        key={
-                                          "acte" +
-                                          indexActe +
-                                          "dent" +
-                                          indexDent
-                                        }
-                                        className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                                        onChange={(e) =>
-                                          this.handleSelectedDent(
-                                            e,
-                                            indexActe,
-                                            indexDent,
-                                          )
-                                        }
-                                        style={{ height: 35 }}
-                                      >
-                                        <option value="" />
-                                        {dents.map((option) => {
-                                          return (
-                                            <option
-                                              key={
-                                                "acte" +
-                                                indexActe +
-                                                "dent" +
-                                                indexDent +
-                                                option._id
-                                              }
-                                              value={option._id}
-                                            >
-                                              {option.numeroFDI}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                    </div>
-                                  );
-                                },
+                                : {}
+                            }
+                          >
+                            <td>
+                              <Select
+                                name="natureActe"
+                                options={natureActes}
+                                onChange={(e) =>
+                                  this.handleSelectedNature(e, indexActe)
+                                }
+                                width={170}
+                                height={35}
+                              />
+                            </td>
+                            <td>
+                              {filteredActeDentaires[indexActe] &&
+                              filteredActeDentaires[indexActe].length !== 0 ? (
+                                <div className="flex w-fit flex-wrap">
+                                  <select
+                                    name="codeActe"
+                                    id="codeActe"
+                                    className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                    onChange={(e) =>
+                                      this.handleSelectedActe(e, indexActe)
+                                    }
+                                    style={{
+                                      height: 35,
+                                    }}
+                                  >
+                                    <option value="" />
+                                    {filteredActeDentaires[indexActe].map(
+                                      (option) => {
+                                        return (
+                                          <option
+                                            key={indexActe + option._id}
+                                            value={option._id}
+                                          >
+                                            {option.code}
+                                          </option>
+                                        );
+                                      },
+                                    )}
+                                  </select>
+                                </div>
+                              ) : (
+                                ""
                               )}
                             </td>
-                          ) : (
-                            <td></td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <SchemaDent dents={colorDents} />
-              </div>
-              {this.renderButton("Sauvegarder")}
-            </form>
+                            <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                              {selectedActes[indexActe]
+                                ? selectedActes[indexActe].nom
+                                : ""}
+                            </td>
+                            <td>
+                              <Input
+                                type="number"
+                                name="nombreDent"
+                                value={
+                                  nombreDentsPerActe[indexActe]
+                                    ? nombreDentsPerActe[indexActe]
+                                    : 0
+                                }
+                                onChange={(e) =>
+                                  this.defineNombreDentsPerActe(e, indexActe)
+                                }
+                                width={60}
+                                height={35}
+                              />
+                            </td>
+
+                            {selectedActes[indexActe] ? (
+                              <td className="item-dent">
+                                {_.times(
+                                  nombreDentsPerActe[indexActe],
+                                  (indexDent) => {
+                                    return (
+                                      <div
+                                        className="flex w-fit flex-wrap"
+                                        key={indexActe + indexDent}
+                                      >
+                                        <select
+                                          name="dent"
+                                          key={
+                                            "acte" +
+                                            indexActe +
+                                            "dent" +
+                                            indexDent
+                                          }
+                                          className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                          onChange={(e) =>
+                                            this.handleSelectedDent(
+                                              e,
+                                              indexActe,
+                                              indexDent,
+                                            )
+                                          }
+                                          style={{ height: 35 }}
+                                        >
+                                          <option value="" />
+                                          {dents.map((option) => {
+                                            return (
+                                              <option
+                                                key={
+                                                  "acte" +
+                                                  indexActe +
+                                                  "dent" +
+                                                  indexDent +
+                                                  option._id
+                                                }
+                                                value={option._id}
+                                              >
+                                                {option.numeroFDI}
+                                              </option>
+                                            );
+                                          })}
+                                        </select>
+                                      </div>
+                                    );
+                                  },
+                                )}
+                              </td>
+                            ) : (
+                              <td></td>
+                            )}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <SchemaDent dents={colorDents} />
+                </div>
+                {this.renderButton("Sauvegarder")}
+              </form>
+            </div>
           </>
         )}
       </div>

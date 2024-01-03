@@ -14,9 +14,9 @@ const Table = ({
 }) => {
   return (
     <>
-      <div className="flex ">{tableControlPanel}</div>
+      <div className="flex">{tableControlPanel}</div>
       {itemActions}
-      <table className=" my-0 w-full">
+      <table className=" my-0 h-fit w-full">
         <TableHeader
           columns={columns}
           isAllSelectedItems={
