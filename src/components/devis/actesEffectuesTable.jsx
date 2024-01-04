@@ -42,8 +42,8 @@ function ActesEffectuesTable(props) {
     return true;
   });
   return (
-    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
-      <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
+    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-sm  bg-[#c4d8b4] shadow-custom ">
+      <div className="w-[100%] bg-[#98c573] p-2 text-xl font-bold text-[#474a52] ">
         Historique des actes effectués
       </div>
       <div className="m-2 flex">

@@ -55,13 +55,74 @@ class DeviForm extends Form {
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
   };
   async populateDatas() {
-    const { data: dents } = await getDents();
-    const { data: medecins } = await getMedecins();
-    const { data: acteDentaires } = await getActeDentaires();
-    const { data: natureActes } = await getNatureActes();
-    const { data: patients } = await getPatients();
-    this.setState({ dents, medecins, acteDentaires, natureActes, patients });
+    try {
+      const deviId = this.props.match.params.id;
+      if (deviId === "new" || deviId === undefined) {
+        const { data: dents } = await getDents();
+        const { data: medecins } = await getMedecins();
+        const { data: acteDentaires } = await getActeDentaires();
+        const { data: natureActes } = await getNatureActes();
+        const { data: patients } = await getPatients();
+        this.setState({
+          dents,
+          medecins,
+          acteDentaires,
+          natureActes,
+          patients,
+        });
+      } else {
+        const { data: devi } = await getDevi(deviId);
+        const { data: dents } = await getDents();
+        const { data: medecins } = await getMedecins();
+        const { data: acteDentaires } = await getActeDentaires();
+        const { data: natureActes } = await getNatureActes();
+
+        this.setState({
+          data: this.mapToViewModel(devi),
+          selectedPatient: devi.patientId,
+          dents,
+          medecins,
+          acteDentaires,
+          natureActes,
+        });
+      }
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        this.props.history.replace(":not-found");
+    }
   }
+
+  onSelectPatient = async (patient) => {
+    let data = { ...this.state.data };
+    if (
+      patient.deviIds !== undefined &&
+      patient.deviIds !== null &&
+      patient.deviIds.length !== 0
+    ) {
+      let newSelectedDevis = [];
+      const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
+      const devisResults = await Promise.all(promises);
+      newSelectedDevis = devisResults.map(({ data: devi }) => devi);
+
+      return this.setState({
+        devis: [...newSelectedDevis],
+        selectedPatient: patient,
+        searchQuery: "",
+        data: {
+          ...data,
+          patientId: patient._id,
+        },
+      });
+    } else
+      this.setState({
+        selectedPatient: patient,
+        searchQuery: "",
+        data: {
+          ...data,
+          patientId: patient._id,
+        },
+      });
+  };
 
   async componentDidMount() {
     await this.populateDatas();
@@ -127,6 +188,15 @@ class DeviForm extends Form {
       });
       this.setState({ actesEffectues: actes });
     }
+  }
+  mapToViewModel(devi) {
+    return {
+      _id: devi._id,
+      patientId: devi.patientId._id,
+      medecinId: devi.medecinId && devi.medecin._id ? devi.medecinId._id : "",
+      dateDevi: devi.dateDevi,
+      acteEffectues: devi.acteEffectues ? devi.acteEffectues : [],
+    };
   }
 
   doSubmit = async () => {
@@ -241,38 +311,7 @@ class DeviForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-  onSelectPatient = async (patient) => {
-    let data = { ...this.state.data };
 
-    if (
-      patient.deviIds !== undefined &&
-      patient.deviIds !== null &&
-      patient.deviIds.length !== 0
-    ) {
-      let newSelectedDevis = [];
-      const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
-      const devisResults = await Promise.all(promises);
-      newSelectedDevis = devisResults.map(({ data: devi }) => devi);
-
-      return this.setState({
-        devis: [...newSelectedDevis],
-        selectedPatient: patient,
-        searchQuery: "",
-        data: {
-          ...data,
-          patientId: patient._id,
-        },
-      });
-    } else
-      this.setState({
-        selectedPatient: patient,
-        searchQuery: "",
-        data: {
-          ...data,
-          patientId: patient._id,
-        },
-      });
-  };
   handleSelectedDent = (e, indexActe, indexDent) => {
     let selectedDents = [...this.state.selectedDents];
     let selectedDent = { ...selectedDents[indexActe] };
@@ -294,7 +333,6 @@ class DeviForm extends Form {
     devis.acteEffectues[indexActe]["dentIds"][indexDent] = acteEffectue.dentIds;
     this.setState({ selectedDents, data: devis });
   };
-
   render() {
     const {
       medecins,
@@ -310,8 +348,12 @@ class DeviForm extends Form {
       filteredPatients,
       searchQuery,
       selectedPatient,
+      data,
+      loading,
     } = this.state;
     let colorDents = {};
+    console.log("data", data);
+    console.log("medecins", medecins);
     selectedDents.map((acteDentItems, indexActeDents) => {
       for (const dentItem in acteDentItems) {
         if (acteDentItems[dentItem])
@@ -320,6 +362,7 @@ class DeviForm extends Form {
       }
       return "";
     });
+
     return (
       <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
@@ -373,13 +416,15 @@ class DeviForm extends Form {
             <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
               <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
             </div>
-            <ActesEffectuesTable
-              actesEffectuees={this.state.actesEffectues}
-              onSort={this.handleSort}
-              sortColumn={this.state.sortColumn}
-            />
-            <div>
-              <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+            {this.props.match.params.id === "new" && (
+              <ActesEffectuesTable
+                actesEffectuees={this.state.actesEffectues}
+                onSort={this.handleSort}
+                sortColumn={this.state.sortColumn}
+              />
+            )}
+            <div className="mt-2 bg-[#a2bdc5]">
+              <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
                 Actes à éffectués
               </p>
               <form onSubmit={this.handleSubmit}>
@@ -438,7 +483,7 @@ class DeviForm extends Form {
                         return (
                           <tr
                             key={"acte" + indexActe}
-                            className="h-12 bg-[#dedcf1]  text-center"
+                            className="h-12 bg-[#dedcf1] text-center"
                             style={
                               selectedNatureActes[indexActe]
                                 ? {
@@ -576,7 +621,7 @@ class DeviForm extends Form {
                       })}
                     </tbody>
                   </table>
-                  <SchemaDent dents={colorDents} />
+                  <SchemaDent className="min-w-fit" dents={colorDents} />
                 </div>
                 {this.renderButton("Sauvegarder")}
               </form>
