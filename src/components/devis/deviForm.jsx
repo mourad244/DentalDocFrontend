@@ -18,6 +18,7 @@ import _ from "lodash";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
+import ClipLoader from "react-spinners/ClipLoader";
 
 class DeviForm extends Form {
   state = {
@@ -26,6 +27,7 @@ class DeviForm extends Form {
       medecinId: "",
       dateDevi: "",
       acteEffectues: [],
+      numOrdre: "",
     },
     errors: {},
     medecins: [],
@@ -46,6 +48,7 @@ class DeviForm extends Form {
     colors: colorsNatureActe,
     filteredActeDentaires: [],
     nombreDentsPerActe: [],
+    loading: true,
   };
   schema = {
     _id: Joi.string(),
@@ -53,43 +56,92 @@ class DeviForm extends Form {
     medecinId: Joi.string().allow("").label("Medecin"),
     dateDevi: Joi.date().label("Date"),
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
+    numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
   };
   async populateDatas() {
-    try {
-      const deviId = this.props.match.params.id;
-      if (deviId === "new" || deviId === undefined) {
-        const { data: dents } = await getDents();
-        const { data: medecins } = await getMedecins();
-        const { data: acteDentaires } = await getActeDentaires();
-        const { data: natureActes } = await getNatureActes();
-        const { data: patients } = await getPatients();
-        this.setState({
-          dents,
-          medecins,
-          acteDentaires,
-          natureActes,
-          patients,
+    this.setState({ loading: false });
+    const deviId = this.props.match.params.id;
+    if (deviId === "new" || deviId === undefined) {
+      const { data: dents } = await getDents();
+      const { data: medecins } = await getMedecins();
+      const { data: acteDentaires } = await getActeDentaires();
+      const { data: natureActes } = await getNatureActes();
+      const { data: patients } = await getPatients();
+      this.setState({
+        dents,
+        medecins,
+        acteDentaires,
+        natureActes,
+        patients,
+      });
+    } else {
+      const { data: devi } = await getDevi(deviId);
+      const { data: dents } = await getDents();
+      const { data: medecins } = await getMedecins();
+      const { data: acteDentaires } = await getActeDentaires();
+      const { data: natureActes } = await getNatureActes();
+      /* 
+                update
+      filteredActeDentaires,
+      selectedNatureActes,
+      selectedActes,
+      nombreDentsPerActe,
+      selectedDents,
+      */
+      let filteredActeDentaires = [];
+      let selectedNatureActes = [];
+      let selectedActes = [];
+      let nombreDentsPerActe = [];
+      let selectedDents = [];
+      devi.acteEffectues.map((itemActe, index) => {
+        let filteredActeDentaire = {};
+        let selectedNatureActe = {};
+        let selectedActe = {};
+        let nombreDents = 0;
+        let selectedDent = {};
+        //       nature Acte
+        selectedNatureActe = itemActe.acteId.natureId
+          ? itemActe.acteId.natureId
+          : "";
+        console.log("selectedNatureActe", selectedNatureActe);
+        //       code acte
+        selectedActe = itemActe.acteId ? itemActe.acteId : "";
+        //       Num Acte
+        //       dent
+        nombreDents = itemActe.dentIds.length;
+        itemActe.dentIds.map((e, indexDent) => {
+          return (selectedDent[indexDent] = e);
         });
-      } else {
-        const { data: devi } = await getDevi(deviId);
-        const { data: dents } = await getDents();
-        const { data: medecins } = await getMedecins();
-        const { data: acteDentaires } = await getActeDentaires();
-        const { data: natureActes } = await getNatureActes();
+        filteredActeDentaire = acteDentaires.filter((e) => {
+          return selectedActe
+            ? e.natureId &&
+                e.natureId._id.toString() === selectedNatureActe._id.toString()
+            : "";
+        });
+        filteredActeDentaires[index] = filteredActeDentaire;
+        selectedNatureActes[index] = selectedNatureActe;
+        selectedActes[index] = selectedActe;
+        nombreDentsPerActe[index] = nombreDents;
+        selectedDents[index] = selectedDent;
+        return true;
+      });
 
-        this.setState({
-          data: this.mapToViewModel(devi),
-          selectedPatient: devi.patientId,
-          dents,
-          medecins,
-          acteDentaires,
-          natureActes,
-        });
-      }
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        this.props.history.replace(":not-found");
+      this.setState({
+        data: this.mapToViewModel(devi),
+        selectedPatient: devi.patientId,
+        dents,
+        medecins,
+        acteDentaires,
+        natureActes,
+        nombreActes: devi.acteEffectues.length,
+        filteredActeDentaires,
+        selectedNatureActes,
+        selectedActes,
+        nombreDentsPerActe,
+        selectedDents,
+      });
     }
+    this.setState({ loaded: true });
   }
 
   onSelectPatient = async (patient) => {
@@ -100,6 +152,7 @@ class DeviForm extends Form {
       patient.deviIds.length !== 0
     ) {
       let newSelectedDevis = [];
+      console.log("patient", patient);
       const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
       const devisResults = await Promise.all(promises);
       newSelectedDevis = devisResults.map(({ data: devi }) => devi);
@@ -188,14 +241,18 @@ class DeviForm extends Form {
       });
       this.setState({ actesEffectues: actes });
     }
+    // if (prevState.loading !== this.state.loading) {
+    //   // this.setState({ loading: false });
+    // }
   }
   mapToViewModel(devi) {
     return {
       _id: devi._id,
       patientId: devi.patientId._id,
-      medecinId: devi.medecinId && devi.medecin._id ? devi.medecinId._id : "",
+      medecinId: devi.medecinId && devi.medecinId._id ? devi.medecinId._id : "",
       dateDevi: devi.dateDevi,
       acteEffectues: devi.acteEffectues ? devi.acteEffectues : [],
+      numOrdre: devi.numOrdre,
     };
   }
 
@@ -203,12 +260,11 @@ class DeviForm extends Form {
     let selectedActes = [...this.state.selectedActes];
     let montant = 0;
     selectedActes.map((acteItem, index) => {
-      montant += acteItem.prix;
+      return (montant += acteItem.prix);
     });
 
     let newData = { ...this.state.data };
     newData.montant = montant;
-
     await saveDevi(newData);
     this.props.history.push("/devis");
   };
@@ -348,12 +404,9 @@ class DeviForm extends Form {
       filteredPatients,
       searchQuery,
       selectedPatient,
-      data,
       loading,
     } = this.state;
     let colorDents = {};
-    console.log("data", data);
-    console.log("medecins", medecins);
     selectedDents.map((acteDentItems, indexActeDents) => {
       for (const dentItem in acteDentItems) {
         if (acteDentItems[dentItem])
@@ -363,7 +416,11 @@ class DeviForm extends Form {
       return "";
     });
 
-    return (
+    return loading ? (
+      <div className="spinner">
+        <ClipLoader loading={loading} size={70} />
+      </div>
+    ) : (
       <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
           Formulaire du devis
@@ -431,7 +488,7 @@ class DeviForm extends Form {
                 <div className="flex flex-wrap">
                   <div className="mt-3">
                     <Input
-                      type="text"
+                      type="number"
                       name="nombreActe"
                       value={nombreActes}
                       label="Nombre des actes"
@@ -504,6 +561,11 @@ class DeviForm extends Form {
                                 }
                                 width={170}
                                 height={35}
+                                value={
+                                  selectedNatureActes[indexActe]
+                                    ? selectedNatureActes[indexActe]._id
+                                    : ""
+                                }
                               />
                             </td>
                             <td>
@@ -520,6 +582,11 @@ class DeviForm extends Form {
                                     style={{
                                       height: 35,
                                     }}
+                                    value={
+                                      selectedActes[indexActe]
+                                        ? selectedActes[indexActe]._id
+                                        : ""
+                                    }
                                   >
                                     <option value="" />
                                     {filteredActeDentaires[indexActe].map(
