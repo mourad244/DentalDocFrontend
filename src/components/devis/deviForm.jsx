@@ -53,7 +53,7 @@ class DeviForm extends Form {
   schema = {
     _id: Joi.string(),
     patientId: Joi.string().allow("").label("Patient"),
-    medecinId: Joi.string().allow("").label("Medecin"),
+    medecinId: Joi.string().required().label("Medecin"),
     dateDevi: Joi.date().label("Date"),
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
     numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
@@ -103,7 +103,6 @@ class DeviForm extends Form {
         selectedNatureActe = itemActe.acteId.natureId
           ? itemActe.acteId.natureId
           : "";
-        console.log("selectedNatureActe", selectedNatureActe);
         //       code acte
         selectedActe = itemActe.acteId ? itemActe.acteId : "";
         //       Num Acte
@@ -152,7 +151,6 @@ class DeviForm extends Form {
       patient.deviIds.length !== 0
     ) {
       let newSelectedDevis = [];
-      console.log("patient", patient);
       const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
       const devisResults = await Promise.all(promises);
       newSelectedDevis = devisResults.map(({ data: devi }) => devi);
@@ -656,6 +654,17 @@ class DeviForm extends Form {
                                             )
                                           }
                                           style={{ height: 35 }}
+                                          value={
+                                            selectedDents[indexActe]
+                                              ? selectedDents[indexActe][
+                                                  indexDent
+                                                ]
+                                                ? selectedDents[indexActe][
+                                                    indexDent
+                                                  ]._id
+                                                : ""
+                                              : ""
+                                          }
                                         >
                                           <option value="" />
                                           {dents.map((option) => {
