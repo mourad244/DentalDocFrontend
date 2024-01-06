@@ -255,9 +255,14 @@ class DeviForm extends Form {
 
   doSubmit = async () => {
     let data = { ...this.state.data };
+    let selectedActes = [...this.state.selectedActes];
     let montant = 0;
-    this.state.data.acteEffectues.map((acteItem, index) => {
-      return (montant += acteItem.prix);
+    data.acteEffectues.map((acteItem, index) => {
+      if (acteItem.prix) {
+        return (montant += acteItem.prix);
+      } else if (selectedActes[index] && selectedActes[index].prix) {
+        return (montant += selectedActes[index].prix);
+      } else return (montant += 0);
     });
     data.montant = montant;
     await saveDevi(data);
