@@ -113,11 +113,7 @@ function App() {
             )}
             {/* paiements */}
             {user.role === "admin" || user.role === "comptable" ? (
-              <Route
-                path="/ajouterpaiement"
-                exact
-                component={NouveauPaiement}
-              />
+              <Route path="/paiements/:id" exact component={NouveauPaiement} />
             ) : (
               ""
             )}

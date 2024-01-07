@@ -25,7 +25,7 @@ class DeviForm extends Form {
     data: {
       patientId: "",
       medecinId: "",
-      dateDevi: "",
+      dateDevi: new Date(),
       acteEffectues: [],
       numOrdre: "",
     },
@@ -198,10 +198,8 @@ class DeviForm extends Form {
         : this.setState({ filteredPatients: newFilteredPatients });
     }
     if (prevState.devis !== this.state.devis) {
-      console.log("devis", this.state.devis);
       let actes = [];
       this.state.devis.map((itemDevi) => {
-        //----------in array inside acteId -------
         if (itemDevi.acteEffectues !== undefined)
           itemDevi.acteEffectues.map((itemActe) => {
             let acte = {
@@ -211,6 +209,7 @@ class DeviForm extends Form {
               code: "",
               nom: "",
               dents: [],
+              prix: 0,
             };
             //       date
             acte.date = itemDevi.dateDevi;
@@ -234,6 +233,7 @@ class DeviForm extends Form {
               return (dents += e.numeroFDI + "-");
             });
             acte.dents = dents;
+            acte.prix = itemActe.prix ? itemActe.prix : 0;
             actes.push(acte);
             return true;
           });
@@ -556,8 +556,8 @@ class DeviForm extends Form {
                     )} */}
                   </div>
                 </div>
-                <div className="m-2 flex">
-                  <table className="my-0 mr-2 h-fit w-full">
+                <div className="m-2 flex justify-between">
+                  <table className="my-0 mr-2 h-fit w-fit">
                     <thead className="h-12  text-[#4f5361]">
                       <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
                         {/* <th>N° Acte</th> */}

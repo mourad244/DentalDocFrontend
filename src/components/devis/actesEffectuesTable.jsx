@@ -2,7 +2,6 @@ import React from "react";
 import Table from "../../common/table";
 import Moment from "react-moment";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
-import "./actesEffectuesTable.css";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 
 function ActesEffectuesTable(props) {
@@ -27,6 +26,7 @@ function ActesEffectuesTable(props) {
       },
     },
     { path: "medecin", label: "Medecin" },
+    { path: "prix", label: "Prix" },
   ];
 
   const { actesEffectuees, onSort, sortColumn } = props;
@@ -46,7 +46,7 @@ function ActesEffectuesTable(props) {
       <div className="w-[100%] bg-[#98c573] p-2 text-xl font-bold text-[#474a52] ">
         Historique des actes effectués
       </div>
-      <div className="m-2 flex">
+      <div className="m-2 flex justify-between">
         <div className="mr-2">
           <Table
             columns={columns}

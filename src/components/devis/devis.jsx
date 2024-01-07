@@ -266,7 +266,6 @@ function Devis() {
   };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
-      {/* <MenuDevi /> */}
       <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
         Liste des devis
       </div>
@@ -277,10 +276,10 @@ function Devis() {
             history.push("/devis/new");
           }}
         >
-          Nouveau devis
+          Nouveau devi
         </button>
       </div>
-      <div className="flex h-14">
+      <div className="mx-2 flex h-14">
         <ul className="m-auto flex list-none rounded-md bg-[#f5f5f5] p-2 shadow-custom">
           {times.map((data, index) => (
             <li key={data.nom + index} onClick={updateTimeChanged(index)}>
@@ -308,17 +307,11 @@ function Devis() {
             }}
           />
         </div>
-        {/* <svg width="225" height="45" viewBox="0 0 225 45">
-            <path
-              d="M0 10C0 4.47715 4.47715 0 10 0H214.5C220.023 0 224.5 4.47715 224.5 10V35C224.5 40.5228 220.023 45 214.5 45H10C4.47716 45 0 40.5228 0 35V10Z"
-              fill="#455a94"
-            />
-            <text fill="white" fontSize="28" fontWeight="900">
-              <tspan x="13" y="32.0703">
-                Total: {totalCount} devis
-              </tspan>
-            </text>
-          </svg> */}
+        <div className="mr-2  flex items-center">
+          <p className="rounded-sm bg-[#495984] p-2 text-sm font-bold text-white ">
+            Total: {totalCount} devis
+          </p>
+        </div>
       </div>
       {/* <div className="m-2 flex w-fit flex-wrap">
         <select
@@ -348,11 +341,9 @@ function Devis() {
             devis={filteredDevis}
             sortColumn={sortColumn}
             onSort={handleSort}
-            // datas, selectedFilterItems, onFilterChange,
             datas={datas}
             selectedFilterItems={selectedFilterItems}
             onValueChange={onFilterChange}
-            //  totalItems, onItemSelect, onItemsSelect, selectedItems,
             headers={fields}
             totalItems={filteredDevis.length}
             onItemSelect={handleSelectDevi}

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-import Table from "../../common/table";
-import Select from "../../common/select";
 import CustomeTable from "../../common/CustomeTable";
 
 import Moment from "react-moment";

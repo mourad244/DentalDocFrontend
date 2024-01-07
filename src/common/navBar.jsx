@@ -119,7 +119,7 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/ajouterpaiement"
+                to="/paiements"
                 onClick={() => {
                   resetIcon();
                   setActivePaiement(true);
