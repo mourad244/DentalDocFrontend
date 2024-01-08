@@ -7,7 +7,6 @@ import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getActeDentaires } from "../../services/acteDentaireService";
 
-import Joi from "joi-browser";
 import Form from "../../common/form";
 import Input from "../../common/input";
 import Select from "../../common/select";
@@ -15,10 +14,11 @@ import SearchBox from "../../common/searchBox";
 import ActesEffectuesTable from "./actesEffectuesTable";
 
 import _ from "lodash";
+import Joi from "joi-browser";
+import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
-import ClipLoader from "react-spinners/ClipLoader";
 
 class DeviForm extends Form {
   state = {
@@ -45,7 +45,6 @@ class DeviForm extends Form {
     selectedNatureActes: [],
     selectedActes: [],
     selectedDents: [],
-    selectedPrixs: [],
     colors: colorsNatureActe,
     filteredActeDentaires: [],
     nombreDentsPerActe: [],
@@ -64,10 +63,11 @@ class DeviForm extends Form {
     const deviId = this.props.match.params.id;
     if (deviId === "new" || deviId === undefined) {
       const { data: dents } = await getDents();
-      const { data: medecins } = await getMedecins();
-      const { data: acteDentaires } = await getActeDentaires();
-      const { data: natureActes } = await getNatureActes();
       const { data: patients } = await getPatients();
+      const { data: medecins } = await getMedecins();
+      const { data: natureActes } = await getNatureActes();
+      const { data: acteDentaires } = await getActeDentaires();
+
       this.setState({
         dents,
         medecins,
@@ -79,21 +79,15 @@ class DeviForm extends Form {
       const { data: devi } = await getDevi(deviId);
       const { data: dents } = await getDents();
       const { data: medecins } = await getMedecins();
-      const { data: acteDentaires } = await getActeDentaires();
       const { data: natureActes } = await getNatureActes();
-      /* 
-                update
-      filteredActeDentaires,
-      selectedNatureActes,
-      selectedActes,
-      nombreDentsPerActe,
-      selectedDents,
-      */
-      let filteredActeDentaires = [];
-      let selectedNatureActes = [];
+      const { data: acteDentaires } = await getActeDentaires();
+
+      let selectedDents = [];
       let selectedActes = [];
       let nombreDentsPerActe = [];
-      let selectedDents = [];
+      let selectedNatureActes = [];
+      let filteredActeDentaires = [];
+
       devi.acteEffectues.map((itemActe, index) => {
         let filteredActeDentaire = {};
         let selectedNatureActe = {};
@@ -118,14 +112,13 @@ class DeviForm extends Form {
                 e.natureId._id.toString() === selectedNatureActe._id.toString()
             : "";
         });
-        filteredActeDentaires[index] = filteredActeDentaire;
-        selectedNatureActes[index] = selectedNatureActe;
+        selectedDents[index] = selectedDent;
         selectedActes[index] = selectedActe;
         nombreDentsPerActe[index] = nombreDents;
-        selectedDents[index] = selectedDent;
+        selectedNatureActes[index] = selectedNatureActe;
+        filteredActeDentaires[index] = filteredActeDentaire;
         return true;
       });
-
       this.setState({
         data: this.mapToViewModel(devi),
         selectedPatient: devi.patientId,
@@ -274,6 +267,7 @@ class DeviForm extends Form {
   };
 
   handleSelectedNature = (e, index) => {
+    let data = { ...this.state.data };
     let selectedNatureActes = [...this.state.selectedNatureActes];
     let filteredActeDentaires = [...this.state.filteredActeDentaires];
     let selectedActes = [...this.state.selectedActes];
@@ -315,6 +309,7 @@ class DeviForm extends Form {
 
     // reset selectedActe
     delete selectedActes[index];
+    delete data.acteEffectues[index];
     // reset nombreDent
     nombreDentsPerActe[index] = 0;
 
@@ -326,6 +321,7 @@ class DeviForm extends Form {
       selectedActes,
       nombreDentsPerActe,
       selectedDents,
+      data,
     });
     // }
   };
@@ -437,7 +433,7 @@ class DeviForm extends Form {
     ) : (
       <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-          Formulaire du devis
+          Formulaire du devi
         </p>
         <div className="ml-2  flex justify-start">
           <button
@@ -546,21 +542,12 @@ class DeviForm extends Form {
                         </select>
                       </div>
                     </div>
-                    {/* {this.renderSelect(
-                      "medecinId",
-                      "Medecin",
-                      medecins,
-                      170,
-                      35,
-                      140,
-                    )} */}
                   </div>
                 </div>
                 <div className="m-2 flex justify-between">
                   <table className="my-0 mr-2 h-fit w-fit">
                     <thead className="h-12  text-[#4f5361]">
                       <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
-                        {/* <th>N° Acte</th> */}
                         <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
                           Nature Acte
                         </th>

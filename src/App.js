@@ -17,8 +17,8 @@ import Settings from "./components/settings/settings";
 import Paiements from "./components/paiements/paiements";
 import DeviForm from "./components/devis/deviForm";
 import PatientForm from "./components/patients/patientForm";
+import PaiementForm from "./components/paiements/paiementForm";
 import NouveauReport from "./components/reports/nouveauReport";
-import NouveauPaiement from "./components/paiements/nouveauPaiement";
 
 import { ToastContainer } from "react-toastify";
 
@@ -113,7 +113,7 @@ function App() {
             )}
             {/* paiements */}
             {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/paiements/:id" exact component={NouveauPaiement} />
+              <Route path="/paiements/:id" exact component={PaiementForm} />
             ) : (
               ""
             )}
