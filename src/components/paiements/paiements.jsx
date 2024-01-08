@@ -37,7 +37,7 @@ function Paiements() {
   const [selectedPaiements, setSelectedPaiements] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
   const [sortColumn, setSortColumn] = useState({
-    path: "datePaiement",
+    path: "date",
     order: "asc",
   });
   const [totalCount, setTotalCount] = useState(0);
@@ -52,7 +52,7 @@ function Paiements() {
     { order: 1, name: "select", label: "Select" },
     { order: 2, name: "patientId", label: "Patient" },
     { order: 3, name: "mode", label: "Mode Paiement" },
-    { order: 4, name: "datePaiement", label: "Date" },
+    { order: 4, name: "date", label: "Date" },
     { order: 5, name: "montant", label: "Montant" },
   ];
 
@@ -74,10 +74,9 @@ function Paiements() {
         case "journee":
           filtered = filtered.filter(
             (m) =>
-              new Date(m.datePaiement).getFullYear() ===
-                time.value.getFullYear() &&
-              new Date(m.datePaiement).getMonth() === time.value.getMonth() &&
-              new Date(m.datePaiement).getDate() === time.value.getDate(),
+              new Date(m.date).getFullYear() === time.value.getFullYear() &&
+              new Date(m.date).getMonth() === time.value.getMonth() &&
+              new Date(m.date).getDate() === time.value.getDate(),
           );
           break;
         case "semaine":
@@ -85,9 +84,8 @@ function Paiements() {
         case "mois":
           filtered = filtered.filter(
             (m) =>
-              new Date(m.datePaiement).getFullYear() ===
-                time.value.getFullYear() &&
-              new Date(m.datePaiement).getMonth() === time.value.getMonth(),
+              new Date(m.date).getFullYear() === time.value.getFullYear() &&
+              new Date(m.date).getMonth() === time.value.getMonth(),
           );
           break;
         case "trimestre":
@@ -96,9 +94,7 @@ function Paiements() {
           break;
         case "annee":
           filtered = filtered.filter(
-            (m) =>
-              new Date(m.datePaiement).getFullYear() ===
-              time.value.getFullYear(),
+            (m) => new Date(m.date).getFullYear() === time.value.getFullYear(),
           );
           break;
         default:

@@ -39,8 +39,8 @@ function PaiementActesTable(props) {
             onSort={onSort}
           />
           <div className="flex justify-end border-t-2 border-black">
-            <p className="mr-3 text-sm font-bold text-[#303233]">
-              {totalDevis} Dh
+            <p className=" m-2 text-sm font-bold text-[#303233]">
+              Total: {totalDevis} Dh
             </p>
           </div>
         </div>
