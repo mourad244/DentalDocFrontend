@@ -17,12 +17,13 @@ import { IoChevronBackCircleSharp } from "react-icons/io5";
 
 import RecuPaiement from "../../documents/recuPaiement";
 import "./paiementForm.css";
+import PaiementEffectuesTable from "./paiementEffectuesTable";
 
 class PaiementForm extends Form {
   state = {
     data: {
       patientId: "",
-      date: "",
+      date: new Date(),
       montant: "",
       mode: "Espèce",
       numCheque: undefined,
@@ -67,7 +68,6 @@ class PaiementForm extends Form {
       const { data: paiement } = await getPaiement(paiementId);
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
-
       this.setState({
         data: this.mapToViewModel(paiement),
         selectedPatient: paiement.patientId,
@@ -81,24 +81,23 @@ class PaiementForm extends Form {
   onSelectPatient = async (patient) => {
     let data = { ...this.state.data };
     let devis = [];
-    let paiements = [];
+    let newSelectedPaiements = [];
+    let newSelectedDevis = [];
+
     if (
       patient.deviIds !== undefined &&
       patient.deviIds !== null &&
       patient.deviIds.length !== 0
     ) {
-      let newSelectedDevis = [];
       const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
       const devisResults = await Promise.all(promises);
       newSelectedDevis = devisResults.map(({ data: devi }) => devi);
-      devis = newSelectedDevis;
     }
     if (
       patient.paiementIds !== undefined &&
       patient.paiementIds !== null &&
       patient.paiementIds.length !== 0
     ) {
-      let newSelectedPaiements = [];
       const promises = patient.paiementIds.map((item) =>
         getPaiement(item.paiementId._id),
       );
@@ -106,14 +105,13 @@ class PaiementForm extends Form {
       newSelectedPaiements = paiementsResults.map(
         ({ data: paiement }) => paiement,
       );
-      paiements = newSelectedPaiements;
     }
     data.patientId = patient._id;
     this.setState({
       data,
       selectedPatient: patient,
-      devis,
-      paiements,
+      devis: newSelectedDevis,
+      paiements: newSelectedPaiements,
       searchQuery: "",
     });
   };
@@ -140,6 +138,9 @@ class PaiementForm extends Form {
     }
     if (prevState.devis !== this.state.devis) {
       let actes = [];
+      const totalPaiements = this.state.selectedPatient.totalPaiements;
+      let restePaiements = totalPaiements;
+
       this.state.devis.map((itemDevi) => {
         if (itemDevi.acteEffectues !== undefined)
           itemDevi.acteEffectues.map((itemActe) => {
@@ -151,6 +152,7 @@ class PaiementForm extends Form {
               nom: "",
               dents: [],
               prix: 0,
+              reste: 0,
             };
             //       date
             acte.date = itemDevi.dateDevi;
@@ -175,6 +177,16 @@ class PaiementForm extends Form {
             });
             acte.dents = dents;
             acte.prix = itemActe.prix ? itemActe.prix : 0;
+            if (restePaiements >= acte.prix) {
+              restePaiements -= acte.prix;
+              acte.reste = 0;
+            } else if (restePaiements < acte.prix && restePaiements !== 0) {
+              acte.reste = acte.prix - restePaiements;
+              restePaiements = 0;
+            } else {
+              acte.reste = acte.prix;
+            }
+
             actes.push(acte);
             return true;
           });
@@ -217,7 +229,6 @@ class PaiementForm extends Form {
       paiements,
       devis,
     } = this.state;
-    console.log("patient", selectedPatient);
     return loading ? (
       <div className="spinner">
         <ClipLoader loading={loading} size={70} />
@@ -276,14 +287,23 @@ class PaiementForm extends Form {
               <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
             </div>
             {this.props.match.params.id === "new" && devis.length !== 0 && (
-              <PaiementActesTable
-                actesEffectuees={actesEffectues}
-                onSort={this.handleSort}
-                sortColumn={this.state.sortColumn}
-                totalDevis={selectedPatient.totalDevis}
-              />
+              <div className="flex flex-wrap">
+                <PaiementActesTable
+                  actesEffectuees={actesEffectues}
+                  onSort={this.handleSort}
+                  sortColumn={this.state.sortColumn}
+                  totalDevis={selectedPatient.totalDevis}
+                  totalPaiements={selectedPatient.totalPaiements}
+                />
+                <PaiementEffectuesTable
+                  paiements={paiements}
+                  onSort={this.handleSort}
+                  sortColumn={this.state.sortColumn}
+                  totalPaiements={selectedPatient.totalPaiements}
+                />
+              </div>
             )}
-            <div className="mt-2 bg-[#a2bdc5]">
+            <div className="m-2 bg-[#a2bdc5]">
               <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
                 Paiement
               </p>
@@ -334,7 +354,7 @@ class PaiementForm extends Form {
                     </div>
                   </div>
                 </div>
-                {this.renderButton("Sauvegarder")}
+                <div className="m-3">{this.renderButton("Sauvegarder")}</div>
               </form>
             </div>
           </>

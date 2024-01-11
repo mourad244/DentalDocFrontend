@@ -321,6 +321,7 @@ function Paiements() {
           />
         </div>
       </div> */}
+      {console.log("filteredPaiements", filteredPaiements)}
       {loading ? (
         <div className="spinner">
           <ClipLoader loading={loading} size={70} />

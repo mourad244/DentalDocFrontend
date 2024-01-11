@@ -146,6 +146,7 @@ class DeviForm extends Form {
     ) {
       let newSelectedDevis = [];
       const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
+
       const devisResults = await Promise.all(promises);
       newSelectedDevis = devisResults.map(({ data: devi }) => devi);
       return this.setState({
@@ -195,6 +196,7 @@ class DeviForm extends Form {
       this.state.devis.map((itemDevi) => {
         if (itemDevi.acteEffectues !== undefined)
           itemDevi.acteEffectues.map((itemActe) => {
+            console.log("itemActe", itemActe);
             let acte = {
               date: "",
               medecin: "",
@@ -258,6 +260,7 @@ class DeviForm extends Form {
       } else return (montant += 0);
     });
     data.montant = montant;
+    console.log("data", data);
     await saveDevi(data);
     this.props.history.push("/devis");
   };
@@ -330,9 +333,9 @@ class DeviForm extends Form {
     let selectedActes = [...this.state.selectedActes];
     let selectedActe = { ...selectedActes[index] };
 
-    const selected = this.state.acteDentaires
-      //
-      .find((item) => item._id === e.target.value);
+    const selected = this.state.acteDentaires.find(
+      (item) => item._id === e.target.value,
+    );
 
     selectedActe = selected;
     selectedActes[index] = selectedActe;
@@ -345,10 +348,12 @@ class DeviForm extends Form {
       devi.acteEffectues[index] = {
         acteId: "",
         dentIds: [],
+        prix: 0,
       };
     }
 
     devi.acteEffectues[index]["acteId"] = acteEffectue.acteId;
+    devi.acteEffectues[index]["prix"] = selected ? selected.prix : 0;
     this.setState({ selectedActes, data: devi });
   };
 
@@ -492,7 +497,7 @@ class DeviForm extends Form {
             )}
             <div className="mt-2 bg-[#a2bdc5]">
               <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
-                Actes à éffectués
+                Actes à éffectuer
               </p>
               <form onSubmit={this.handleSubmit}>
                 <div className="flex flex-wrap">
