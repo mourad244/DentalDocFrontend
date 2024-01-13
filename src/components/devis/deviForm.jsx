@@ -196,7 +196,6 @@ class DeviForm extends Form {
       this.state.devis.map((itemDevi) => {
         if (itemDevi.acteEffectues !== undefined)
           itemDevi.acteEffectues.map((itemActe) => {
-            console.log("itemActe", itemActe);
             let acte = {
               date: "",
               medecin: "",
@@ -260,7 +259,6 @@ class DeviForm extends Form {
       } else return (montant += 0);
     });
     data.montant = montant;
-    console.log("data", data);
     await saveDevi(data);
     this.props.history.push("/devis");
   };

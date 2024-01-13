@@ -6,7 +6,6 @@ import { toast, ToastContainer } from "react-toastify";
 import logo from "../assets/images/logo-dental-doc.png";
 
 import auth from "../services/authService";
-import "./loginform.css";
 
 class LoginForm extends Form {
   state = {

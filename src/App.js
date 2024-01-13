@@ -18,7 +18,6 @@ import Paiements from "./components/paiements/paiements";
 import DeviForm from "./components/devis/deviForm";
 import PatientForm from "./components/patients/patientForm";
 import PaiementForm from "./components/paiements/paiementForm";
-import NouveauReport from "./components/reports/nouveauReport";
 
 import { ToastContainer } from "react-toastify";
 

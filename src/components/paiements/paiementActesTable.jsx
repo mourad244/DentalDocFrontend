@@ -12,7 +12,7 @@ function PaiementActesTable(props) {
       content: (acte) => {
         // i want to fix the max length of the description to 20 characters
         if (acte.nom.length > 20) {
-          return <p>{acte.nom.substring(0, 30)}...</p>;
+          return <p>{acte.nom.substring(0, 40)}...</p>;
         }
       },
     },

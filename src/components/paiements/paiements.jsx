@@ -4,8 +4,6 @@ import { withRouter, useHistory } from "react-router-dom";
 import { getPaiements, deletePaiement } from "../../services/paiementService";
 
 import PaiementsTable from "./paiementsTable";
-import Recettes from "../../documents/recettes";
-import PaiementsList from "../../documents/paiementsList";
 
 import _ from "lodash";
 import { toast } from "react-toastify";
@@ -50,10 +48,11 @@ function Paiements() {
   const history = useHistory();
   const fields = [
     { order: 1, name: "select", label: "Select" },
-    { order: 2, name: "patientId", label: "Patient" },
-    { order: 3, name: "mode", label: "Mode Paiement" },
-    { order: 4, name: "date", label: "Date" },
-    { order: 5, name: "montant", label: "Montant" },
+    { order: 2, name: "numOrdre", label: "N° ordre" },
+    { order: 3, name: "patientId", label: "Patient" },
+    { order: 4, name: "mode", label: "Mode Paiement" },
+    // { order: 5, name: "date", label: "Date" },
+    { order: 6, name: "montant", label: "Montant" },
   ];
 
   useEffect(() => {
@@ -321,7 +320,6 @@ function Paiements() {
           />
         </div>
       </div> */}
-      {console.log("filteredPaiements", filteredPaiements)}
       {loading ? (
         <div className="spinner">
           <ClipLoader loading={loading} size={70} />

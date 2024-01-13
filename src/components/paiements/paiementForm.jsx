@@ -14,9 +14,7 @@ import Form from "../../common/form";
 import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-
-import RecuPaiement from "../../documents/recuPaiement";
-import "./paiementForm.css";
+// import RecuPaiement from "../../documents/recuPaiement";
 import PaiementEffectuesTable from "./paiementEffectuesTable";
 
 class PaiementForm extends Form {
@@ -27,6 +25,7 @@ class PaiementForm extends Form {
       montant: "",
       mode: "Espèce",
       numCheque: undefined,
+      numOrdre: "",
     },
     errors: {},
     patients: [],
@@ -50,6 +49,7 @@ class PaiementForm extends Form {
     montant: Joi.number().required().label("Montant"),
     mode: Joi.string().label("Mode Paiement"),
     numCheque: Joi.string().allow("").label("Numero Cheque"),
+    numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
   };
 
   async populateDatas() {
@@ -203,6 +203,7 @@ class PaiementForm extends Form {
       montant: paiement.montant,
       mode: paiement.mode,
       numCheque: paiement.numCheque,
+      numOrdre: paiement.numOrdre,
     };
   }
   doSubmit = async () => {
@@ -295,6 +296,7 @@ class PaiementForm extends Form {
                   totalDevis={selectedPatient.totalDevis}
                   totalPaiements={selectedPatient.totalPaiements}
                 />
+
                 <PaiementEffectuesTable
                   paiements={paiements}
                   onSort={this.handleSort}
