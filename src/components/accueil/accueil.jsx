@@ -2,10 +2,18 @@ import React, { useEffect, useState } from "react";
 import { getDevis } from "../../services/deviService";
 import { getPaiements } from "../../services/paiementService";
 
+import PatientByAgeChart from "./patientByAgeChart";
+import PatientByGenderChart from "./patientByGenderChart";
+
 import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
-import BarChart from "./BarChart";
+import AppointementChart from "./appointementByDayChart";
+import AppointementTotalChart from "./appointementTotalChart";
+import DentalProcedureChart from "./dentalProcedureChart";
+import RevenuByTreatmentChart from "./revenuByTreatmentChart";
+import RevenuByPatientGenreChart from "./revenuByPatientGenreChart";
+import RevenuByPatientAgeChart from "./revenuByPatientAgeChart";
 function Accueil() {
   // const [filteredDevis, setFilteredDevis] = useState([]);
   const date = new Date();
@@ -124,10 +132,6 @@ function Accueil() {
       }
       setTotalMontantDevis(totalDevis);
       setTotalMontantPaiements(totalPaiements);
-      console.log("filteredDevis", filteredDevis);
-      console.log("filteredPaiements", filteredPaiements);
-      // setDevis(filteredDevis);
-      // setPaiements(filteredPaiements);
     };
     getData();
   }, [devis, paiements, time]);
@@ -240,10 +244,38 @@ function Accueil() {
           </div>
         )}
       </div>
-      <div className="flex justify-between">
+      <div className="flex flex-col ">
+        {/*------------ patient demographic--------------- */}
         <div className="m-2">
-          <BarChart />
+          <PatientByAgeChart />
         </div>
+        <div className="m-2">
+          <PatientByGenderChart />
+        </div>
+        {/* ------------appointement statistics------------ */}
+        <div className="m-2">
+          <AppointementChart />
+        </div>
+        <div className="m-2">
+          <AppointementTotalChart />
+        </div>
+        {/*-------------treatement types and frequencies--------------- */}
+        <div className="m-2">
+          <DentalProcedureChart />
+        </div>
+        {/* -------------revenue and payement perforemd------------- */}
+        <div className="m-2">
+          <RevenuByTreatmentChart />
+        </div>
+        <div className="m-2">
+          <RevenuByPatientGenreChart />
+        </div>
+        <div className="m-2">
+          <RevenuByPatientAgeChart />
+        </div>
+        {/* patient retention rates to understand patient loyalty (new vs returning) */}
+
+        {/* waiting time and service efficiency: average waiting time and duration of appointment */}
       </div>
     </div>
   );
