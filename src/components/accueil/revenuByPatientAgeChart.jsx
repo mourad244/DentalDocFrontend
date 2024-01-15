@@ -92,8 +92,11 @@ function RevenuByPatientAgeChart() {
   }, []);
 
   return (
-    <div className="revenuByPatientAgeChart">
-      <svg ref={svgRef} width="500" height="400" />
+    <div>
+      <h2 className="text-xl font-bold">Revenu by patient age</h2>
+      <div className="revenuByPatientAgeChart">
+        <svg ref={svgRef} width="500" height="400" />
+      </div>
     </div>
   );
 }

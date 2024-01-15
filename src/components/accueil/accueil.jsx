@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
+
 import { getDevis } from "../../services/deviService";
 import { getPaiements } from "../../services/paiementService";
 
 import PatientByAgeChart from "./patientByAgeChart";
+import AppointementChart from "./appointementByDayChart";
 import PatientByGenderChart from "./patientByGenderChart";
+import DentalProcedureChart from "./dentalProcedureChart";
+import PatientRetentionChart from "./patientRetentionChart";
+import AppointementTotalChart from "./appointementTotalChart";
+import RevenuByTreatmentChart from "./revenuByTreatmentChart";
+import RevenuByPatientAgeChart from "./revenuByPatientAgeChart";
+import RevenuByPatientGenreChart from "./revenuByPatientGenreChart";
 
+import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
-import AppointementChart from "./appointementByDayChart";
-import AppointementTotalChart from "./appointementTotalChart";
-import DentalProcedureChart from "./dentalProcedureChart";
-import RevenuByTreatmentChart from "./revenuByTreatmentChart";
-import RevenuByPatientGenreChart from "./revenuByPatientGenreChart";
-import RevenuByPatientAgeChart from "./revenuByPatientAgeChart";
+
 function Accueil() {
   // const [filteredDevis, setFilteredDevis] = useState([]);
   const date = new Date();
@@ -21,6 +25,8 @@ function Accueil() {
   const [paiements, setPaiements] = useState([]);
   const [totalMontantDevis, setTotalMontantDevis] = useState(0);
   const [totalMontantPaiements, setTotalMontantPaiements] = useState(0);
+
+  const [patientsByAge, setPatientsByAge] = useState([]);
   const [times, setTimes] = useState([
     { nom: "journee", active: false },
     // { nom: "semaine", active: false },
@@ -50,12 +56,104 @@ function Accueil() {
   }, []);
 
   useEffect(() => {
-    // nombre de et devis et paiements par periode
     let filteredDevis = [...devis];
     let filteredPaiements = [...paiements];
+    console.log("devis", devis);
+    console.log("paiements", paiements);
     // nombre de patients par periode
     let totalDevis = 0;
     let totalPaiements = 0;
+    const calculateAge = (dateOfBirth) => {
+      const today = new Date();
+      const birthDate = new Date(dateOfBirth);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    };
+    // --------------- patient by age data --------------
+
+    let newPatientsByAge = [
+      { name: "Children", number: 0, value: 12 },
+      { name: "Teens", number: 0, value: 19 },
+      { name: "Young Adults", number: 0, value: 29 },
+      { name: "Adults", number: 0, value: 44 },
+      { name: "Middle-Aged Adults", number: 0, value: 59 },
+      { name: "Seniors", number: 0, value: 60 },
+    ];
+
+    const categorizeByAge = (dateOfBirth) => {
+      const age = calculateAge(dateOfBirth);
+      for (let category of newPatientsByAge) {
+        if (age <= category.value) {
+          category.number++;
+          break;
+        }
+      }
+    };
+
+    /*
+    patientsByGender = [
+      { name: "Homme", number: 0 },
+      { name: "Femme", number: 0 },
+    ];
+    
+    --------------- appointement data --------------
+    appointmentsByDay = [
+      { day/month/year: 0, scheduled: 0, canceled: 0, missed: 0, walk-ins: 0 },
+      .
+      .
+      .
+    ]
+    appointmentsTotal = [
+      { name: "scheduled", value: 0 },
+      { name: "canceled", value: 0 },
+      { name: "missed", value: 0 },
+      { name: "walk-ins", value: 0 },
+    ];
+
+    --------------- dental procedure data --------------
+    dentalProcedures = [
+      { name: "Extraction", value: 0 },
+      { name: "Filling", value: 0 },
+      { name: "Cleaning", value: 0 },
+      { name: "Root Canal", value: 0 },
+      { name: "Crown", value: 0 },
+      { name: "Implant", value: 0 },
+      { name: "Other", value: 0 },
+    ]
+
+    --------------- revenu by treatment data --------------
+    revenuByTreatment = [
+      { name: "Extraction", value: 0 },
+      { name: "Filling", value: 0 },
+      { name: "Cleaning", value: 0 },
+      { name: "Root Canal", value: 0 },
+      { name: "Crown", value: 0 },
+      { name: "Implant", value: 0 },
+      { name: "Other", value: 0 },
+    ]
+    revenuByPatientGenre = [
+      { name: "Homme", value: 0 },
+      { name: "Femme", value: 0 },
+    ]
+
+    revenuByPatientAge = [
+      { name: "Children", number: 0,value: 12 },
+      { name: "Teens", number: 0,value:19 },
+      { name: "Young Adults", number: 0, value:29 },
+      { name: "Adults", number: 0,value:44 },
+      { name: "Middle-aged Adults", number: 0 ,value:59},
+      { name: "Seniors", number: 0 },
+    ]
+    --------------- patient retention data --------------
+    patientRetention = [
+      { name: "New", value: 0 },
+      { name: "Returning", value: 0 },
+    ]
+    */
     const getData = () => {
       switch (time.nom) {
         case "journee":
@@ -94,9 +192,9 @@ function Accueil() {
                   time.value.getFullYear(),
             )
             // add the total of filtered devis
-            .map((data) => {
-              totalDevis += data.montant;
-              return data;
+            .forEach((devisItem) => {
+              totalDevis += devisItem.montant;
+              categorizeByAge(devisItem.patientId.dateNaissance);
             });
           filteredPaiements = filteredPaiements
             .filter(
@@ -104,9 +202,8 @@ function Accueil() {
                 new Date(data.date).getMonth() === time.value.getMonth() &&
                 new Date(data.date).getFullYear() === time.value.getFullYear(),
             )
-            .map((data) => {
-              totalPaiements += data.montant;
-              return data;
+            .forEach((paiementItem) => {
+              totalPaiements += paiementItem.montant;
             });
 
           break;
@@ -132,6 +229,8 @@ function Accueil() {
       }
       setTotalMontantDevis(totalDevis);
       setTotalMontantPaiements(totalPaiements);
+      setPatientsByAge(newPatientsByAge);
+      console.log("patientsByAge", newPatientsByAge);
     };
     getData();
   }, [devis, paiements, time]);
@@ -244,39 +343,47 @@ function Accueil() {
           </div>
         )}
       </div>
-      <div className="flex flex-col ">
-        {/*------------ patient demographic--------------- */}
-        <div className="m-2">
-          <PatientByAgeChart />
+      {loading ? (
+        <div className="spinner">
+          <ClipLoader loading={loading} size={70} />
         </div>
-        <div className="m-2">
-          <PatientByGenderChart />
+      ) : (
+        <div className="flex flex-col ">
+          {/*------------ patient demographic--------------- */}
+          <div className="m-2">
+            <PatientByAgeChart data={patientsByAge} />
+          </div>
+          <div className="m-2">
+            <PatientByGenderChart />
+          </div>
+          {/* ------------appointement statistics------------ */}
+          <div className="m-2">
+            <AppointementChart />
+          </div>
+          <div className="m-2">
+            <AppointementTotalChart />
+          </div>
+          {/*-------------treatement types and frequencies--------------- */}
+          <div className="m-2">
+            <DentalProcedureChart />
+          </div>
+          {/* -------------revenue and payement perforemd------------- */}
+          <div className="m-2">
+            <RevenuByTreatmentChart />
+          </div>
+          <div className="m-2">
+            <RevenuByPatientGenreChart />
+          </div>
+          <div className="m-2">
+            <RevenuByPatientAgeChart />
+          </div>
+          {/* patient retention rates to understand patient loyalty (new vs returning) */}
+          <div className="m-2">
+            <PatientRetentionChart />
+          </div>
+          {/* waiting time and service efficiency: average waiting time and duration of appointment */}
         </div>
-        {/* ------------appointement statistics------------ */}
-        <div className="m-2">
-          <AppointementChart />
-        </div>
-        <div className="m-2">
-          <AppointementTotalChart />
-        </div>
-        {/*-------------treatement types and frequencies--------------- */}
-        <div className="m-2">
-          <DentalProcedureChart />
-        </div>
-        {/* -------------revenue and payement perforemd------------- */}
-        <div className="m-2">
-          <RevenuByTreatmentChart />
-        </div>
-        <div className="m-2">
-          <RevenuByPatientGenreChart />
-        </div>
-        <div className="m-2">
-          <RevenuByPatientAgeChart />
-        </div>
-        {/* patient retention rates to understand patient loyalty (new vs returning) */}
-
-        {/* waiting time and service efficiency: average waiting time and duration of appointment */}
-      </div>
+      )}
     </div>
   );
 }

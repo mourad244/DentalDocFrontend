@@ -1,75 +1,97 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-function PatientByAgeChart() {
-  //   create a chart for age distribution ( - Children (0-12 years)  - Teens (13-19 years)  - Young Adults (20-29 years)   - Adults (30-44 years)  - Middle-aged Adults (45-59 years)  - Seniors (60+ years) depending on the age of the patient
-  const data = [
-    { name: "Children", value: 30 },
-    { name: "Teens", value: 40 },
-    { name: "Young Adults", value: 20 },
-    { name: "Adults", value: 40 },
-    { name: "Middle-aged Adults", value: 60 },
-    { name: "Seniors", value: 40 },
-  ];
-  const width = 400;
-  const height = 400;
-  const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
-  const xScale = d3
-    .scaleBand()
-    .domain(data.map((d) => d.name))
-    .range([0, innerWidth])
-    .padding(0.2);
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data, (d) => d.value)])
-    .range([innerHeight, 0]);
-  const colorScale = d3
-    .scaleOrdinal()
-    .domain(data.map((d) => d.name))
-    .range(d3.schemeSet2);
+function PatientByAgeChart({ data }) {
+  // const data = [
+  //   { name: "Children", number: 400 },
+  //   { name: "Teens", number: 300 },
+  //   { name: "Young Adults", number: 300 },
+  //   { name: "Adults", number: 200 },
+  //   { name: "Middle-aged Adults", number: 278 },
+  //   { name: "Seniors", number: 189 },
+  // ];
+  const svgRef = useRef();
+
+  useEffect(() => {
+    const svg = d3.select(svgRef.current);
+    const width = 400;
+    const height = 400;
+    const margin = { top: 20, right: 20, bottom: 20, left: 40 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const maxYValue = d3.max(data, (d) => d.number);
+
+    const xScale = d3
+      .scaleBand()
+      .domain(data.map((d) => d.name))
+      .range([0, innerWidth])
+      .padding(0.2);
+
+    const yScale = d3
+      .scaleLinear()
+      .domain([
+        0,
+        d3.max(data, (d) => d.number) > 0 ? d3.max(data, (d) => d.number) : 1,
+      ])
+      .range([innerHeight, 0]);
+
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(data.map((d) => d.name))
+      .range(d3.schemeSet2);
+
+    // Clear the existing SVG content
+    svg.selectAll("*").remove();
+
+    const g = svg
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Create and format the y-axis
+    const yAxis = d3
+      .axisLeft(yScale)
+      .tickFormat(d3.format("d")) // Format as integer
+      .tickValues(
+        maxYValue <= 10
+          ? d3.range(0, maxYValue + 1)
+          : d3.ticks(0, maxYValue, 5), // For larger numbers, limit the number of ticks
+      ); // For small numbers, use every integer
+
+    g.append("g").call(yAxis);
+    // Create the x-axis
+    const xAxis = g
+      .append("g")
+      .attr("transform", `translate(0,${innerHeight})`)
+      .call(d3.axisBottom(xScale));
+
+    // Rotate the x-axis labels
+    xAxis
+      .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 9)
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(25)")
+      .style("text-anchor", "start");
+
+    // Draw bars
+    g.selectAll(".bar")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => xScale(d.name))
+      .attr("y", (d) => yScale(Math.max(0, d.number)))
+      .attr("width", xScale.bandwidth())
+      .attr("height", (d) => Math.max(0, innerHeight - yScale(d.number)))
+      .attr("fill", (d) => colorScale(d.name));
+  }, [data]); // Redraw chart when data
+
   return (
     <div>
-      <h2 className="text-xl font-bold">Age distribution of patients</h2>
-      <svg width={width + 30} height={height + 60}>
-        <g transform={`translate(${margin.left},${margin.top})`}>
-          {xScale.domain().map((tickValue) => (
-            <g key={tickValue} transform={`translate(${xScale(tickValue)},0)`}>
-              <line y2={innerHeight} stroke="black" strokeDasharray="4" />
-              <text
-                style={{ textAnchor: "start" }}
-                x={xScale.bandwidth() / 2}
-                y={innerHeight + 4}
-                dy=".72em"
-                transform={`rotate(25, ${xScale.bandwidth() / 2}, ${
-                  innerHeight + 3
-                })`}
-              >
-                {tickValue}
-              </text>
-            </g>
-          ))}
-          {yScale.ticks().map((tickValue) => (
-            <g key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
-              <line x2={innerWidth} stroke="black" strokeDasharray="4" />
-              <text style={{ textAnchor: "end" }} x={-3} dy=".32em">
-                {tickValue}
-              </text>
-            </g>
-          ))}
-          {data.map((d) => (
-            <rect
-              key={d.name}
-              x={xScale(d.name)}
-              y={yScale(d.value)}
-              width={xScale.bandwidth()}
-              height={innerHeight - yScale(d.value)}
-              fill={colorScale(d.name)}
-            />
-          ))}
-        </g>
-      </svg>
+      <h2 className="text-xl font-bold">Patients by age</h2>
+      <div className="patientByAgeChart">
+        <svg ref={svgRef} width="400" height="400" />
+      </div>
     </div>
   );
 }
