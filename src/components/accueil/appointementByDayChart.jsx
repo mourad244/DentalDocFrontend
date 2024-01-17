@@ -40,7 +40,7 @@ function AppointementChartByDays() {
     { day: 31, scheduled: 4, canceled: 2, missed: 1 },
   ];
   const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-  const width = 960 - margin.left - margin.right;
+  const width = 500 - margin.left - margin.right;
   const height = 500 - margin.top - margin.bottom;
 
   const svgRef = useRef();
@@ -139,9 +139,9 @@ function AppointementChartByDays() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Appointement Chart</h2>
+      <h2 className="text-xl font-bold text-white">Appointement Chart</h2>
       <div id="appointementChart">
-        <svg ref={svgRef} />{" "}
+        <svg ref={svgRef} />
       </div>
     </div>
   );

@@ -56,8 +56,8 @@ function RevenuByPatientGenreChart() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Revenu by patient genre</h2>
-      <svg ref={svgRef} />
+      <h2 className="text-xl font-bold text-white">Revenu by patient genre</h2>
+      <svg ref={svgRef} width={300} height={300} />
     </div>
   );
 }

@@ -348,35 +348,44 @@ function Accueil() {
           <ClipLoader loading={loading} size={70} />
         </div>
       ) : (
-        <div className="flex flex-col ">
+        <div className="m-2 flex flex-col">
           {/*------------ patient demographic--------------- */}
-          <div className="m-2">
-            <PatientByAgeChart data={patientsByAge} />
-          </div>
-          <div className="m-2">
-            <PatientByGenderChart />
+          <div className="flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
+            <div className="m-2">
+              <PatientByAgeChart data={patientsByAge} />
+            </div>
+            <div className="m-2">
+              <PatientByGenderChart />
+            </div>
           </div>
           {/* ------------appointement statistics------------ */}
-          <div className="m-2">
-            <AppointementChart />
-          </div>
-          <div className="m-2">
-            <AppointementTotalChart />
+          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
+            {/*             <div className="m-2">
+              <AppointementChart />
+            </div> */}
+            <div className="m-2">
+              <AppointementTotalChart />
+            </div>
           </div>
           {/*-------------treatement types and frequencies--------------- */}
-          <div className="m-2">
-            <DentalProcedureChart />
+          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
+            <div className="m-2">
+              <DentalProcedureChart />
+            </div>
           </div>
           {/* -------------revenue and payement perforemd------------- */}
-          <div className="m-2">
-            <RevenuByTreatmentChart />
+          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
+            <div className="m-2">
+              <RevenuByTreatmentChart />
+            </div>
+            <div className="m-2">
+              <RevenuByPatientGenreChart />
+            </div>
+            <div className="m-2">
+              <RevenuByPatientAgeChart />
+            </div>
           </div>
-          <div className="m-2">
-            <RevenuByPatientGenreChart />
-          </div>
-          <div className="m-2">
-            <RevenuByPatientAgeChart />
-          </div>
+
           {/* patient retention rates to understand patient loyalty (new vs returning) */}
           <div className="m-2">
             <PatientRetentionChart />

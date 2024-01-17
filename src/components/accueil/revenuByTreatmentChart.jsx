@@ -24,83 +24,127 @@ function RevenuByTreatmentChart() {
     { name: "Ceramic Braces", value: 5500 },
     { name: "Lingual Braces", value: 9.0 },
   ];
-  const margin = { top: 20, right: 20, bottom: 60, left: 60 };
-  const width = 500 - margin.left - margin.right;
-  const height = 500 - margin.top - margin.bottom;
 
   const svgRef = useRef();
 
   useEffect(() => {
-    const svg = d3
-      .select(svgRef.current)
-      .attr("viewBox", [
+    const sortedData = [...data].sort((a, b) => b.value - a.value).slice(0, 5);
+
+    const svg = d3.select(svgRef.current);
+    const width = 300;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const maxYValue = d3.max(sortedData, (d) => d.value);
+
+    svg.selectAll("*").remove();
+    // Define the gradient
+    const defs = svg.append("defs");
+    const gradient = defs
+      .append("linearGradient")
+      .attr("id", "ageGradient")
+      .attr("x1", "0%")
+      .attr("x2", "0%")
+      .attr("y1", "0%")
+      .attr("y2", "100%");
+    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#6D9499");
+    gradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "#87EAE9");
+    // ... axis setup ...
+    const xScale = d3
+      .scaleBand()
+      .domain(sortedData.map((d) => d.name))
+      // make an order of the data based on the value
+      .range([0, innerWidth])
+      .padding(0.2);
+    const yScale = d3
+      .scaleLinear()
+      .domain([
         0,
-        0,
-        width + margin.left + margin.right,
-        height + margin.top + margin.bottom,
+        d3.max(data, (d) => d.value) > 0 ? d3.max(data, (d) => d.value) : 1,
       ])
+      .range([innerHeight, 0]);
+    const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-    const x = d3
-      .scaleBand()
-      .rangeRound([0, width])
-      .padding(0.1)
-      .domain(data.map((d) => d.name));
 
-    const y = d3
-      .scaleLinear()
-      .rangeRound([height, 0])
-      .domain([0, d3.max(data, (d) => d.value)]);
+    // Create and format the y-axis
+    const yAxis = d3
+      .axisLeft(yScale)
+      .tickFormat(d3.format("d")) // Format as integer
+      .tickSize(-innerWidth) // Extend the tick lines across the chart width
 
+      .tickValues(
+        maxYValue <= 10
+          ? d3.range(0, maxYValue + 1)
+          : d3.ticks(0, maxYValue, 5), // For larger numbers, limit the number of ticks
+      ); // For small numbers, use every integer
+
+    g.append("g")
+      .call(yAxis)
+      .selectAll("text")
+      .style("font-weight", "bold")
+      .style("fill", "white");
+    g.select(".domain").style("stroke", "white");
+    g.selectAll(".tick line")
+      .style("stroke", "white")
+      .style("stroke-dasharray", "2,2");
+    g.select(".domain").remove();
+
+    // Create the x-axis
+    const xAxis = g
+      .append("g")
+      .attr("transform", `translate(0,${innerHeight})`)
+      .call(d3.axisBottom(xScale));
+    xAxis
+      .selectAll(".tick text")
+      .text((d) => (d.length > 10 ? d.substring(0, 10) + "..." : d));
+    // Rotate the x-axis labels
+    xAxis
+      .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 0)
+      .attr("dy", "1.4em")
+      .attr("transform", "rotate(25)")
+      .style("text-anchor", "start")
+      .style("font-weight", "bold")
+      .style("fill", "white");
+
+    xAxis.select(".domain").style("stroke", "white");
+    xAxis.selectAll(".tick line").style("stroke", "white");
+
+    // Draw bars
     svg
       .append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
-
-    svg
-      .selectAll("text")
-      .style("text-anchor", "start") // Anchor text from the start
-      .attr("dx", "-.6em") // No horizontal adjustment
-      .attr("dy", "1em") // Slight vertical adjustment for better visibility
-      .attr("transform", (d) => `translate(${x.bandwidth() / 2}, 0) rotate(35)`) // Position in the middle and rotate by 25 degrees
-      .text((d) => (d.length > 10 ? d.slice(0, 10) + "..." : d));
-    svg
-      .selectAll("text")
-      .append("title")
-      .text((d) => d);
-
-    svg.append("g").call(d3.axisLeft(y));
-
-    const bars = svg
+      .attr("transform", `translate(${margin.left},${margin.top})`)
       .selectAll(".bar")
-      .data(data)
+      .data(sortedData)
       .enter()
-      .append("g")
-      .attr("class", "bar");
-
-    bars
       .append("rect")
-      .attr("x", (d) => x(d.name))
-      .attr("y", (d) => y(d.value))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => height - y(d.value))
-      .style("fill", "steelblue");
-
-    bars
-      .append("text")
-      .attr("x", (d) => x(d.name) + x.bandwidth() / 2)
-      .attr("y", (d) => y(d.value) - 5)
-      .text((d) => d.value)
-      .attr("text-anchor", "middle")
-      .style("fill", "black")
-      .style("font-size", "10px");
+      .attr("class", "bar")
+      .attr("x", (d) => xScale(d.name))
+      .attr("y", (d) => yScale(d.value))
+      .attr("width", xScale.bandwidth())
+      .attr("height", (d) => innerHeight - yScale(d.value))
+      .attr("fill", "url(#ageGradient)")
+      .on("mouseover", function (event, d) {
+        d3.select(this).transition().duration(200).style("opacity", 0.7);
+        d3.select(this).append("title").text(`${d.value}`);
+      })
+      .on("mouseout", function () {
+        d3.select(this).transition().duration(200).style("opacity", 1);
+        d3.select(this).select("title").remove();
+      });
   }, [data]);
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Revenu par traitement</h2>
+      <h2 className="text-xl font-bold text-white">Revenu par traitement</h2>
       <div className="revenuByTreatmentChart">
-        <svg ref={svgRef} />
+        <svg ref={svgRef} width={300} height={300} />
       </div>
     </div>
   );

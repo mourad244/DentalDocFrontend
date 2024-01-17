@@ -6,25 +6,38 @@ function RevenuByPatientAgeChart() {
   //   create a chart for age distribution ( - Children (0-12 years)  - Teens (13-19 years)  - Young Adults (20-29 years)   - Adults (30-44 years)  - Middle-aged Adults (45-59 years)  - Seniors (60+ years) depending on the age of the patient
 
   const data = [
-    { name: "Children", value: 400 },
-    { name: "Teens", value: 300 },
-    { name: "Young Adults", value: 300 },
-    { name: "Adults", value: 200 },
-    { name: "Middle-aged Adults", value: 278 },
-    { name: "Seniors", value: 189 },
+    { name: "0-12", value: 400 },
+    { name: "13-19", value: 300 },
+    { name: "20-29", value: 300 },
+    { name: "30-44", value: 200 },
+    { name: "45-59", value: 278 },
+    { name: "60 +", value: 189 },
   ];
 
   const svgRef = useRef();
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-
-    const width = svg.attr("width");
-    const height = svg.attr("height");
-
-    const margin = { top: 20, right: 20, bottom: 20, left: 80 };
+    const width = 300;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 40, left: 60 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
+
+    svg.selectAll("*").remove();
+    const defs = svg.append("defs");
+    const gradient = defs
+      .append("linearGradient")
+      .attr("id", "ageGradient")
+      .attr("x1", "0%")
+      .attr("x2", "0%")
+      .attr("y1", "0%")
+      .attr("y2", "100%");
+    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#6D9499");
+    gradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "#87EAE9");
 
     const xScale = d3
       .scaleLinear()
@@ -41,46 +54,43 @@ function RevenuByPatientAgeChart() {
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    g.append("g").call(d3.axisLeft(yScale));
-    function wrap(text, width) {
-      text.each(function () {
-        var text = d3.select(this),
-          words = text.text().split(/\s+/).reverse(),
-          word,
-          line = [],
-          lineNumber = 0,
-          lineHeight = 1.1, // ems
-          y = text.attr("y"),
-          dy = parseFloat(text.attr("dy")),
-          tspan = text
-            .text(null)
-            .append("tspan")
-            .attr("x", -10)
-            .attr("y", y)
-            .attr("dy", dy + "em");
+    const yAxis = g.append("g").call(d3.axisLeft(yScale).tickSize(-innerWidth));
 
-        while ((word = words.pop())) {
-          line.push(word);
-          tspan.text(line.join(" "));
-          if (tspan.node().getComputedTextLength() > width) {
-            line.pop();
-            tspan.text(line.join(" "));
-            line = [word];
-            tspan = text
-              .append("tspan")
-              .attr("x", -10)
-              .attr("y", y)
-              .attr("dy", ++lineNumber * lineHeight + dy + "em")
-              .text(word);
-          }
-        }
-      });
-    }
+    yAxis
+      .selectAll(".tick text")
+      .attr("fill", "white")
+      .style("font-weight", "bold");
 
-    g.selectAll(".tick text").call(wrap, margin.left - 10);
+    yAxis.selectAll(".tick line").style("display", "none");
+    yAxis.select(".domain").remove();
+
+    const xAxis = d3.axisBottom(xScale);
+    xAxis
+      .tickFormat(d3.format("d")) // Format as integer
+      .tickSize(-innerHeight) // Extend the tick lines across the chart width
+      .tickValues(
+        d3.max(data, (d) => d.value) <= 10
+          ? d3.range(0, d3.max(data, (d) => d.value) + 1)
+          : d3.ticks(
+              0,
+              d3.max(data, (d) => d.value),
+              5,
+            ),
+      );
+    // change the lines colors to white
+
+    // Append and call xAxis
     g.append("g")
-      .call(d3.axisBottom(xScale))
-      .attr("transform", `translate(0, ${innerHeight})`);
+      .call(xAxis)
+      .attr("transform", `translate(0, ${innerHeight})`)
+      .selectAll("text")
+      .style("font-weight", "bold")
+      .style("fill", "white");
+    g.select(".domain").style("stroke", "white");
+    g.selectAll(".tick line")
+      .style("stroke", "white")
+      .style("stroke-dasharray", "2,2");
+    g.select(".domain").remove();
 
     g.selectAll("rect")
       .data(data)
@@ -88,14 +98,23 @@ function RevenuByPatientAgeChart() {
       .append("rect")
       .attr("y", (d) => yScale(d.name))
       .attr("width", (d) => xScale(d.value))
-      .attr("height", yScale.bandwidth());
+      .attr("height", yScale.bandwidth())
+      .attr("fill", "url(#ageGradient)")
+      .on("mouseover", function (event, d) {
+        d3.select(this).transition().duration(200).style("opacity", 0.7);
+        d3.select(this).append("title").text(`${d.value}`);
+      })
+      .on("mouseout", function () {
+        d3.select(this).transition().duration(200).style("opacity", 1);
+        d3.select(this).select("title").remove();
+      });
   }, []);
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Revenu by patient age</h2>
+      <h2 className="text-xl font-bold text-white"> by patient age</h2>
       <div className="revenuByPatientAgeChart">
-        <svg ref={svgRef} width="500" height="400" />
+        <svg ref={svgRef} width="300" height="300" />
       </div>
     </div>
   );
