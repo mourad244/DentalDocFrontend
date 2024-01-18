@@ -3,8 +3,8 @@ import * as d3 from "d3";
 
 function PatientByGenderChart() {
   const data = [
-    { name: "Homme", value: 20 },
-    { name: "Femme", value: 40 },
+    { name: "Homme", value: 60 },
+    { name: "Femme", value: 30 },
   ];
   const total = data.reduce((acc, item) => acc + item.value, 0);
 
@@ -37,7 +37,9 @@ function PatientByGenderChart() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white">Patient's Gender</h2>
+      <h2 className="text-center text-sm font-bold text-white">
+        Patient's Gender
+      </h2>
       <svg width={width} height={height}>
         <defs>
           {/* Gradient for "Homme" */}
@@ -51,80 +53,96 @@ function PatientByGenderChart() {
             <stop offset="100%" style={{ stopColor: "#A3C2C5" }} />
           </linearGradient>
         </defs>
-
-        <g transform={`translate(${margin.left},${margin.top})`}>
-          <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
-            {pie(data).map((d) => (
-              <path
-                key={d.data.name}
-                fill={colorScale(d.data.name)}
-                d={arc(d)}
-              />
-            ))}
-          </g>
-          <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
-            {pie(data).map((d, i) => (
-              <g key={d.data.name}>
-                <path
-                  fill={colorScale(d.data.name)}
-                  d={arc(d)}
-                  onMouseOver={(event) => {
-                    // Show tooltip on mouse over
-                    const tooltip = d3.select("#tooltip");
-                    tooltip.style("display", "block");
-                    tooltip.text(`${d.data.name}: ${d.data.value}`);
-                    tooltip.style("left", event.clientX + "px");
-                    tooltip.style("top", event.clientY + "px");
-                  }}
-                  onMouseOut={(event) => {
-                    d3.select(event.currentTarget)
-                      .transition()
-                      .duration(200)
-                      .style("opacity", 1);
-                  }}
-                >
-                  <title>{`${d.data.value}`}</title>
-                </path>
-                <text
-                  transform={`translate(${arc.centroid(d)[0]}, ${
-                    arc.centroid(d)[1] - 6
-                  })`}
-                  textAnchor="middle"
-                  alignmentBaseline="middle"
-                  fill={getContrastYIQ(colorScale(d.data.name))}
-                  fontSize="12px"
-                  fontWeight="bold"
-                >
-                  {d.data.name}
-                </text>
-                <text
-                  transform={`translate(${arc.centroid(d)[0]}, ${
-                    arc.centroid(d)[1] + 10
-                  })`}
-                  textAnchor="middle"
-                  alignmentBaseline="middle"
-                  fill={getContrastYIQ(colorScale(d.data.name))}
-                  fontSize="14px"
-                  fontWeight="bold"
-                >
-                  {`${((d.data.value / total) * 100).toFixed(1)}%`}
-                </text>
+        {total === 0 ? (
+          <text
+            transform={`translate(${width / 2}, ${height / 2})`}
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            fill="white"
+            fontSize="20px"
+            fontWeight="bold"
+          >
+            No Data
+          </text>
+        ) : (
+          <>
+            <g transform={`translate(${margin.left},${margin.top})`}>
+              <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
+                {pie(data).map((d) => (
+                  <path
+                    key={d.data.name}
+                    fill={colorScale(d.data.name)}
+                    d={arc(d)}
+                  />
+                ))}
               </g>
-            ))}
-          </g>
-        </g>
-        <text
-          transform={`translate(${innerWidth / 2 + 20}, ${
-            innerHeight / 2 + 20
-          })`}
-          textAnchor="middle"
-          alignmentBaseline="middle"
-          fill="white"
-          fontSize="20px"
-          fontWeight="bold"
-        >
-          Total: {total}
-        </text>
+              <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
+                {pie(data).map((d, i) => (
+                  <g key={d.data.name}>
+                    <path
+                      fill={colorScale(d.data.name)}
+                      d={arc(d)}
+                      // onMouseOver={(event) => {
+                      //   // Show tooltip on mouse over
+                      //   const tooltip = d3.select("#tooltip");
+                      //   tooltip.style("display", "block");
+                      //   tooltip.text(`${d.data.name}: ${d.data.value}`);
+                      //   tooltip.style("left", event.clientX + "px");
+                      //   tooltip.style("top", event.clientY + "px");
+                      // }}
+                      // onMouseOut={() => {
+                      //   // Hide tooltip on mouse out
+                      //   d3.select("#tooltip")
+
+                      //     .transition()
+                      //     .duration(500)
+                      //     .style("display", "none");
+                      // }}
+                    >
+                      <title>{`${d.data.value}`}</title>
+                    </path>
+                    <text
+                      transform={`translate(${arc.centroid(d)[0]}, ${
+                        arc.centroid(d)[1] - 6
+                      })`}
+                      textAnchor="middle"
+                      alignmentBaseline="middle"
+                      fill={getContrastYIQ(colorScale(d.data.name))}
+                      fontSize="12px"
+                      fontWeight="bold"
+                    >
+                      {d.data.name}
+                    </text>
+                    <text
+                      transform={`translate(${arc.centroid(d)[0]}, ${
+                        arc.centroid(d)[1] + 10
+                      })`}
+                      textAnchor="middle"
+                      alignmentBaseline="middle"
+                      fill={getContrastYIQ(colorScale(d.data.name))}
+                      fontSize="14px"
+                      fontWeight="bold"
+                    >
+                      {`${((d.data.value / total) * 100).toFixed(1)}%`}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            </g>
+            <text
+              transform={`translate(${innerWidth / 2 + 20}, ${
+                innerHeight / 2 + 20
+              })`}
+              textAnchor="middle"
+              alignmentBaseline="middle"
+              fill="white"
+              fontSize="20px"
+              fontWeight="bold"
+            >
+              Total: {total}
+            </text>
+          </>
+        )}
       </svg>
     </div>
   );

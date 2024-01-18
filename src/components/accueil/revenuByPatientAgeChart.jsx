@@ -6,12 +6,12 @@ function RevenuByPatientAgeChart() {
   //   create a chart for age distribution ( - Children (0-12 years)  - Teens (13-19 years)  - Young Adults (20-29 years)   - Adults (30-44 years)  - Middle-aged Adults (45-59 years)  - Seniors (60+ years) depending on the age of the patient
 
   const data = [
-    { name: "0-12", value: 400 },
-    { name: "13-19", value: 300 },
-    { name: "20-29", value: 300 },
-    { name: "30-44", value: 200 },
-    { name: "45-59", value: 278 },
     { name: "60 +", value: 189 },
+    { name: "45-59", value: 278 },
+    { name: "30-44", value: 200 },
+    { name: "20-29", value: 300 },
+    { name: "13-19", value: 300 },
+    { name: "0-12", value: 400 },
   ];
 
   const svgRef = useRef();
@@ -111,8 +111,10 @@ function RevenuByPatientAgeChart() {
   }, []);
 
   return (
-    <div>
-      <h2 className="text-xl font-bold text-white"> by patient age</h2>
+    <div className="w-fit">
+      <h2 className="text-center text-sm font-bold text-white">
+        by patient age
+      </h2>
       <div className="revenuByPatientAgeChart">
         <svg ref={svgRef} width="300" height="300" />
       </div>

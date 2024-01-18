@@ -141,8 +141,10 @@ function RevenuByTreatmentChart() {
   }, [data]);
 
   return (
-    <div>
-      <h2 className="text-xl font-bold text-white">Revenu par traitement</h2>
+    <div className="w-fit">
+      <h2 className="text-center text-sm font-bold text-white">
+        Revenu par traitement
+      </h2>
       <div className="revenuByTreatmentChart">
         <svg ref={svgRef} width={300} height={300} />
       </div>

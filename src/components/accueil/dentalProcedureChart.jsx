@@ -17,7 +17,7 @@ function DentalProcedureChart() {
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-    const width = 300;
+    const width = 400;
     const height = 300;
     const margin = { top: 20, right: 30, bottom: 40, left: 40 };
     const innerWidth = width - margin.left - margin.right;
@@ -127,8 +127,10 @@ function DentalProcedureChart() {
 
   return (
     <div className="w-auto">
-      <h2 className="text-xl font-bold text-white">Common procedures</h2>
-      <svg ref={svgRef} width={300} height={300} />
+      <h2 className="text-center text-sm font-bold text-white">
+        Common procedures
+      </h2>
+      <svg ref={svgRef} width={400} height={300} />
     </div>
   );
 }

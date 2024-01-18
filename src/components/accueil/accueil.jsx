@@ -312,7 +312,7 @@ function Accueil() {
   };
 
   return (
-    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
+    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border bg-[#E5EEEB] shadow-component ">
       <div className="mx-2 flex h-14">
         <ul className="m-auto flex list-none rounded-md bg-[#f5f5f5] p-2 shadow-custom">
           {times.map((data, index) => (
@@ -348,48 +348,76 @@ function Accueil() {
           <ClipLoader loading={loading} size={70} />
         </div>
       ) : (
-        <div className="m-2 flex flex-col">
+        <div className="m-2 flex flex-wrap">
           {/*------------ patient demographic--------------- */}
-          <div className="flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
-            <div className="m-2">
-              <PatientByAgeChart data={patientsByAge} />
-            </div>
-            <div className="m-2">
-              <PatientByGenderChart />
+          <div className="m-2  w-fit  rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
+            <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
+              Patient Demographics
+            </h2>
+            <div className="flex ">
+              <div className="m-2">
+                <PatientByAgeChart data={patientsByAge} />
+              </div>
+              <div className="m-2">
+                <PatientByGenderChart />
+              </div>
             </div>
           </div>
           {/* ------------appointement statistics------------ */}
-          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
+          <div className="m-2 h-fit  w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
             {/*             <div className="m-2">
               <AppointementChart />
             </div> */}
-            <div className="m-2">
-              <AppointementTotalChart />
+            <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
+              Appointment Statistics
+            </h2>
+            <div className="flex ">
+              <div className="m-2">
+                <AppointementTotalChart />
+              </div>
             </div>
           </div>
           {/*-------------treatement types and frequencies--------------- */}
-          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
-            <div className="m-2">
-              <DentalProcedureChart />
+          <div className="m-2 h-fit w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756]  shadow-custom">
+            <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
+              Treatement types and frequencies
+            </h2>
+            <div className="flex ">
+              <div className="m-2">
+                <DentalProcedureChart />
+              </div>
+            </div>
+          </div>
+          {/* patient retention rates to understand patient loyalty (new vs returning) */}
+
+          <div className="m-2  h-fit w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
+            <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
+              Patient Retention Rates
+            </h2>
+            <div className="flex ">
+              <div className="m-2">
+                <PatientRetentionChart />
+              </div>
             </div>
           </div>
           {/* -------------revenue and payement perforemd------------- */}
-          <div className="mt-2 flex w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] p-2 shadow-custom">
-            <div className="m-2">
-              <RevenuByTreatmentChart />
-            </div>
-            <div className="m-2">
-              <RevenuByPatientGenreChart />
-            </div>
-            <div className="m-2">
-              <RevenuByPatientAgeChart />
+          <div className="m-2 h-fit  w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
+            <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
+              Revenue and Payment Trends
+            </h2>
+            <div className="flex ">
+              <div className="m-2 ">
+                <RevenuByTreatmentChart />
+              </div>
+              <div className="m-2">
+                <RevenuByPatientGenreChart />
+              </div>
+              <div className="m-2">
+                <RevenuByPatientAgeChart />
+              </div>
             </div>
           </div>
 
-          {/* patient retention rates to understand patient loyalty (new vs returning) */}
-          <div className="m-2">
-            <PatientRetentionChart />
-          </div>
           {/* waiting time and service efficiency: average waiting time and duration of appointment */}
         </div>
       )}
