@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-function RevenuByPatientAgeChart() {
+function RevenuByPatientAgeChart({ data }) {
   // create an horizontal line chart to visualize payment by age distribution
   //   create a chart for age distribution ( - Children (0-12 years)  - Teens (13-19 years)  - Young Adults (20-29 years)   - Adults (30-44 years)  - Middle-aged Adults (45-59 years)  - Seniors (60+ years) depending on the age of the patient
 
-  const data = [
-    { name: "60 +", value: 189 },
-    { name: "45-59", value: 278 },
-    { name: "30-44", value: 200 },
-    { name: "20-29", value: 300 },
-    { name: "13-19", value: 300 },
-    { name: "0-12", value: 400 },
-  ];
+  // const data = [
+  //   { name: "60 +", number: 189 },
+  //   { name: "45-59", number: 278 },
+  //   { name: "30-44", number: 200 },
+  //   { name: "20-29", number: 300 },
+  //   { name: "13-19", number: 300 },
+  //   { name: "0-12", number: 400 },
+  // ];
 
   const svgRef = useRef();
 
@@ -41,7 +41,7 @@ function RevenuByPatientAgeChart() {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.value)])
+      .domain([0, d3.max(data, (d) => d.number)])
       .range([0, innerWidth]);
 
     const yScale = d3
@@ -69,11 +69,11 @@ function RevenuByPatientAgeChart() {
       .tickFormat(d3.format("d")) // Format as integer
       .tickSize(-innerHeight) // Extend the tick lines across the chart width
       .tickValues(
-        d3.max(data, (d) => d.value) <= 10
-          ? d3.range(0, d3.max(data, (d) => d.value) + 1)
+        d3.max(data, (d) => d.number) <= 10
+          ? d3.range(0, d3.max(data, (d) => d.number) + 1)
           : d3.ticks(
               0,
-              d3.max(data, (d) => d.value),
+              d3.max(data, (d) => d.number),
               5,
             ),
       );
@@ -97,12 +97,12 @@ function RevenuByPatientAgeChart() {
       .enter()
       .append("rect")
       .attr("y", (d) => yScale(d.name))
-      .attr("width", (d) => xScale(d.value))
+      .attr("width", (d) => xScale(d.number))
       .attr("height", yScale.bandwidth())
       .attr("fill", "url(#ageGradient)")
       .on("mouseover", function (event, d) {
         d3.select(this).transition().duration(200).style("opacity", 0.7);
-        d3.select(this).append("title").text(`${d.value}`);
+        d3.select(this).append("title").text(`${d.number}`);
       })
       .on("mouseout", function () {
         d3.select(this).transition().duration(200).style("opacity", 1);

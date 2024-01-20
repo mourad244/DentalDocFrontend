@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { getDevis } from "../../services/deviService";
 import { getPaiements } from "../../services/paiementService";
+import { getActeDentaires } from "../../services/acteDentaireService";
 
 import PatientByAgeChart from "./patientByAgeChart";
 import AppointementChart from "./appointementByDayChart";
@@ -17,16 +18,58 @@ import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import VerticalDashedLine from "../../assets/verticalDashedLine";
+
+const calculateAge = (dateOfBirth) => {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
 
 function Accueil() {
   // const [filteredDevis, setFilteredDevis] = useState([]);
   const date = new Date();
   const [devis, setDevis] = useState([]);
   const [paiements, setPaiements] = useState([]);
+  const [acteDentaires, setActeDentaires] = useState([]);
   const [totalMontantDevis, setTotalMontantDevis] = useState(0);
   const [totalMontantPaiements, setTotalMontantPaiements] = useState(0);
 
-  const [patientsByAge, setPatientsByAge] = useState([]);
+  const [patientsByAge, setPatientsByAge] = useState([
+    { name: "0-12", number: 0, value: 12 },
+    { name: "13-19", number: 0, value: 19 },
+    { name: "20-29", number: 0, value: 29 },
+    { name: "30-44", number: 0, value: 44 },
+    { name: "45-59", number: 0, value: 59 },
+    { name: "60+", number: 0, value: 60 },
+  ]);
+  const [patientsByGender, setPatientsByGender] = useState([
+    { name: "Homme", number: 0 },
+    { name: "Femme", number: 0 },
+  ]);
+  const [revenuByPatientGenre, setRevenuByPatientGenre] = useState([
+    { name: "Homme", number: 0 },
+    { name: "Femme", number: 0 },
+  ]);
+  const [revenuByPatientAge, setRevenuByPatientAge] = useState([
+    { name: "0-12", number: 0, value: 12 },
+    { name: "13-19", number: 0, value: 19 },
+    { name: "20-29", number: 0, value: 29 },
+    { name: "30-44", number: 0, value: 44 },
+    { name: "45-59", number: 0, value: 59 },
+    { name: "60+", number: 0, value: 60 },
+  ]);
+  const [topActeDentaires, setTopActeDentaires] = useState([]);
+  const [patientRetention, setPatientRetention] = useState([
+    { name: "New", number: 0 },
+    { name: "Returning", number: 0 },
+  ]);
+
   const [times, setTimes] = useState([
     { nom: "journee", active: false },
     // { nom: "semaine", active: false },
@@ -48,8 +91,10 @@ function Accueil() {
       setLoading(true);
       const { data: devis } = await getDevis();
       const { data: paiements } = await getPaiements();
+      const { data: acteDentairesData } = await getActeDentaires();
       setDevis(devis);
       setPaiements(paiements);
+      setActeDentaires(acteDentairesData);
       setLoading(false);
     };
     fetchData();
@@ -58,102 +103,93 @@ function Accueil() {
   useEffect(() => {
     let filteredDevis = [...devis];
     let filteredPaiements = [...paiements];
-    console.log("devis", devis);
-    console.log("paiements", paiements);
     // nombre de patients par periode
     let totalDevis = 0;
     let totalPaiements = 0;
-    const calculateAge = (dateOfBirth) => {
-      const today = new Date();
-      const birthDate = new Date(dateOfBirth);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age;
-    };
+
     // --------------- patient by age data --------------
 
     let newPatientsByAge = [
-      { name: "Children", number: 0, value: 12 },
-      { name: "Teens", number: 0, value: 19 },
-      { name: "Young Adults", number: 0, value: 29 },
-      { name: "Adults", number: 0, value: 44 },
-      { name: "Middle-Aged Adults", number: 0, value: 59 },
-      { name: "Seniors", number: 0, value: 60 },
+      { name: "0-12", number: 0, value: 12 },
+      { name: "13-19", number: 0, value: 19 },
+      { name: "20-29", number: 0, value: 29 },
+      { name: "30-44", number: 0, value: 44 },
+      { name: "45-59", number: 0, value: 59 },
+      { name: "60+", number: 0, value: 60 },
     ];
 
-    const categorizeByAge = (dateOfBirth) => {
-      const age = calculateAge(dateOfBirth);
+    let newPatientsByGender = [
+      { name: "Homme", number: 0 },
+      { name: "Femme", number: 0 },
+    ];
+    let newTopActeDentaires = [];
+    let newPatientRetention = [
+      { name: "New", number: 0 },
+      { name: "Returning", number: 0 },
+    ];
+
+    let newRevenuByPatientGenre = [
+      { name: "Homme", number: 0 },
+      { name: "Femme", number: 0 },
+    ];
+    let newRevenuByPatientAge = [
+      { name: "0-12", number: 0, value: 12 },
+      { name: "13-19", number: 0, value: 19 },
+      { name: "20-29", number: 0, value: 29 },
+      { name: "30-44", number: 0, value: 44 },
+      { name: "45-59", number: 0, value: 59 },
+      { name: "60+", number: 0, value: 60 },
+    ];
+    /* 
+    
+
+    ---------- payement------------------
+     
+       const revenuByPatientAge = [
+        { name: "Children", number: 0, value: 12 },
+        { name: "Teens", number: 0, value: 19 },
+        { name: "Young Adults", number: 0, value: 29 },
+        { name: "Adults", number: 0, value: 44 },
+        { name: "Middle-Aged Adults", number: 0, value: 59 },
+        { name: "Seniors", number: 0, value: 60 },
+      ];
+      
+
+
+    ------------appointment data--------------
+    const appointmentTypes = [
+      { name: "Scheduled", number: 10 },
+      { name: "Canceled", number: 50 },
+      { name: "Walk-ins", number: 0 },
+      { name: "Missed", number: 20 },
+    ];
+
+ */
+    const uniquePatientIds = new Set();
+
+    const getPatientData = (patient) => {
+      if (uniquePatientIds.has(patient._id)) return; // Skip if patient already counted
+      // check the length of patientId.deviIds if 1 then new else returning,
+      if (patient.deviIds.length === 1) newPatientRetention[0].number++;
+      else newPatientRetention[1].number++;
+
+      // Categorize by age
+      const age = calculateAge(patient.dateNaissance);
       for (let category of newPatientsByAge) {
         if (age <= category.value) {
           category.number++;
           break;
         }
       }
+      // Categorize by gender
+      if (patient.isMasculin) {
+        newPatientsByGender[0].number++;
+      } else {
+        newPatientsByGender[1].number++;
+      }
+
+      uniquePatientIds.add(patient._id);
     };
-
-    /*
-    patientsByGender = [
-      { name: "Homme", number: 0 },
-      { name: "Femme", number: 0 },
-    ];
-    
-    --------------- appointement data --------------
-    appointmentsByDay = [
-      { day/month/year: 0, scheduled: 0, canceled: 0, missed: 0, walk-ins: 0 },
-      .
-      .
-      .
-    ]
-    appointmentsTotal = [
-      { name: "scheduled", value: 0 },
-      { name: "canceled", value: 0 },
-      { name: "missed", value: 0 },
-      { name: "walk-ins", value: 0 },
-    ];
-
-    --------------- dental procedure data --------------
-    dentalProcedures = [
-      { name: "Extraction", value: 0 },
-      { name: "Filling", value: 0 },
-      { name: "Cleaning", value: 0 },
-      { name: "Root Canal", value: 0 },
-      { name: "Crown", value: 0 },
-      { name: "Implant", value: 0 },
-      { name: "Other", value: 0 },
-    ]
-
-    --------------- revenu by treatment data --------------
-    revenuByTreatment = [
-      { name: "Extraction", value: 0 },
-      { name: "Filling", value: 0 },
-      { name: "Cleaning", value: 0 },
-      { name: "Root Canal", value: 0 },
-      { name: "Crown", value: 0 },
-      { name: "Implant", value: 0 },
-      { name: "Other", value: 0 },
-    ]
-    revenuByPatientGenre = [
-      { name: "Homme", value: 0 },
-      { name: "Femme", value: 0 },
-    ]
-
-    revenuByPatientAge = [
-      { name: "Children", number: 0,value: 12 },
-      { name: "Teens", number: 0,value:19 },
-      { name: "Young Adults", number: 0, value:29 },
-      { name: "Adults", number: 0,value:44 },
-      { name: "Middle-aged Adults", number: 0 ,value:59},
-      { name: "Seniors", number: 0 },
-    ]
-    --------------- patient retention data --------------
-    patientRetention = [
-      { name: "New", value: 0 },
-      { name: "Returning", value: 0 },
-    ]
-    */
     const getData = () => {
       switch (time.nom) {
         case "journee":
@@ -192,9 +228,51 @@ function Accueil() {
                   time.value.getFullYear(),
             )
             // add the total of filtered devis
-            .forEach((devisItem) => {
-              totalDevis += devisItem.montant;
-              categorizeByAge(devisItem.patientId.dateNaissance);
+            .forEach((deviItem) => {
+              //----------- calculate top acte dentaire
+              deviItem.acteEffectues.forEach((acteDentaire) => {
+                const foundedActeDentaire = acteDentaires.find(
+                  (data) =>
+                    data._id.toString() === acteDentaire.acteId.toString(),
+                );
+                if (foundedActeDentaire) {
+                  // top acte dentaire
+                  const indexTopActeDentaires = newTopActeDentaires.findIndex(
+                    (data) => data.name === foundedActeDentaire.nom,
+                  );
+                  if (indexTopActeDentaires === -1) {
+                    newTopActeDentaires.push({
+                      name: foundedActeDentaire.nom,
+                      number: 1,
+                      montant: foundedActeDentaire.prix,
+                    });
+                  } else {
+                    newTopActeDentaires[indexTopActeDentaires].number++;
+                    newTopActeDentaires[indexTopActeDentaires].montant +=
+                      foundedActeDentaire.prix;
+                  }
+
+                  // revenu by patient genre
+                  // if deviItem.patientId.isMasculin
+                  if (deviItem.patientId.isMasculin) {
+                    newRevenuByPatientGenre[0].number += acteDentaire.prix;
+                  } else {
+                    newRevenuByPatientGenre[1].number += acteDentaire.prix;
+                  }
+                  // revenu by patient age
+                  const age = calculateAge(deviItem.patientId.dateNaissance);
+                  for (let category of newRevenuByPatientAge) {
+                    if (age <= category.value) {
+                      category.number += acteDentaire.prix;
+                      break;
+                    }
+                  }
+                }
+              });
+              // calculate the retentation
+
+              totalDevis += deviItem.montant;
+              getPatientData(deviItem.patientId);
             });
           filteredPaiements = filteredPaiements
             .filter(
@@ -205,7 +283,10 @@ function Accueil() {
             .forEach((paiementItem) => {
               totalPaiements += paiementItem.montant;
             });
-
+          setTopActeDentaires(newTopActeDentaires);
+          setRevenuByPatientGenre(newRevenuByPatientGenre);
+          console.log("1", newRevenuByPatientAge);
+          setRevenuByPatientAge(newRevenuByPatientAge);
           break;
         case "trimestre":
           break;
@@ -230,10 +311,11 @@ function Accueil() {
       setTotalMontantDevis(totalDevis);
       setTotalMontantPaiements(totalPaiements);
       setPatientsByAge(newPatientsByAge);
-      console.log("patientsByAge", newPatientsByAge);
+      setPatientsByGender(newPatientsByGender);
+      setPatientRetention(newPatientRetention);
     };
     getData();
-  }, [devis, paiements, time]);
+  }, [devis, paiements, acteDentaires, time]);
 
   const updateTimeChanged = (index) => {
     let newArray = [...times];
@@ -358,8 +440,10 @@ function Accueil() {
               <div className="m-2">
                 <PatientByAgeChart data={patientsByAge} />
               </div>
+              <VerticalDashedLine />
+
               <div className="m-2">
-                <PatientByGenderChart />
+                <PatientByGenderChart data={patientsByGender} />
               </div>
             </div>
           </div>
@@ -384,7 +468,7 @@ function Accueil() {
             </h2>
             <div className="flex ">
               <div className="m-2">
-                <DentalProcedureChart />
+                <DentalProcedureChart data={topActeDentaires} />
               </div>
             </div>
           </div>
@@ -396,7 +480,7 @@ function Accueil() {
             </h2>
             <div className="flex ">
               <div className="m-2">
-                <PatientRetentionChart />
+                <PatientRetentionChart data={patientRetention} />
               </div>
             </div>
           </div>
@@ -407,13 +491,16 @@ function Accueil() {
             </h2>
             <div className="flex ">
               <div className="m-2 ">
-                <RevenuByTreatmentChart />
+                <RevenuByTreatmentChart data={topActeDentaires} />
               </div>
+              <VerticalDashedLine />
+
               <div className="m-2">
-                <RevenuByPatientGenreChart />
+                <RevenuByPatientGenreChart data={revenuByPatientGenre} />
               </div>
+              <VerticalDashedLine />
               <div className="m-2">
-                <RevenuByPatientAgeChart />
+                <RevenuByPatientAgeChart data={revenuByPatientAge} />
               </div>
             </div>
           </div>

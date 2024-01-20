@@ -52,9 +52,12 @@ class LoginForm extends Form {
             </p>
 
             <form onSubmit={this.handleSubmit}>
-              {this.renderInput("email", "email")}
-              {this.renderInput("password", "Password", 170, 35, "password")}
-              {this.renderButton("Login")}
+              <div className="mt-3">{this.renderInput("email", "email")}</div>
+              <div className="mt-3">
+                {this.renderInput("password", "Password", 170, 35, "password")}
+              </div>
+
+              <div className="mt-3">{this.renderButton("Login")}</div>
               <ToastContainer />
             </form>
           </div>

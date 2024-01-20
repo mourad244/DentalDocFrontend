@@ -1,12 +1,12 @@
 import React from "react";
 import * as d3 from "d3";
 
-function PatientByGenderChart() {
+function PatientByGenderChart(/* { data } */) {
   const data = [
-    { name: "Homme", value: 60 },
-    { name: "Femme", value: 30 },
+    { name: "Homme", number: 60 },
+    { name: "Femme", number: 30 },
   ];
-  const total = data.reduce((acc, item) => acc + item.value, 0);
+  const total = data.reduce((acc, item) => acc + item.number, 0);
 
   const width = 300;
   const height = 300;
@@ -24,7 +24,7 @@ function PatientByGenderChart() {
     .domain(data.map((d) => d.name))
     .range(["url(#gradient1)", "url(#gradient2)"]); // Use gradient URLs
 
-  const pie = d3.pie().value((d) => d.value);
+  const pie = d3.pie().value((d) => d.number);
 
   const getContrastYIQ = (hexcolor) => {
     hexcolor = hexcolor.replace("#", "");
@@ -37,9 +37,7 @@ function PatientByGenderChart() {
 
   return (
     <div>
-      <h2 className="text-center text-sm font-bold text-white">
-        Patient's Gender
-      </h2>
+      <h2 className="text-sm font-bold text-white">Patient's Gender</h2>
       <svg width={width} height={height}>
         <defs>
           {/* Gradient for "Homme" */}
@@ -68,38 +66,19 @@ function PatientByGenderChart() {
           <>
             <g transform={`translate(${margin.left},${margin.top})`}>
               <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
-                {pie(data).map((d) => (
-                  <path
-                    key={d.data.name}
-                    fill={colorScale(d.data.name)}
-                    d={arc(d)}
-                  />
-                ))}
-              </g>
-              <g transform={`translate(${innerWidth / 2},${innerHeight / 2})`}>
                 {pie(data).map((d, i) => (
                   <g key={d.data.name}>
                     <path
                       fill={colorScale(d.data.name)}
                       d={arc(d)}
-                      // onMouseOver={(event) => {
-                      //   // Show tooltip on mouse over
-                      //   const tooltip = d3.select("#tooltip");
-                      //   tooltip.style("display", "block");
-                      //   tooltip.text(`${d.data.name}: ${d.data.value}`);
-                      //   tooltip.style("left", event.clientX + "px");
-                      //   tooltip.style("top", event.clientY + "px");
-                      // }}
-                      // onMouseOut={() => {
-                      //   // Hide tooltip on mouse out
-                      //   d3.select("#tooltip")
-
-                      //     .transition()
-                      //     .duration(500)
-                      //     .style("display", "none");
-                      // }}
+                      onMouseOver={(e) => {
+                        d3.select(e.target).style("opacity", 0.5);
+                      }}
+                      onMouseOut={(e) => {
+                        d3.select(e.target).style("opacity", 1);
+                      }}
                     >
-                      <title>{`${d.data.value}`}</title>
+                      <title>{`${d.data.number}`}</title>
                     </path>
                     <text
                       transform={`translate(${arc.centroid(d)[0]}, ${
@@ -123,7 +102,7 @@ function PatientByGenderChart() {
                       fontSize="14px"
                       fontWeight="bold"
                     >
-                      {`${((d.data.value / total) * 100).toFixed(1)}%`}
+                      {`${((d.data.number / total) * 100).toFixed(1)}%`}
                     </text>
                   </g>
                 ))}
