@@ -1,15 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-function PatientByAgeChart(/* { data } */) {
-  const data = [
-    { name: "0 - 12", number: 180 },
-    { name: "13 - 19", number: 230 },
-    { name: "20 - 29", number: 312 },
-    { name: "30 - 44", number: 193 },
-    { name: "45 - 59", number: 278 },
-    { name: "60 +", number: 32 },
-  ];
+function PatientByAgeChart({ data }) {
+  // const data = [
+  //   { name: "0 - 12", number: 180 },
+  //   { name: "13 - 19", number: 230 },
+  //   { name: "20 - 29", number: 312 },
+  //   { name: "30 - 44", number: 193 },
+  //   { name: "45 - 59", number: 278 },
+  //   { name: "60 +", number: 32 },
+  // ];
   const svgRef = useRef();
 
   useEffect(() => {

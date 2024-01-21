@@ -1,11 +1,11 @@
 import React from "react";
 import * as d3 from "d3";
 
-function PatientByGenderChart(/* { data } */) {
-  const data = [
-    { name: "Homme", number: 60 },
-    { name: "Femme", number: 30 },
-  ];
+function PatientByGenderChart({ data }) {
+  // const data = [
+  //   { name: "Homme", number: 60 },
+  //   { name: "Femme", number: 30 },
+  // ];
   const total = data.reduce((acc, item) => acc + item.number, 0);
 
   const width = 300;

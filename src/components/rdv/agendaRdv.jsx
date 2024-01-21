@@ -31,13 +31,15 @@ const AgendaRdv = (props) => {
     "Samedi",
     "Dimanche",
   ];
-  const { /* selectedMedecin, */ selectedPatient } = props;
+  const { selectedPatient, selectedRdv } = props;
   const date = new Date();
   const [rdvs, setRdvs] = useState([]);
   const [filteredRdvs, setFilteredRdvs] = useState([]);
-  const [nombreDays, setNombreDays] = useState("");
-  const [reload, setReload] = useState(true);
+
   const [time, setTime] = useState(new Date());
+  const [reload, setReload] = useState(true);
+  const [nombreDays, setNombreDays] = useState("");
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: rdvs } = await getRdvs();
@@ -46,6 +48,7 @@ const AgendaRdv = (props) => {
     };
     if (reload) fetchData();
   }, [reload]);
+
   useEffect(() => {
     const filterRdvs = async () => {
       let listRdvObj = {};
@@ -54,8 +57,6 @@ const AgendaRdv = (props) => {
       rdvs
         .filter((e) => {
           return (
-            /* (e.medecinId._id === selectedMedecin._id ||
-              e.medecinId._id === selectedMedecin) && */
             new Date(e.datePrevu).getFullYear() === time.getFullYear() &&
             new Date(e.datePrevu).getMonth() === time.getMonth()
           );
@@ -74,11 +75,10 @@ const AgendaRdv = (props) => {
           if (!listRdvObj[date]) return (listRdvObj[date] = 1);
           else return (listRdvObj[date] += 1);
         });
-
       setFilteredRdvs(newfilteredRdvs);
     };
     filterRdvs();
-  }, [rdvs /* , selectedMedecin */, selectedPatient, time]);
+  }, [rdvs, selectedPatient, time]);
   useEffect(() => {
     const daysInMonth = () => {
       const newNombreDays = new Date(
@@ -113,7 +113,6 @@ const AgendaRdv = (props) => {
     } else if (window.confirm("Confirmer l'ajour du rdv")) {
       await saveRdv({
         patientId: selectedPatient._id,
-        // medecinId: selectedMedecin._id ? selectedMedecin._id : selectedMedecin,
         datePrevu: date,
       });
       setReload(true);
@@ -138,6 +137,8 @@ const AgendaRdv = (props) => {
           });
 
           if (found) {
+            console.log("selectedRdv", selectedRdv);
+            console.log("found", found);
             if (
               d.getFullYear() > date.getFullYear() ||
               (d.getFullYear() >= date.getFullYear() &&
@@ -145,11 +146,11 @@ const AgendaRdv = (props) => {
               (d.getFullYear() >= date.getFullYear() &&
                 d.getMonth() >= date.getMonth() &&
                 d.getDate() >= date.getDate())
-            )
+            ) {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="shadow-daySelected m-2 flex h-10 w-10  cursor-pointer rounded-3xl bg-[#455a94] text-white"
+                  className="m-2 flex h-10 w-10 cursor-pointer  rounded-3xl bg-[#455a94] text-white shadow-daySelected"
                   onClick={() => handleSelectedDate(t)}
                 >
                   <label className="m-auto cursor-pointer align-middle text-sm font-bold">
@@ -157,7 +158,7 @@ const AgendaRdv = (props) => {
                   </label>
                 </div>,
               );
-            else
+            } else {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
@@ -169,6 +170,7 @@ const AgendaRdv = (props) => {
                   </label>
                 </div>,
               );
+            }
           } else if (!found || found.nombre < 10) {
             if (
               d.getFullYear() > date.getFullYear() ||
@@ -205,7 +207,7 @@ const AgendaRdv = (props) => {
             arrayDiv.push(
               <div
                 key={"date-active" + countTotal}
-                className="shadow-dayFull pointer-events-none  m-2 flex h-10 w-10 rounded-3xl bg-[#eaeaea]"
+                className="pointer-events-none m-2  flex h-10 w-10 rounded-3xl bg-[#eaeaea] shadow-dayFull"
                 onClick={() => handleSelectedDate(t)}
               >
                 <label className="m-auto cursor-pointer align-middle text-sm font-bold">
@@ -221,7 +223,7 @@ const AgendaRdv = (props) => {
             <div
               key={"date-inactif" + j}
               className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-            ></div>,
+            />,
           );
           countTotal++;
         } else {
@@ -229,7 +231,7 @@ const AgendaRdv = (props) => {
             <div
               key={"date-inactif" + j}
               className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-            ></div>,
+            />,
           );
         }
       }

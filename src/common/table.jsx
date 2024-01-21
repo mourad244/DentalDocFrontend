@@ -26,7 +26,6 @@ const Table = ({
           onItemsSelect={onItemsSelect}
           onSort={onSort}
         />
-
         <TableBody columns={columns} data={data} />
       </table>
     </>

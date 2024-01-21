@@ -96,7 +96,6 @@ function Rdvs() {
         newRdvs[index].isHonnore = !newRdvs[index].isHonnore;
         await saveRdv({
           _id: e._id,
-          // medecinId: e.medecinId._id,
           patientId: e.patientId._id,
           datePrevu: e.datePrevu,
           isHonnore: e.isHonnore,
@@ -130,6 +129,25 @@ function Rdvs() {
   };
   const handleEdit = () => {
     history.push(`/rdvs/${selectedRdv._id}`);
+  };
+  const handleCancel = () => {
+    let newRdvs = [...rdvs];
+    let data = { ...selectedRdv };
+    data.isHonnore = false;
+    data.isAnnule = true;
+    data.patientId = data.patientId._id;
+
+    newRdvs.some((e, index) => {
+      if (e._id === selectedRdv._id) {
+        newRdvs[index].isHonnore = false;
+        newRdvs[index].isAnnule = true;
+        return true;
+      }
+    });
+    saveRdv(data);
+    setSelectedRdv(null);
+    setSelectedRdvs([]);
+    setRdvs(newRdvs);
   };
   const handleDelete = async (rdvs) => {
     const originalRdvs = rdvs;
@@ -196,6 +214,7 @@ function Rdvs() {
         </div>
       ) : (
         <div className="m-2">
+          {console.log("selectedRdv", selectedRdv)}
           <RdvsTable
             rdvs={filteredRdvs}
             sortColumn={sortColumn}
@@ -205,7 +224,28 @@ function Rdvs() {
             onItemsSelect={handleSelectRdvs}
             selectedItems={selectedRdvs}
             selectedItem={selectedRdv}
-            onEdit={selectedRdv ? handleEdit : undefined}
+            onCancel={
+              selectedRdv &&
+              new Date() <=
+                new Date(
+                  new Date(selectedRdv.datePrevu).getFullYear(),
+                  new Date(selectedRdv.datePrevu).getMonth(),
+                  new Date(selectedRdv.datePrevu).getDate(),
+                )
+                ? handleCancel
+                : undefined
+            }
+            onEdit={
+              selectedRdv &&
+              new Date() <=
+                new Date(
+                  new Date(selectedRdv.datePrevu).getFullYear(),
+                  new Date(selectedRdv.datePrevu).getMonth(),
+                  new Date(selectedRdv.datePrevu).getDate(),
+                )
+                ? handleEdit
+                : undefined
+            }
             onDelete={
               selectedRdv !== null || selectedRdvs.length !== 0
                 ? handleDelete

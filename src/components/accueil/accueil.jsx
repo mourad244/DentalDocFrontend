@@ -69,6 +69,12 @@ function Accueil() {
     { name: "New", number: 0 },
     { name: "Returning", number: 0 },
   ]);
+  const [appointementTypes, setAppointmentTypes] = useState([
+    { name: "Scheduled", number: 0 },
+    { name: "Canceled", number: 0 },
+    { name: "Walk-ins", number: 0 },
+    { name: "Missed", number: 0 },
+  ]);
 
   const [times, setTimes] = useState([
     { nom: "journee", active: false },
@@ -140,31 +146,13 @@ function Accueil() {
       { name: "45-59", number: 0, value: 59 },
       { name: "60+", number: 0, value: 60 },
     ];
-    /* 
-    
-
-    ---------- payement------------------
-     
-       const revenuByPatientAge = [
-        { name: "Children", number: 0, value: 12 },
-        { name: "Teens", number: 0, value: 19 },
-        { name: "Young Adults", number: 0, value: 29 },
-        { name: "Adults", number: 0, value: 44 },
-        { name: "Middle-Aged Adults", number: 0, value: 59 },
-        { name: "Seniors", number: 0, value: 60 },
-      ];
-      
-
-
-    ------------appointment data--------------
-    const appointmentTypes = [
-      { name: "Scheduled", number: 10 },
-      { name: "Canceled", number: 50 },
+    let newAppointmentTypes = [
+      { name: "Scheduled", number: 0 },
+      { name: "Canceled", number: 0 },
       { name: "Walk-ins", number: 0 },
-      { name: "Missed", number: 20 },
+      { name: "Missed", number: 0 },
     ];
 
- */
     const uniquePatientIds = new Set();
 
     const getPatientData = (patient) => {
@@ -285,7 +273,6 @@ function Accueil() {
             });
           setTopActeDentaires(newTopActeDentaires);
           setRevenuByPatientGenre(newRevenuByPatientGenre);
-          console.log("1", newRevenuByPatientAge);
           setRevenuByPatientAge(newRevenuByPatientAge);
           break;
         case "trimestre":
