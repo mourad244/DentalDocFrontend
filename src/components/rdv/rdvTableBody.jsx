@@ -17,12 +17,11 @@ function RdvTableBody(props) {
   return (
     <tbody>
       {data.map((item) => {
-        console.log("item", item);
         return (
           <tr
             key={item._id || uuidv4()}
             className={`h-12 ${
-              item.isAnnule ? "bg-[#ff8c8c]" : "bg-[#dedcf1]"
+              item.isAnnule || item.isReporte ? "bg-[#ff8c8c]" : "bg-[#dedcf1]"
             }  text-center`}
           >
             {columns.map((column) => {

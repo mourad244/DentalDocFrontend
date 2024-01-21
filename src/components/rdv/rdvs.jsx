@@ -214,7 +214,6 @@ function Rdvs() {
         </div>
       ) : (
         <div className="m-2">
-          {console.log("selectedRdv", selectedRdv)}
           <RdvsTable
             rdvs={filteredRdvs}
             sortColumn={sortColumn}
@@ -226,6 +225,7 @@ function Rdvs() {
             selectedItem={selectedRdv}
             onCancel={
               selectedRdv &&
+              !selectedRdv.isReporte &&
               new Date() <=
                 new Date(
                   new Date(selectedRdv.datePrevu).getFullYear(),
@@ -237,6 +237,7 @@ function Rdvs() {
             }
             onEdit={
               selectedRdv &&
+              !selectedRdv.isReporte &&
               new Date() <=
                 new Date(
                   new Date(selectedRdv.datePrevu).getFullYear(),

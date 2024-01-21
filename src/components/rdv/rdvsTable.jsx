@@ -5,6 +5,8 @@ import { TiCancel } from "react-icons/ti";
 import { AiFillDelete } from "react-icons/ai";
 import RdvTableBody from "./rdvTableBody";
 import TableHeader from "../../common/tableHeader";
+import Moment from "react-moment";
+import { v4 as uuidv4 } from "uuid";
 
 function RdvsTable(props) {
   const columns = [
@@ -37,16 +39,19 @@ function RdvsTable(props) {
       path: "patientId.telephone",
       label: "Télephone",
     },
-    // {
-    //   path: "medecinId.nom",
-    //   label: "Medecin",
-    // },
-    //           isHonnore: false,
     {
       path: "isHonnore",
       label: "Honnoré?",
       content: (rdv) => {
         if (rdv.isAnnule) return <label key={rdv._id}>Annulé</label>;
+        if (rdv.isReporte) {
+          return (
+            <label key={rdv._id}>
+              Reporté au{" "}
+              <Moment format="DD/MM/YYYY">{rdv.dateNouveauRdv}</Moment>
+            </label>
+          );
+        }
         return (
           <input
             key={rdv._id}

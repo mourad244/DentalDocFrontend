@@ -111,10 +111,28 @@ const AgendaRdv = (props) => {
       setReload(true);
       props.history.push("/rdvs");
     } else if (window.confirm("Confirmer l'ajour du rdv")) {
-      await saveRdv({
-        patientId: selectedPatient._id,
-        datePrevu: date,
-      });
+      //
+      // if ther is no selectedRdv
+      if (Object.keys(selectedRdv).length !== 0) {
+        let oldData = {
+          _id: selectedRdv._id,
+          patientId: selectedPatient._id,
+          datePrevu: selectedRdv.datePrevu,
+          isReporte: true,
+          dateNouveauRdv: date,
+        };
+        let newData = {
+          patientId: selectedPatient._id,
+          datePrevu: date,
+        };
+
+        await saveRdv(oldData);
+        await saveRdv(newData);
+      } else
+        await saveRdv({
+          patientId: selectedPatient._id,
+          datePrevu: date,
+        });
       setReload(true);
       props.history.push("/rdvs");
     }
@@ -138,7 +156,6 @@ const AgendaRdv = (props) => {
 
           if (found) {
             console.log("selectedRdv", selectedRdv);
-            console.log("found", found);
             if (
               d.getFullYear() > date.getFullYear() ||
               (d.getFullYear() >= date.getFullYear() &&
@@ -150,10 +167,16 @@ const AgendaRdv = (props) => {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className="m-2 flex h-10 w-10 cursor-pointer  rounded-3xl bg-[#455a94] text-white shadow-daySelected"
-                  onClick={() => handleSelectedDate(t)}
+                  className={`m-2 flex h-10 w-10 rounded-3xl  ${
+                    found.isReporte
+                      ? "border-2 border-[#e49012]"
+                      : found.isAnnule
+                      ? "border-2 border-[#ff6868]"
+                      : ""
+                  } bg-[#152961] text-white shadow-daySelected`}
+                  // onClick={() => handleSelectedDate(t)}
                 >
-                  <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                  <label className="m-auto align-middle text-sm font-bold">
                     {countTotal + 1}
                   </label>
                 </div>,
