@@ -1,21 +1,23 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { getPatients } from "../../services/patientService";
-import { getDevi } from "../../services/deviService";
-import { getNatureActes } from "../../services/natureActeService";
-import { savePaiement, getPaiement } from "../../services/paiementService";
-import { getActeDentaires } from "../../services/acteDentaireService";
 
+import { getDevi } from "../../services/deviService";
+import { getPatients, getPatient } from "../../services/patientService";
+import { getNatureActes } from "../../services/natureActeService";
+import { getActeDentaires } from "../../services/acteDentaireService";
+import { savePaiement, getPaiement } from "../../services/paiementService";
+
+import Form from "../../common/form";
 import PaiementActesTable from "./paiementActesTable";
+import PaiementEffectuesTable from "./paiementEffectuesTable";
 
 import _ from "lodash";
 import Joi from "joi-browser";
-import Form from "../../common/form";
 import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
+
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 // import RecuPaiement from "../../documents/recuPaiement";
-import PaiementEffectuesTable from "./paiementEffectuesTable";
 
 class PaiementForm extends Form {
   state = {
@@ -54,11 +56,53 @@ class PaiementForm extends Form {
 
   async populateDatas() {
     this.setState({ loading: false });
-    const paiementId = this.props.match.params.id;
+    const paiementId = this.props.match.params.paiementid;
+    const patientId = this.props.match.params.patientid;
     if (paiementId === "new" || paiementId === undefined) {
       const { data: patients } = await getPatients();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
+      if (patientId) {
+        const { data: patient } = await getPatient(patientId);
+        let newData = { ...this.state.data };
+        let newSelectedPaiements = [];
+        let newSelectedDevis = [];
+        if (
+          patient.deviIds !== undefined &&
+          patient.deviIds !== null &&
+          patient.deviIds.length !== 0
+        ) {
+          const promises = patient.deviIds.map((item) =>
+            getDevi(item.deviId._id),
+          );
+          const devisResults = await Promise.all(promises);
+          newSelectedDevis = devisResults.map(({ data: devi }) => devi);
+        }
+        if (
+          patient.paiementIds !== undefined &&
+          patient.paiementIds !== null &&
+          patient.paiementIds.length !== 0
+        ) {
+          const promises = patient.paiementIds.map((item) =>
+            getPaiement(item.paiementId._id),
+          );
+          const paiementsResults = await Promise.all(promises);
+          newSelectedPaiements = paiementsResults.map(
+            ({ data: paiement }) => paiement,
+          );
+        }
+        newData.patientId = patient._id;
+        return this.setState({
+          data: newData,
+          selectedPatient: patient,
+          devis: newSelectedDevis,
+          paiements: newSelectedPaiements,
+          // patients,
+          natureActes,
+          acteDentaires,
+          loaded: true,
+        });
+      }
       this.setState({
         patients,
         natureActes,
@@ -80,7 +124,6 @@ class PaiementForm extends Form {
 
   onSelectPatient = async (patient) => {
     let data = { ...this.state.data };
-    let devis = [];
     let newSelectedPaiements = [];
     let newSelectedDevis = [];
 
@@ -250,7 +293,7 @@ class PaiementForm extends Form {
             Retour à la Liste
           </button>
         </div>
-        {this.props.match.params.id === "new" && (
+        {this.props.match.params.paiementid === "new" && (
           <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
             <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
               Chercher un patient
@@ -282,12 +325,14 @@ class PaiementForm extends Form {
             </div>
           </div>
         )}
+        {console.log("this.props.match.params.", this.props.match.params)}
         {Object.keys(selectedPatient).length !== 0 ? (
           <>
             <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
               <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
             </div>
-            {this.props.match.params.id === "new" && devis.length !== 0 && (
+            {(this.props.match.params.paiementid === "new" ||
+              this.props.match.params.patientid) && (
               <div className="flex flex-wrap">
                 <PaiementActesTable
                   actesEffectuees={actesEffectues}

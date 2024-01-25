@@ -14,7 +14,7 @@ class PatientForm extends Form {
     data: {
       cin: "",
       dateCreation: "",
-      medecinId: "",
+      // medecinId: "",
       historiqueMedecins: [],
       nom: "",
       prenom: "",
@@ -44,7 +44,7 @@ class PatientForm extends Form {
     provinceId: Joi.string().allow("").allow(null).label("Province"),
     regionId: Joi.string().allow("").allow(null).label("Region"),
     // dateDerniereVisite: Joi.date().allow("").label("Date dernière visite"),
-    medecinId: Joi.string().allow("").label("Medecin"),
+    // medecinId: Joi.string().allow("").label("Medecin"),
     historiqueMedecins: Joi.array().allow([]).label("Medecins"),
     profession: Joi.string().allow("").label("profession"),
   };
@@ -95,7 +95,7 @@ class PatientForm extends Form {
       _id: patient._id,
       cin: patient.cin,
       dateCreation: patient.dateCreation,
-      medecinId: patient.medecinId ? patient.medecinId._id : undefined,
+      // medecinId: patient.medecinId ? patient.medecinId._id : undefined,
       historiqueMedecins: patient.historiqueMedecins,
       nom: patient.nom,
       prenom: patient.prenom,

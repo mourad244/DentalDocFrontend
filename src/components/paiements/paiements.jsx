@@ -243,6 +243,8 @@ function Paiements() {
         break;
     }
     setCurrentPage(1);
+    setSelectedPaiement(null);
+    setSelectedPaiements([]);
   };
 
   const handleSort = (sortColumn) => {

@@ -9,7 +9,6 @@ import AgendaRdv from "./agendaRdv";
 
 import SearchBox from "../../common/searchBox";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import Input from "../../common/input";
 
 function RdvForm(props) {
   const [patients, setPatients] = useState([]);

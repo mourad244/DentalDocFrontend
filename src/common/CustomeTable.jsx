@@ -15,7 +15,6 @@ const CustomeTable = ({
   selectedItems,
 }) => {
   const raiseSort = (path) => {
-    console.log("path", path);
     const newSortColumn = { ...sortColumn };
     if (newSortColumn.path === path)
       newSortColumn.order = newSortColumn.order === "asc" ? "desc" : "asc";

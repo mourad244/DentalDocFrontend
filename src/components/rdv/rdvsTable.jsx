@@ -1,12 +1,14 @@
 import React from "react";
-import Table from "../../common/table";
-import { AiTwotoneEdit } from "react-icons/ai";
+
+import TableHeader from "../../common/tableHeader";
+import RdvTableBody from "./rdvTableBody";
+
+import { TbDental } from "react-icons/tb";
 import { TiCancel } from "react-icons/ti";
 import { AiFillDelete } from "react-icons/ai";
-import RdvTableBody from "./rdvTableBody";
-import TableHeader from "../../common/tableHeader";
+import { AiTwotoneEdit } from "react-icons/ai";
+
 import Moment from "react-moment";
-import { v4 as uuidv4 } from "uuid";
 
 function RdvsTable(props) {
   const columns = [
@@ -64,6 +66,10 @@ function RdvsTable(props) {
         );
       },
     },
+    {
+      path: "deviId.numOrdre",
+      label: "N° Devis",
+    },
   ];
 
   const {
@@ -72,6 +78,7 @@ function RdvsTable(props) {
     sortColumn,
     onEdit,
     onCancel,
+    onAddDevi,
     onItemSelect,
     onItemsSelect,
     // onViewDetails,
@@ -81,6 +88,14 @@ function RdvsTable(props) {
   } = props;
   const itemActions = (
     <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+      <TbDental
+        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
+          onAddDevi === undefined ? "pointer-events-none opacity-50 " : ""
+        }`}
+        onClick={onAddDevi}
+        title="Ajouter un devis"
+      />
+
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""

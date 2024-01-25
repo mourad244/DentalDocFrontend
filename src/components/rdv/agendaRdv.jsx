@@ -155,7 +155,6 @@ const AgendaRdv = (props) => {
           });
 
           if (found) {
-            console.log("selectedRdv", selectedRdv);
             if (
               d.getFullYear() > date.getFullYear() ||
               (d.getFullYear() >= date.getFullYear() &&
@@ -169,11 +168,11 @@ const AgendaRdv = (props) => {
                   key={"date-active" + countTotal}
                   className={`m-2 flex h-10 w-10 rounded-3xl  ${
                     found.isReporte
-                      ? "border-2 border-[#e49012]"
+                      ? "bg-[#e49012]"
                       : found.isAnnule
-                      ? "border-2 border-[#ff6868]"
-                      : ""
-                  } bg-[#152961] text-white shadow-daySelected`}
+                      ? " bg-[#ff6868]"
+                      : "bg-[#152961]"
+                  }  text-white shadow-daySelected`}
                   // onClick={() => handleSelectedDate(t)}
                 >
                   <label className="m-auto align-middle text-sm font-bold">

@@ -41,7 +41,13 @@ function RevenuByPatientAgeChart({ data }) {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.number)])
+      .domain([
+        0,
+        Math.max(
+          1,
+          d3.max(data, (d) => d.number),
+        ),
+      ]) // Ensure the domain starts at 0 and ends at least at 1
       .range([0, innerWidth]);
 
     const yScale = d3
@@ -97,18 +103,20 @@ function RevenuByPatientAgeChart({ data }) {
       .enter()
       .append("rect")
       .attr("y", (d) => yScale(d.name))
-      .attr("width", (d) => xScale(d.number))
+      .attr("width", (d) => (d.number ? xScale(d.number) : 0)) // Set width to 0 if number is null or 0
       .attr("height", yScale.bandwidth())
       .attr("fill", "url(#ageGradient)")
       .on("mouseover", function (event, d) {
-        d3.select(this).transition().duration(200).style("opacity", 0.7);
-        d3.select(this).append("title").text(`${d.number}`);
+        if (d.number) {
+          d3.select(this).transition().duration(200).style("opacity", 0.7);
+          d3.select(this).append("title").text(`${d.number}`);
+        }
       })
       .on("mouseout", function () {
         d3.select(this).transition().duration(200).style("opacity", 1);
         d3.select(this).select("title").remove();
       });
-  }, []);
+  }, [data]);
 
   return (
     <div className="w-fit">

@@ -21,7 +21,11 @@ function RdvTableBody(props) {
           <tr
             key={item._id || uuidv4()}
             className={`h-12 ${
-              item.isAnnule || item.isReporte ? "bg-[#ff8c8c]" : "bg-[#dedcf1]"
+              item.isAnnule
+                ? "bg-[#ff8c8c]"
+                : item.isReporte
+                ? "bg-[#e49012]"
+                : "bg-[#dedcf1]"
             }  text-center`}
           >
             {columns.map((column) => {

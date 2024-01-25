@@ -185,6 +185,9 @@ function Devis() {
   const handleEdit = () => {
     history.push(`/devis/${selectedDevi._id}`);
   };
+  const handleAddPaiement = () => {
+    history.push(`/paiements/new/${selectedDevi.patientId._id}`);
+  };
   const updateTimeChanged = (index) => (e) => {
     let newArray = [...times];
     newArray.map((data) => (data.active = false));
@@ -255,6 +258,8 @@ function Devis() {
       default:
         break;
     }
+    setSelectedDevi(null);
+    setSelectedDevis([]);
     setCurrentPage(1);
   };
   const handleSort = (sortColumn) => {
@@ -350,6 +355,7 @@ function Devis() {
             onItemsSelect={handleSelectDevis}
             selectedItems={selectedDevis}
             selectedItem={selectedDevi}
+            onAddPaiement={selectedDevi ? handleAddPaiement : undefined}
             onPrint={() => {
               console.log("print");
             }}

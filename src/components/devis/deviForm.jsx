@@ -1,7 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import { getDents } from "../../services/dentService";
-import { getPatients } from "../../services/patientService";
+import { getPatients, getPatient } from "../../services/patientService";
 import { getMedecins } from "../../services/medecinService";
 import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
@@ -28,6 +28,7 @@ class DeviForm extends Form {
       dateDevi: new Date(),
       acteEffectues: [],
       numOrdre: "",
+      rdvIds: [],
     },
     errors: {},
     medecins: [],
@@ -57,17 +58,68 @@ class DeviForm extends Form {
     dateDevi: Joi.date().label("Date"),
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
     numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
+    rdvIds: Joi.array().allow([]).label("Rendez-vous"),
   };
   async populateDatas() {
     this.setState({ loading: false });
-    const deviId = this.props.match.params.id;
+    const patientId = this.props.match.params.patientid;
+    const deviId = this.props.match.params.deviid;
+    const rdvId = this.props.match.params.rdvid;
     if (deviId === "new" || deviId === undefined) {
       const { data: dents } = await getDents();
       const { data: patients } = await getPatients();
       const { data: medecins } = await getMedecins();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
+      if (patientId) {
+        console.log("rdvId", rdvId);
 
+        const { data: patient } = await getPatient(patientId);
+        let newData = { ...this.state.data };
+
+        if (
+          patient.deviIds !== undefined &&
+          patient.deviIds !== null &&
+          patient.deviIds.length !== 0
+        ) {
+          let newSelectedDevis = [];
+          const promises = patient.deviIds.map((item) =>
+            getDevi(item.deviId._id),
+          );
+
+          const devisResults = await Promise.all(promises);
+          newSelectedDevis = devisResults.map(({ data: devi }) => devi);
+          return this.setState({
+            devis: [...newSelectedDevis],
+            selectedPatient: patient,
+            searchQuery: "",
+            data: {
+              ...newData,
+              patientId: patient._id,
+              rdvIds: rdvId ? [rdvId] : [],
+            },
+            dents,
+            medecins,
+            acteDentaires,
+            natureActes,
+          });
+        } else {
+          return this.setState({
+            selectedPatient: patient,
+            searchQuery: "",
+            data: {
+              ...newData,
+              patientId: patient._id,
+              rdvIds: rdvId ? [rdvId] : [],
+            },
+            devis: [],
+            dents,
+            medecins,
+            acteDentaires,
+            natureActes,
+          });
+        }
+      }
       this.setState({
         dents,
         medecins,
@@ -75,13 +127,12 @@ class DeviForm extends Form {
         natureActes,
         patients,
       });
-    } else {
+    } else if (deviId) {
       const { data: devi } = await getDevi(deviId);
       const { data: dents } = await getDents();
       const { data: medecins } = await getMedecins();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
-
       let selectedDents = [];
       let selectedActes = [];
       let nombreDentsPerActe = [];
@@ -449,7 +500,7 @@ class DeviForm extends Form {
             Retour à la Liste
           </button>
         </div>
-        {this.props.match.params.id === "new" && (
+        {this.props.match.params.deviid === "new" && (
           <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
             <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
               Chercher un patient
@@ -486,13 +537,15 @@ class DeviForm extends Form {
             <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
               <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
             </div>
-            {this.props.match.params.id === "new" && devis.length !== 0 && (
-              <ActesEffectuesTable
-                actesEffectuees={actesEffectues}
-                onSort={this.handleSort}
-                sortColumn={this.state.sortColumn}
-              />
-            )}
+            {(this.props.match.params.deviid === "new" ||
+              this.props.match.params.patientid) &&
+              devis.length !== 0 && (
+                <ActesEffectuesTable
+                  actesEffectuees={actesEffectues}
+                  onSort={this.handleSort}
+                  sortColumn={this.state.sortColumn}
+                />
+              )}
             <div className="mt-2 bg-[#a2bdc5]">
               <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
                 Actes à éffectuer

@@ -1,13 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-function AppointementTotalChart() {
-  const data = [
-    { name: "Scheduled", number: 10 },
-    { name: "Canceled", number: 50 },
-    { name: "Walk-ins", number: 0 },
-    { name: "Missed", number: 20 },
-  ];
+function AppointementTotalChart({ data }) {
+  // const data = [
+  //   { name: "Scheduled", number: 2 },
+  //   { name: "Canceled", number: 50 },
+  //   { name: "Walk-ins", number: 5 },
+  //   { name: "Missed", number: 20 },
+  //   { name: "Reported", number: 2 },
+  // ];
   const total = data.reduce((sum, entry) => sum + entry.number, 0);
 
   const svgRef = useRef();
@@ -53,6 +54,7 @@ function AppointementTotalChart() {
         { id: "gradient2", name: "Canceled" },
         { id: "gradient3", start: "#003547", end: "#003144", name: "Walk-ins" },
         { id: "gradient4", start: "#FFB0AB", end: "#F08890", name: "Missed" },
+        { id: "gradient5", start: "#FFF700", end: "#FFD700", name: "Reported" }, // Yellow gradient
       ];
 
       gradients.forEach((grad) => {
@@ -97,18 +99,56 @@ function AppointementTotalChart() {
           d3.select(this).style("opacity", 1);
           d3.select("#tooltip").style("display", "none");
         });
-      segments.each(function (d) {
-        if (d.data.number > 0) {
-          d3.select(this)
-            .append("text")
-            .attr("transform", `translate(${arc.centroid(d)})`)
-            .attr("text-anchor", "middle")
-            .style("fill", "white")
-            .style("font-weight", "bold")
-            .style("font-size", "12px")
-            .text(`${((d.data.number / total) * 100).toFixed(1)}%`);
-        }
-      });
+      // segments.each(function (d) {
+      //   if (d.data.number > 0) {
+      //     // Calculate midpoint angle
+      //     const angle = (d.startAngle + d.endAngle) / 2;
+
+      //     // Generate a random radial offset within a range
+      //     const minOffset = radius / 25;
+      //     // Minimum offset
+      //     const maxOffset = radius / 3; // Maximum offset
+      //     const randomOffset =
+      //       Math.random() * (maxOffset - minOffset) + minOffset;
+
+      //     // Calculate text position
+      //     const x = (radius - randomOffset) * Math.sin(angle);
+      //     const y = -(radius - randomOffset) * Math.cos(angle);
+
+      //     d3.select(this)
+      //       .append("text")
+      //       .attr("transform", `translate(${x}, ${y})`)
+      //       .attr("text-anchor", "middle")
+      //       .style("fill", "black")
+      //       .style("font-weight", "bold")
+      //       .style("font-size", "12px")
+      //       .text(`${((d.data.number / total) * 100).toFixed(1)}%`);
+      //   }
+      // });
+      // Create a separate group for text elements
+      const textGroup = svg.append("g").attr("class", "text-group");
+
+      textGroup
+        .selectAll("text")
+        .data(arcs)
+        .join("text")
+        .each(function (d) {
+          if (d.data.number > 0) {
+            const angle = (d.startAngle + d.endAngle) / 2;
+            const randomOffset =
+              Math.random() * (radius / 2 - radius / 10) + radius / 10;
+            const x = (radius - randomOffset) * Math.sin(angle);
+            const y = -(radius - randomOffset) * Math.cos(angle);
+
+            d3.select(this)
+              .attr("transform", `translate(${x}, ${y})`)
+              .attr("text-anchor", "middle")
+              .style("fill", "white")
+              .style("font-weight", "bold")
+              .style("font-size", "12px")
+              .text(`${((d.data.number / total) * 100).toFixed(1)}%`);
+          }
+        });
       // Legend
       const legend = svg
         .append("g")
@@ -117,7 +157,7 @@ function AppointementTotalChart() {
       gradients.forEach((grad, index) => {
         const legendItem = legend
           .append("g")
-          .attr("transform", `translate(210, ${index * 20})`)
+          .attr("transform", `translate(210, ${index * 18})`)
           .style("cursor", "pointer")
           .on("mouseover", () => {
             segments

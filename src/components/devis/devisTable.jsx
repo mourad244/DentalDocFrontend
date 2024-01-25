@@ -7,22 +7,24 @@ import { v4 as uuidv4 } from "uuid";
 import { FaPrint } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
+import { TbReportMoney } from "react-icons/tb";
 
 function DevisTable({
   devis,
   datas,
   onSort,
-  sortColumn,
   onEdit,
+  onPrint,
+  headers,
+  onDelete,
+  sortColumn,
+  totalItems,
   onItemSelect,
   onItemsSelect,
   selectedItems,
   onValueChange,
+  onAddPaiement,
   selectedFilterItems,
-  totalItems,
-  onDelete,
-  onPrint,
-  headers,
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCollapseOpen, setIsCollapseOpen] = useState(false);
@@ -173,6 +175,14 @@ function DevisTable({
   );
   const itemActions = (
     <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+      <TbReportMoney
+        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
+          onAddPaiement === undefined ? "pointer-events-none opacity-50 " : ""
+        }`}
+        onClick={onAddPaiement}
+        title="Ajouter un paiement"
+      />
+
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""

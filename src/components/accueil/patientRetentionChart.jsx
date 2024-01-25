@@ -7,11 +7,10 @@ function PatientRetentionChart({ data }) {
   //   { name: "Returning", value: 300 },
   // ];
 
-  const total = data.reduce((sum, entry) => sum + entry.number, 0);
-
   const svgRef = useRef();
 
   useEffect(() => {
+    const total = data.reduce((sum, entry) => sum + entry.number, 0);
     const margin = { top: 0, right: 0, bottom: 0, left: 100 };
     const width = 300 - margin.left - margin.right;
     const height = 300 - margin.top - margin.bottom;
@@ -143,7 +142,7 @@ function PatientRetentionChart({ data }) {
           .style("fill", "white");
       });
     }
-  }, []);
+  }, [data]);
 
   return (
     <div className="w-fit">

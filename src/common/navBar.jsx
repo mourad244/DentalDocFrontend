@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 import { ReactComponent as AccueilIconActive } from "../assets/icons/sidebar/accueil-active.svg";
 import { ReactComponent as AccueilIcon } from "../assets/icons/sidebar/accueil.svg";
@@ -15,7 +15,7 @@ import { ReactComponent as SettingsIcon } from "../assets/icons/sidebar/settings
 import { ReactComponent as SettingsIconActive } from "../assets/icons/sidebar/settings-active.svg";
 
 const NavBar = ({ user }) => {
-  const url = window.location.href;
+  const location = useLocation();
 
   const [activeAccueil, setActiveAccueil] = useState(false);
   const [activePatient, setActivePatient] = useState(false);
@@ -23,6 +23,24 @@ const NavBar = ({ user }) => {
   const [activeDevi, setActiveDevi] = useState(false);
   const [activePaiement, setActivePaiement] = useState(false);
   const [activeSettings, setActiveSettings] = useState(false);
+
+  useEffect(() => {
+    resetIcon();
+    const path = location.pathname;
+    if (path.includes("/accueil")) {
+      setActiveAccueil(true);
+    } else if (path.includes("/patients")) {
+      setActivePatient(true);
+    } else if (path.includes("/rdvs")) {
+      setActiveRdv(true);
+    } else if (path.includes("/devis")) {
+      setActiveDevi(true);
+    } else if (path.includes("/paiements")) {
+      setActivePaiement(true);
+    } else if (path.includes("/settings")) {
+      setActiveSettings(true);
+    }
+  }, [location]);
 
   const resetIcon = () => {
     setActiveAccueil(false);
@@ -46,7 +64,7 @@ const NavBar = ({ user }) => {
                 setActiveAccueil(true);
               }}
             >
-              {url.includes("accueil") || activeAccueil ? (
+              {location.pathname.includes("accueil") || activeAccueil ? (
                 <AccueilIconActive className="shadow-inner" />
               ) : (
                 <AccueilIcon />
@@ -67,7 +85,7 @@ const NavBar = ({ user }) => {
                   setActivePatient(true);
                 }}
               >
-                {url.includes("patient") || activePatient ? (
+                {location.pathname.includes("patient") || activePatient ? (
                   <PatientIconActive />
                 ) : (
                   <PatientIcon />
@@ -85,7 +103,7 @@ const NavBar = ({ user }) => {
                   setActiveRdv(true);
                 }}
               >
-                {url.includes("rdv") || activeRdv ? (
+                {location.pathname.includes("rdv") || activeRdv ? (
                   <RdvIconActive />
                 ) : (
                   <RdvIcon />
@@ -107,7 +125,7 @@ const NavBar = ({ user }) => {
                   setActiveDevi(true);
                 }}
               >
-                {url.includes("devi") || activeDevi ? (
+                {location.pathname.includes("devi") || activeDevi ? (
                   <DeviIconActive />
                 ) : (
                   <DeviIcon />
@@ -125,7 +143,7 @@ const NavBar = ({ user }) => {
                   setActivePaiement(true);
                 }}
               >
-                {url.includes("paiement") || activePaiement ? (
+                {location.pathname.includes("paiement") || activePaiement ? (
                   <PaiementIconActive />
                 ) : (
                   <PaiementIcon />
@@ -147,7 +165,7 @@ const NavBar = ({ user }) => {
                   setActiveSettings(true);
                 }}
               >
-                {url.includes("settings") || activeSettings ? (
+                {location.pathname.includes("settings") || activeSettings ? (
                   <SettingsIconActive />
                 ) : (
                   <SettingsIcon />

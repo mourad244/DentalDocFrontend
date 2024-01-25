@@ -20,13 +20,11 @@ function Rdvs() {
   const [selectedRdv, setSelectedRdv] = useState(null);
   const [selectedRdvs, setSelectedRdvs] = useState([]);
 
-  const [dataUpdated, setDataUpdated] = useState(true);
   const [loading, setLoading] = useState(false);
   const [sortColumn, setSortColumn] = useState({
     path: "datePrevu",
     order: "asc",
   });
-  const [searchQuery, setSearchQuery] = useState("");
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemOffset, setItemOffset] = useState(0);
@@ -66,6 +64,7 @@ function Rdvs() {
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * pageSize) % totalCount;
+
     setItemOffset(newOffset);
   };
   const displayDate = () => {
@@ -80,7 +79,8 @@ function Rdvs() {
 
   const navigateDate = (operation) => {
     const periode = new Date(time.setDate(time.getDate() + operation));
-
+    setSelectedRdv(null);
+    setSelectedRdvs([]);
     setTime(periode);
     setCurrentPage(1);
   };
@@ -104,6 +104,7 @@ function Rdvs() {
     });
     setFilteredRdvs(newRdvs);
   };
+
   const handleViewDetails = () => {
     setShowDetails(true);
   };
@@ -130,6 +131,9 @@ function Rdvs() {
   const handleEdit = () => {
     history.push(`/rdvs/${selectedRdv._id}`);
   };
+  const handleAddDevi = () => {
+    history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
+  };
   const handleCancel = () => {
     let newRdvs = [...rdvs];
     let data = { ...selectedRdv };
@@ -149,22 +153,19 @@ function Rdvs() {
     setSelectedRdvs([]);
     setRdvs(newRdvs);
   };
-  const handleDelete = async (rdvs) => {
+  const handleDelete = async (items) => {
     const originalRdvs = rdvs;
     setRdvs(
       rdvs.filter((p) => {
-        let founded = selectedRdvs.find(
-          (c) => c._id.toString() === p._id.toString(),
-        );
+        let founded = items.find((c) => c._id.toString() === p._id.toString());
         if (founded) return false;
         return true;
       }),
     );
-    setDataUpdated(true);
     setSelectedRdv(null);
     setSelectedRdvs([]);
     try {
-      rdvs.forEach(async (item) => {
+      items.forEach(async (item) => {
         await deleteRdv(item._id);
       });
       toast.success("Rendez-vous supprimé avec succés");
@@ -214,6 +215,7 @@ function Rdvs() {
         </div>
       ) : (
         <div className="m-2">
+          {console.log("selectec", selectedRdv)}
           <RdvsTable
             rdvs={filteredRdvs}
             sortColumn={sortColumn}
@@ -221,6 +223,16 @@ function Rdvs() {
             onCheck={handleHonnoreChecked}
             onItemSelect={handleSelectRdv}
             onItemsSelect={handleSelectRdvs}
+            onAddDevi={
+              selectedRdv &&
+              (!selectedRdv.deviId ||
+                (selectedRdv.deviId &&
+                  selectedRdv.deviId.numOrdre === undefined)) &&
+              !selectedRdv.isReporte &&
+              !selectedRdv.isAnnule
+                ? handleAddDevi
+                : undefined
+            }
             selectedItems={selectedRdvs}
             selectedItem={selectedRdv}
             onCancel={

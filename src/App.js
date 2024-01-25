@@ -27,8 +27,8 @@ import logo from "./assets/images/logo-dental-doc.png";
 
 function App() {
   const [user, setUser] = useState();
-  const [logged, setLogged] = useState(false);
   const [roles, setRoles] = useState([]);
+  const [logged, setLogged] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +62,7 @@ function App() {
   return (
     <React.Fragment>
       <ToastContainer />
-      <div className="m-0  flex h-16  bg-gradient-radial p-1 ">
+      <div className="m-0 flex h-16 bg-gradient-radial p-1 ">
         <img src={logo} alt="" />
         <p className="m-auto ml-9 flex h-12 items-center text-center text-lg font-bold text-white">
           Cabinet dentaire
@@ -104,7 +104,16 @@ function App() {
             )}
             {/* Devis */}
             {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/devis/:id" exact component={DeviForm} />
+              <Route
+                path="/devis/new/:patientid/:rdvid"
+                exact
+                component={DeviForm}
+              />
+            ) : (
+              ""
+            )}
+            {user.role === "admin" || user.role === "comptable" ? (
+              <Route path="/devis/:deviid" exact component={DeviForm} />
             ) : (
               ""
             )}
@@ -115,7 +124,20 @@ function App() {
             )}
             {/* paiements */}
             {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/paiements/:id" exact component={PaiementForm} />
+              <Route
+                path="/paiements/new/:patientid"
+                exact
+                component={PaiementForm}
+              />
+            ) : (
+              ""
+            )}
+            {user.role === "admin" || user.role === "comptable" ? (
+              <Route
+                path="/paiements/:paiementid"
+                exact
+                component={PaiementForm}
+              />
             ) : (
               ""
             )}
@@ -146,6 +168,7 @@ function App() {
             ) : (
               ""
             )}
+
             {user.role === "admin" && (
               <Route path="/settings" exact component={Settings} />
             )}

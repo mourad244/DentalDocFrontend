@@ -5,7 +5,7 @@ import { getPaiements } from "../../services/paiementService";
 import { getActeDentaires } from "../../services/acteDentaireService";
 
 import PatientByAgeChart from "./patientByAgeChart";
-import AppointementChart from "./appointementByDayChart";
+// import AppointementChart from "./appointementByDayChart";
 import PatientByGenderChart from "./patientByGenderChart";
 import DentalProcedureChart from "./dentalProcedureChart";
 import PatientRetentionChart from "./patientRetentionChart";
@@ -16,9 +16,9 @@ import RevenuByPatientGenreChart from "./revenuByPatientGenreChart";
 
 import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
-import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
-import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
 import VerticalDashedLine from "../../assets/verticalDashedLine";
+import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 
 const calculateAge = (dateOfBirth) => {
   const today = new Date();
@@ -37,8 +37,8 @@ function Accueil() {
   const [devis, setDevis] = useState([]);
   const [paiements, setPaiements] = useState([]);
   const [acteDentaires, setActeDentaires] = useState([]);
-  const [totalMontantDevis, setTotalMontantDevis] = useState(0);
-  const [totalMontantPaiements, setTotalMontantPaiements] = useState(0);
+  // const [totalMontantDevis, setTotalMontantDevis] = useState(0);
+  // const [totalMontantPaiements, setTotalMontantPaiements] = useState(0);
 
   const [patientsByAge, setPatientsByAge] = useState([
     { name: "0-12", number: 0, value: 12 },
@@ -74,6 +74,7 @@ function Accueil() {
     { name: "Canceled", number: 0 },
     { name: "Walk-ins", number: 0 },
     { name: "Missed", number: 0 },
+    { name: "Reported", number: 0 },
   ]);
 
   const [times, setTimes] = useState([
@@ -110,9 +111,9 @@ function Accueil() {
     let filteredDevis = [...devis];
     let filteredPaiements = [...paiements];
     // nombre de patients par periode
-    let totalDevis = 0;
-    let totalPaiements = 0;
-
+    // let totalDevis = 0;
+    // let totalPaiements = 0;
+    // let totalAppointements = 0;
     // --------------- patient by age data --------------
 
     let newPatientsByAge = [
@@ -151,18 +152,19 @@ function Accueil() {
       { name: "Canceled", number: 0 },
       { name: "Walk-ins", number: 0 },
       { name: "Missed", number: 0 },
+      { name: "Reported", number: 0 },
     ];
 
     const uniquePatientIds = new Set();
 
-    const getPatientData = (patient) => {
-      if (uniquePatientIds.has(patient._id)) return; // Skip if patient already counted
-      // check the length of patientId.deviIds if 1 then new else returning,
-      if (patient.deviIds.length === 1) newPatientRetention[0].number++;
+    const getPatientData = (deviItem) => {
+      const patientItem = deviItem.patientId;
+      if (uniquePatientIds.has(patientItem._id)) return;
+      if (patientItem.deviIds.length === 1) newPatientRetention[0].number++;
       else newPatientRetention[1].number++;
 
       // Categorize by age
-      const age = calculateAge(patient.dateNaissance);
+      const age = calculateAge(patientItem.dateNaissance);
       for (let category of newPatientsByAge) {
         if (age <= category.value) {
           category.number++;
@@ -170,13 +172,13 @@ function Accueil() {
         }
       }
       // Categorize by gender
-      if (patient.isMasculin) {
+      if (patientItem.isMasculin) {
         newPatientsByGender[0].number++;
       } else {
         newPatientsByGender[1].number++;
       }
 
-      uniquePatientIds.add(patient._id);
+      uniquePatientIds.add(patientItem._id);
     };
     const getData = () => {
       switch (time.nom) {
@@ -189,34 +191,45 @@ function Accueil() {
                 new Date(data.dateDevi).getFullYear() ===
                   time.value.getFullYear(),
             )
-            .map((data) => {
-              totalDevis += data.montant;
-              return data;
-            });
-          filteredPaiements = filteredPaiements
-            .filter(
-              (data) =>
-                new Date(data.date).getDate() === time.value.getDate() &&
-                new Date(data.date).getMonth() === time.value.getMonth() &&
-                new Date(data.date).getFullYear() === time.value.getFullYear(),
-            )
-            .map((data) => {
-              totalPaiements += data.montant;
-              return data;
-            });
-          break;
-        case "semaine":
-          break;
-        case "mois":
-          filteredDevis = filteredDevis
-            .filter(
-              (data) =>
-                new Date(data.dateDevi).getMonth() === time.value.getMonth() &&
-                new Date(data.dateDevi).getFullYear() ===
-                  time.value.getFullYear(),
-            )
-            // add the total of filtered devis
             .forEach((deviItem) => {
+              // calculate the retentation
+              if (deviItem.rdvIds.length === 0) {
+                newAppointmentTypes[2].number++;
+                return;
+              } else
+                deviItem.rdvIds
+                  .filter(
+                    (rdvItem) =>
+                      new Date(rdvItem.datePrevu).getDate() ===
+                        time.value.getDate() &&
+                      new Date(rdvItem.datePrevu).getMonth() ===
+                        time.value.getMonth() &&
+                      new Date(rdvItem.datePrevu).getFullYear() ===
+                        time.value.getFullYear(),
+                  )
+                  .forEach((rdvItem) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const dateRdv = new Date(rdvItem.datePrevu);
+                    dateRdv.setHours(0, 0, 0, 0);
+                    if (rdvItem.isHonnore || dateRdv >= today) {
+                      newAppointmentTypes[0].number++;
+                      return;
+                    }
+                    if (rdvItem.isAnnule) {
+                      newAppointmentTypes[1].number++;
+                      return;
+                    }
+                    if (!rdvItem.isHonnore && dateRdv < today) {
+                      newAppointmentTypes[3].number++;
+                      return;
+                    }
+                    if (rdvItem.isReporte) {
+                      newAppointmentTypes[4].number++;
+                      return;
+                    }
+                  });
               //----------- calculate top acte dentaire
               deviItem.acteEffectues.forEach((acteDentaire) => {
                 const foundedActeDentaire = acteDentaires.find(
@@ -239,9 +252,7 @@ function Accueil() {
                     newTopActeDentaires[indexTopActeDentaires].montant +=
                       foundedActeDentaire.prix;
                   }
-
                   // revenu by patient genre
-                  // if deviItem.patientId.isMasculin
                   if (deviItem.patientId.isMasculin) {
                     newRevenuByPatientGenre[0].number += acteDentaire.prix;
                   } else {
@@ -258,9 +269,114 @@ function Accueil() {
                 }
               });
               // calculate the retentation
+              // totalDevis += deviItem.montant;
+              getPatientData(deviItem);
+            });
+          filteredPaiements = filteredPaiements
+            .filter(
+              (data) =>
+                new Date(data.date).getDate() === time.value.getDate() &&
+                new Date(data.date).getMonth() === time.value.getMonth() &&
+                new Date(data.date).getFullYear() === time.value.getFullYear(),
+            )
+            .forEach((paiementItem) => {
+              // totalPaiements += paiementItem.montant;
+            });
+          setAppointmentTypes(newAppointmentTypes);
+          setTopActeDentaires(newTopActeDentaires);
+          setRevenuByPatientGenre(newRevenuByPatientGenre);
+          setRevenuByPatientAge(newRevenuByPatientAge);
+          setPatientRetention(newPatientRetention);
+          break;
+        case "semaine":
+          break;
+        case "mois":
+          filteredDevis = filteredDevis
+            .filter(
+              (deviItem) =>
+                new Date(deviItem.dateDevi).getMonth() ===
+                  time.value.getMonth() &&
+                new Date(deviItem.dateDevi).getFullYear() ===
+                  time.value.getFullYear(),
+            )
+            // add the total of filtered devis
+            .forEach((deviItem) => {
+              // calculate the retentation
+              if (deviItem.rdvIds.length === 0) {
+                newAppointmentTypes[2].number++;
+                return;
+              } else
+                deviItem.rdvIds
+                  .filter(
+                    (rdvItem) =>
+                      new Date(rdvItem.datePrevu).getMonth() ===
+                        time.value.getMonth() &&
+                      new Date(rdvItem.datePrevu).getFullYear() ===
+                        time.value.getFullYear(),
+                  )
+                  .forEach((rdvItem) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
 
-              totalDevis += deviItem.montant;
-              getPatientData(deviItem.patientId);
+                    const dateRdv = new Date(rdvItem.datePrevu);
+                    dateRdv.setHours(0, 0, 0, 0);
+                    if (rdvItem.isHonnore || dateRdv >= today) {
+                      newAppointmentTypes[0].number++;
+                      return;
+                    }
+                    if (rdvItem.isAnnule) {
+                      newAppointmentTypes[1].number++;
+                      return;
+                    }
+                    if (!rdvItem.isHonnore && dateRdv < today) {
+                      newAppointmentTypes[3].number++;
+                      return;
+                    }
+                    if (rdvItem.isReporte) {
+                      newAppointmentTypes[4].number++;
+                      return;
+                    }
+                  });
+              //----------- calculate top acte dentaire
+              deviItem.acteEffectues.forEach((acteDentaire) => {
+                const foundedActeDentaire = acteDentaires.find(
+                  (data) =>
+                    data._id.toString() === acteDentaire.acteId.toString(),
+                );
+                if (foundedActeDentaire) {
+                  const indexTopActeDentaires = newTopActeDentaires.findIndex(
+                    (data) => data.name === foundedActeDentaire.nom,
+                  );
+                  if (indexTopActeDentaires === -1) {
+                    newTopActeDentaires.push({
+                      name: foundedActeDentaire.nom,
+                      number: 1,
+                      montant: foundedActeDentaire.prix,
+                    });
+                  } else {
+                    newTopActeDentaires[indexTopActeDentaires].number++;
+                    newTopActeDentaires[indexTopActeDentaires].montant +=
+                      foundedActeDentaire.prix;
+                  }
+                  // revenu by patient genre
+                  if (deviItem.patientId.isMasculin) {
+                    newRevenuByPatientGenre[0].number += acteDentaire.prix;
+                  } else {
+                    newRevenuByPatientGenre[1].number += acteDentaire.prix;
+                  }
+                  // revenu by patient age
+                  const age = calculateAge(deviItem.patientId.dateNaissance);
+                  for (let category of newRevenuByPatientAge) {
+                    if (age <= category.value) {
+                      category.number += acteDentaire.prix;
+                      break;
+                    }
+                  }
+                }
+              });
+              // calculate the retentation
+              // totalDevis += deviItem.montant;
+              getPatientData(deviItem);
             });
           filteredPaiements = filteredPaiements
             .filter(
@@ -269,8 +385,9 @@ function Accueil() {
                 new Date(data.date).getFullYear() === time.value.getFullYear(),
             )
             .forEach((paiementItem) => {
-              totalPaiements += paiementItem.montant;
+              // totalPaiements += paiementItem.montant;
             });
+          setAppointmentTypes(newAppointmentTypes);
           setTopActeDentaires(newTopActeDentaires);
           setRevenuByPatientGenre(newRevenuByPatientGenre);
           setRevenuByPatientAge(newRevenuByPatientAge);
@@ -280,23 +397,185 @@ function Accueil() {
         case "semestre":
           break;
         case "annee":
-          filteredDevis = filteredDevis.filter(
-            (data) =>
-              new Date(data.dateDevi).getFullYear() ===
-              time.value.getFullYear(),
-          );
-          filteredPaiements = filteredPaiements.filter(
-            (data) =>
-              new Date(data.date).getFullYear() === time.value.getFullYear(),
-          );
+          filteredDevis = filteredDevis
+            .filter(
+              (data) =>
+                new Date(data.dateDevi).getFullYear() ===
+                time.value.getFullYear(),
+            )
+            .forEach((deviItem) => {
+              // calculate the retentation
+              if (deviItem.rdvIds.length === 0) {
+                newAppointmentTypes[2].number++;
+                return;
+              } else
+                deviItem.rdvIds
+                  .filter(
+                    (rdvItem) =>
+                      new Date(rdvItem.datePrevu).getFullYear() ===
+                      time.value.getFullYear(),
+                  )
+                  .forEach((rdvItem) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const dateRdv = new Date(rdvItem.datePrevu);
+                    dateRdv.setHours(0, 0, 0, 0);
+                    if (rdvItem.isHonnore || dateRdv >= today) {
+                      newAppointmentTypes[0].number++;
+                      return;
+                    }
+                    if (rdvItem.isAnnule) {
+                      newAppointmentTypes[1].number++;
+                      return;
+                    }
+                    if (!rdvItem.isHonnore && dateRdv < today) {
+                      newAppointmentTypes[3].number++;
+                      return;
+                    }
+                    if (rdvItem.isReporte) {
+                      newAppointmentTypes[4].number++;
+                      return;
+                    }
+                  });
+              //----------- calculate top acte dentaire
+              deviItem.acteEffectues.forEach((acteDentaire) => {
+                const foundedActeDentaire = acteDentaires.find(
+                  (data) =>
+                    data._id.toString() === acteDentaire.acteId.toString(),
+                );
+                if (foundedActeDentaire) {
+                  const indexTopActeDentaires = newTopActeDentaires.findIndex(
+                    (data) => data.name === foundedActeDentaire.nom,
+                  );
+                  if (indexTopActeDentaires === -1) {
+                    newTopActeDentaires.push({
+                      name: foundedActeDentaire.nom,
+                      number: 1,
+                      montant: foundedActeDentaire.prix,
+                    });
+                  } else {
+                    newTopActeDentaires[indexTopActeDentaires].number++;
+                    newTopActeDentaires[indexTopActeDentaires].montant +=
+                      foundedActeDentaire.prix;
+                  }
+                  // revenu by patient genre
+                  if (deviItem.patientId.isMasculin) {
+                    newRevenuByPatientGenre[0].number += acteDentaire.prix;
+                  } else {
+                    newRevenuByPatientGenre[1].number += acteDentaire.prix;
+                  }
+                  // revenu by patient age
+                  const age = calculateAge(deviItem.patientId.dateNaissance);
+                  for (let category of newRevenuByPatientAge) {
+                    if (age <= category.value) {
+                      category.number += acteDentaire.prix;
+                      break;
+                    }
+                  }
+                }
+              });
+              // calculate the retentation
+              // totalDevis += deviItem.montant;
+              getPatientData(deviItem);
+            });
+          filteredPaiements = filteredPaiements
+            .filter(
+              (data) =>
+                new Date(data.date).getFullYear() === time.value.getFullYear(),
+            )
+            .forEach((paiementItem) => {
+              // totalPaiements += paiementItem.montant;
+            });
+          setAppointmentTypes(newAppointmentTypes);
+          setTopActeDentaires(newTopActeDentaires);
+          setRevenuByPatientGenre(newRevenuByPatientGenre);
+          setRevenuByPatientAge(newRevenuByPatientAge);
           break;
         case "tous":
+          filteredDevis = filteredDevis.forEach((deviItem) => {
+            //----------- calculate top acte dentaire
+            if (deviItem.rdvIds.length === 0) {
+              newAppointmentTypes[2].number++;
+              return;
+            } else
+              deviItem.rdvIds.forEach((rdvItem) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const dateRdv = new Date(rdvItem.datePrevu);
+                dateRdv.setHours(0, 0, 0, 0);
+                if (rdvItem.isHonnore || dateRdv >= today) {
+                  newAppointmentTypes[0].number++;
+                  return;
+                }
+                if (rdvItem.isAnnule) {
+                  newAppointmentTypes[1].number++;
+                  return;
+                }
+                if (!rdvItem.isHonnore && dateRdv < today) {
+                  newAppointmentTypes[3].number++;
+                  return;
+                }
+                if (rdvItem.isReporte) {
+                  newAppointmentTypes[4].number++;
+                  return;
+                }
+              });
+            deviItem.acteEffectues.forEach((acteDentaire) => {
+              const foundedActeDentaire = acteDentaires.find(
+                (data) =>
+                  data._id.toString() === acteDentaire.acteId.toString(),
+              );
+              if (foundedActeDentaire) {
+                // top acte dentaire
+                const indexTopActeDentaires = newTopActeDentaires.findIndex(
+                  (data) => data.name === foundedActeDentaire.nom,
+                );
+                if (indexTopActeDentaires === -1) {
+                  newTopActeDentaires.push({
+                    name: foundedActeDentaire.nom,
+                    number: 1,
+                    montant: foundedActeDentaire.prix,
+                  });
+                } else {
+                  newTopActeDentaires[indexTopActeDentaires].number++;
+                  newTopActeDentaires[indexTopActeDentaires].montant +=
+                    foundedActeDentaire.prix;
+                }
+                // revenu by patient genre
+                if (deviItem.patientId.isMasculin) {
+                  newRevenuByPatientGenre[0].number += acteDentaire.prix;
+                } else {
+                  newRevenuByPatientGenre[1].number += acteDentaire.prix;
+                }
+                // revenu by patient age
+                const age = calculateAge(deviItem.patientId.dateNaissance);
+                for (let category of newRevenuByPatientAge) {
+                  if (age <= category.value) {
+                    category.number += acteDentaire.prix;
+                    break;
+                  }
+                }
+              }
+            });
+            // calculate the retentation
+            // totalDevis += deviItem.montant;
+            getPatientData(deviItem);
+          });
+          filteredPaiements = filteredPaiements.forEach((paiementItem) => {
+            // totalPaiements += paiementItem.montant;
+          });
+          setAppointmentTypes(newAppointmentTypes);
+          setTopActeDentaires(newTopActeDentaires);
+          setRevenuByPatientGenre(newRevenuByPatientGenre);
+          setRevenuByPatientAge(newRevenuByPatientAge);
           break;
         default:
           break;
       }
-      setTotalMontantDevis(totalDevis);
-      setTotalMontantPaiements(totalPaiements);
+      // setTotalMontantDevis(totalDevis);
+      // setTotalMontantPaiements(totalPaiements);
       setPatientsByAge(newPatientsByAge);
       setPatientsByGender(newPatientsByGender);
       setPatientRetention(newPatientRetention);
@@ -444,7 +723,7 @@ function Accueil() {
             </h2>
             <div className="flex ">
               <div className="m-2">
-                <AppointementTotalChart />
+                <AppointementTotalChart data={appointementTypes} />
               </div>
             </div>
           </div>
