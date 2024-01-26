@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.bf9b0a3e.css",
-    "main.js": "/static/js/main.0ec90e25.js",
+    "main.js": "/static/js/main.58458eb3.js",
     "static/media/logo-dental-doc.png": "/static/media/logo-dental-doc.ccb2bc3b865f1ffdde7b.png",
     "static/media/roboto-latin-900italic.woff": "/static/media/roboto-latin-900italic.c20d916c1a1b094c1cec.woff",
     "static/media/roboto-latin-300italic.woff": "/static/media/roboto-latin-300italic.bd5b7a13f2c52b531a2a.woff",
@@ -43,10 +43,10 @@
     "static/media/precedent-btn.svg": "/static/media/precedent-btn.81abb3b4ac743a9c64f01592c5222358.svg",
     "static/media/suivant-btn.svg": "/static/media/suivant-btn.558a791d03245badd74d8aa419f4a5c9.svg",
     "main.bf9b0a3e.css.map": "/static/css/main.bf9b0a3e.css.map",
-    "main.0ec90e25.js.map": "/static/js/main.0ec90e25.js.map"
+    "main.58458eb3.js.map": "/static/js/main.58458eb3.js.map"
   },
   "entrypoints": [
     "static/css/main.bf9b0a3e.css",
-    "static/js/main.0ec90e25.js"
+    "static/js/main.58458eb3.js"
   ]
 }
