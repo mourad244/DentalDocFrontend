@@ -128,7 +128,7 @@ function DentalProcedureChart({ data }) {
 
   return (
     <div className="w-auto">
-      <h2 className="text-sm font-bold text-white">Common procedures</h2>
+      <h2 className="text-sm font-bold text-white">Traitements communs</h2>
       <svg ref={svgRef} width={400} height={300} />
     </div>
   );

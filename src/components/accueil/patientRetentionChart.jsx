@@ -3,8 +3,8 @@ import * as d3 from "d3";
 
 function PatientRetentionChart({ data }) {
   // const data = [
-  //   { name: "New", value: 400 },
-  //   { name: "Returning", value: 300 },
+  //   { name: "Nouveau", value: 400 },
+  //   { name: "Revenant", value: 300 },
   // ];
 
   const svgRef = useRef();
@@ -48,8 +48,8 @@ function PatientRetentionChart({ data }) {
       // Define gradients
 
       const gradients = [
-        { id: "gradient1", name: "New" },
-        { id: "gradient2", name: "Returning" },
+        { id: "gradient1", name: "Nouveau" },
+        { id: "gradient2", name: "Revenant" },
       ];
 
       gradients.forEach((grad) => {
@@ -146,7 +146,9 @@ function PatientRetentionChart({ data }) {
 
   return (
     <div className="w-fit">
-      <h2 className="text-sm font-bold text-white">Patient retention</h2>
+      <h2 className="text-sm font-bold text-white">
+        Fidélisation des patients
+      </h2>
       <div className="patientRetentionChart">
         <svg ref={svgRef} width="300" height="300" />
       </div>

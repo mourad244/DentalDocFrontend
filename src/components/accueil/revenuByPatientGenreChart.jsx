@@ -149,7 +149,9 @@ function RevenuByPatientGenreChart({ data }) {
 
   return (
     <div className="w-fit">
-      <h2 className="text-sm font-bold text-white">Revenu by patient genre</h2>
+      <h2 className="text-sm font-bold text-white">
+        Revenu par genre des patients
+      </h2>
       <div>
         <svg ref={svgRef} width={300} height={300} />
       </div>

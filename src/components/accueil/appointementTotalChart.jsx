@@ -3,11 +3,11 @@ import * as d3 from "d3";
 
 function AppointementTotalChart({ data }) {
   // const data = [
-  //   { name: "Scheduled", number: 2 },
-  //   { name: "Canceled", number: 50 },
-  //   { name: "Walk-ins", number: 5 },
-  //   { name: "Missed", number: 20 },
-  //   { name: "Reported", number: 2 },
+  //   { name: "Programmé", number: 2 },
+  //   { name: "Annulé", number: 50 },
+  //   { name: "Sans RDV", number: 5 },
+  //   { name: "Manqué", number: 20 },
+  //   { name: "Reporté", number: 2 },
   // ];
   const total = data.reduce((sum, entry) => sum + entry.number, 0);
 
@@ -50,11 +50,11 @@ function AppointementTotalChart({ data }) {
       // Define gradients
 
       const gradients = [
-        { id: "gradient1", name: "Scheduled" },
-        { id: "gradient2", name: "Canceled" },
-        { id: "gradient3", start: "#003547", end: "#003144", name: "Walk-ins" },
-        { id: "gradient4", start: "#FFB0AB", end: "#F08890", name: "Missed" },
-        { id: "gradient5", start: "#FFF700", end: "#FFD700", name: "Reported" }, // Yellow gradient
+        { id: "gradient1", name: "Programmé" },
+        { id: "gradient2", name: "Annulé" },
+        { id: "gradient3", start: "#003547", end: "#003144", name: "Sans RDV" },
+        { id: "gradient4", start: "#FFB0AB", end: "#F08890", name: "Manqué" },
+        { id: "gradient5", start: "#FFF700", end: "#FFD700", name: "Reporté" }, // Yellow gradient
       ];
 
       gradients.forEach((grad) => {
@@ -157,7 +157,7 @@ function AppointementTotalChart({ data }) {
       gradients.forEach((grad, index) => {
         const legendItem = legend
           .append("g")
-          .attr("transform", `translate(210, ${index * 18})`)
+          .attr("transform", `translate(200, ${index * 16})`)
           .style("cursor", "pointer")
           .on("mouseover", () => {
             segments
@@ -181,7 +181,7 @@ function AppointementTotalChart({ data }) {
           .attr("x", 15)
           .attr("y", 10)
           .text(grad.name)
-          .style("font-size", "12px")
+          .style("font-size", "10px")
           .style("fill", "white");
       });
     }
@@ -189,7 +189,7 @@ function AppointementTotalChart({ data }) {
 
   return (
     <div className="w-fit">
-      <h2 className="text-sm font-bold text-white">Total appointements</h2>
+      <h2 className="text-sm font-bold text-white">Total des Rendez-vous</h2>
       <div className="appointementTotalChart">
         <svg ref={svgRef} width="300" height="300" />
       </div>

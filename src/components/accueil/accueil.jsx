@@ -66,15 +66,15 @@ function Accueil() {
   ]);
   const [topActeDentaires, setTopActeDentaires] = useState([]);
   const [patientRetention, setPatientRetention] = useState([
-    { name: "New", number: 0 },
-    { name: "Returning", number: 0 },
+    { name: "Nouveau", number: 0 },
+    { name: "Revenant", number: 0 },
   ]);
   const [appointementTypes, setAppointmentTypes] = useState([
-    { name: "Scheduled", number: 0 },
-    { name: "Canceled", number: 0 },
-    { name: "Walk-ins", number: 0 },
-    { name: "Missed", number: 0 },
-    { name: "Reported", number: 0 },
+    { name: "Programmé", number: 0 },
+    { name: "Annulé", number: 0 },
+    { name: "Sans RDV", number: 0 },
+    { name: "Manqué", number: 0 },
+    { name: "Reporté", number: 0 },
   ]);
 
   const [times, setTimes] = useState([
@@ -131,8 +131,8 @@ function Accueil() {
     ];
     let newTopActeDentaires = [];
     let newPatientRetention = [
-      { name: "New", number: 0 },
-      { name: "Returning", number: 0 },
+      { name: "Nouveau", number: 0 },
+      { name: "Revenant", number: 0 },
     ];
 
     let newRevenuByPatientGenre = [
@@ -148,11 +148,11 @@ function Accueil() {
       { name: "60+", number: 0, value: 60 },
     ];
     let newAppointmentTypes = [
-      { name: "Scheduled", number: 0 },
-      { name: "Canceled", number: 0 },
-      { name: "Walk-ins", number: 0 },
-      { name: "Missed", number: 0 },
-      { name: "Reported", number: 0 },
+      { name: "Programmé", number: 0 },
+      { name: "Annulé", number: 0 },
+      { name: "Sans RDV", number: 0 },
+      { name: "Manqué", number: 0 },
+      { name: "Reporté", number: 0 },
     ];
 
     const uniquePatientIds = new Set();
@@ -700,7 +700,7 @@ function Accueil() {
           {/*------------ patient demographic--------------- */}
           <div className="m-2  w-fit  rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
             <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
-              Patient Demographics
+              Démographie des patients
             </h2>
             <div className="flex ">
               <div className="m-2">
@@ -719,7 +719,7 @@ function Accueil() {
               <AppointementChart />
             </div> */}
             <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
-              Appointment Statistics
+              Statistiques des rendez-vous
             </h2>
             <div className="flex ">
               <div className="m-2">
@@ -730,7 +730,7 @@ function Accueil() {
           {/*-------------treatement types and frequencies--------------- */}
           <div className="m-2 h-fit w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756]  shadow-custom">
             <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
-              Treatement types and frequencies
+              Types de traitement et fréquences
             </h2>
             <div className="flex ">
               <div className="m-2">
@@ -742,7 +742,7 @@ function Accueil() {
 
           <div className="m-2  h-fit w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
             <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
-              Patient Retention Rates
+              Taux de fidélisation des patients
             </h2>
             <div className="flex ">
               <div className="m-2">
@@ -753,7 +753,7 @@ function Accueil() {
           {/* -------------revenue and payement perforemd------------- */}
           <div className="m-2 h-fit  w-fit rounded-xl bg-gradient-to-b from-[#668089] to-[#2E4756] shadow-custom">
             <h2 className=" rounded-lg bg-[#2E4756] p-2 text-2xl font-bold text-white shadow-md">
-              Revenue and Payment Trends
+              Tendances des revenus et des paiements
             </h2>
             <div className="flex ">
               <div className="m-2 ">

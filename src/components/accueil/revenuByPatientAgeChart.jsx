@@ -120,8 +120,8 @@ function RevenuByPatientAgeChart({ data }) {
 
   return (
     <div className="w-fit">
-      <h2 className="text-center text-sm font-bold text-white">
-        by patient age
+      <h2 className="text-sm font-bold text-white">
+        Revenu par age des patients
       </h2>
       <div className="revenuByPatientAgeChart">
         <svg ref={svgRef} width="300" height="300" />

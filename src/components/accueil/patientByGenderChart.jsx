@@ -37,7 +37,7 @@ function PatientByGenderChart({ data }) {
 
   return (
     <div>
-      <h2 className="text-sm font-bold text-white">Patient's Gender</h2>
+      <h2 className="text-sm font-bold text-white">Genre du patient</h2>
       <svg width={width} height={height}>
         <defs>
           {/* Gradient for "Homme" */}
