@@ -49,7 +49,7 @@ class DeviForm extends Form {
     colors: colorsNatureActe,
     filteredActeDentaires: [],
     nombreDentsPerActe: [],
-    loading: true,
+    loading: false,
   };
   schema = {
     _id: Joi.string(),
@@ -61,7 +61,7 @@ class DeviForm extends Form {
     rdvIds: Joi.array().allow([]).label("Rendez-vous"),
   };
   async populateDatas() {
-    this.setState({ loading: false });
+    this.setState({ loading: true });
     const patientId = this.props.match.params.patientid;
     const deviId = this.props.match.params.deviid;
     const rdvId = this.props.match.params.rdvid;
@@ -72,8 +72,6 @@ class DeviForm extends Form {
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
       if (patientId) {
-        console.log("rdvId", rdvId);
-
         const { data: patient } = await getPatient(patientId);
         let newData = { ...this.state.data };
 
@@ -185,7 +183,7 @@ class DeviForm extends Form {
         selectedDents,
       });
     }
-    this.setState({ loaded: true });
+    this.setState({ loading: false });
   }
 
   onSelectPatient = async (patient) => {

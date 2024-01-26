@@ -7,6 +7,8 @@ import { getMedecins } from "../../services/medecinService";
 import { getProvinces } from "../../services/provinceService";
 import { getPatient, savePatient } from "../../services/patientService";
 // import FichePatient from "../../documents/fichePatient";
+
+import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 
 class PatientForm extends Form {
@@ -30,6 +32,7 @@ class PatientForm extends Form {
     errors: {},
     medecins: [],
     form: "patients",
+    loading: false,
   };
   schema = {
     _id: Joi.string(),
@@ -73,9 +76,11 @@ class PatientForm extends Form {
   }
 
   async componentDidMount() {
+    this.setState({ loading: true });
     await this.populateMedecins();
     await this.populateDatas();
     await this.populatePatients();
+    this.setState({ loading: false });
   }
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.formDisplay !== this.props.formDisplay) {
@@ -125,8 +130,12 @@ class PatientForm extends Form {
     //   this.props.match.params.id
     // )
     //   patientId = this.props.match.params.id;
-    const { regions, filteredProvinces } = this.state;
-    return (
+    const { regions, filteredProvinces, loading } = this.state;
+    return loading ? (
+      <div className="spinner">
+        <ClipLoader loading={loading} size={70} />
+      </div>
+    ) : (
       <div className="mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md border border-white bg-white">
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
           Formulaire du patient

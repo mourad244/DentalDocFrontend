@@ -41,7 +41,7 @@ class PaiementForm extends Form {
     paiements: [],
     actesEffectues: [],
     nombreActes: 1,
-    loading: true,
+    loading: false,
   };
 
   schema = {
@@ -55,7 +55,7 @@ class PaiementForm extends Form {
   };
 
   async populateDatas() {
-    this.setState({ loading: false });
+    this.setState({ loading: true });
     const paiementId = this.props.match.params.paiementid;
     const patientId = this.props.match.params.patientid;
     if (paiementId === "new" || paiementId === undefined) {
@@ -119,7 +119,7 @@ class PaiementForm extends Form {
         natureActes,
       });
     }
-    this.setState({ loaded: true });
+    this.setState({ loading: false });
   }
 
   onSelectPatient = async (patient) => {
