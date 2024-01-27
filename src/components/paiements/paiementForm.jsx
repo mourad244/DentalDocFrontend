@@ -325,7 +325,6 @@ class PaiementForm extends Form {
             </div>
           </div>
         )}
-        {console.log("this.props.match.params.", this.props.match.params)}
         {Object.keys(selectedPatient).length !== 0 ? (
           <>
             <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">

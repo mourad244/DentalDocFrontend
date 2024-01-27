@@ -215,7 +215,6 @@ function Rdvs() {
         </div>
       ) : (
         <div className="m-2">
-          {console.log("selectec", selectedRdv)}
           <RdvsTable
             rdvs={filteredRdvs}
             sortColumn={sortColumn}
