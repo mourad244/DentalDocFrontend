@@ -32,7 +32,7 @@ function Rdvs() {
   const history = useHistory();
 
   const [time, setTime] = useState(new Date());
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,7 +106,7 @@ function Rdvs() {
   };
 
   const handleViewDetails = () => {
-    setShowDetails(true);
+    // setShowDetails(true);
   };
   const handleSelectRdv = (rdv) => {
     let newSelectedRdvs = [...selectedRdvs];
@@ -146,7 +146,7 @@ function Rdvs() {
         newRdvs[index].isHonnore = false;
         newRdvs[index].isAnnule = true;
         return true;
-      }
+      } else return false;
     });
     saveRdv(data);
     setSelectedRdv(null);

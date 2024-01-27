@@ -11,7 +11,6 @@ import Form from "../../common/form";
 import PaiementActesTable from "./paiementActesTable";
 import PaiementEffectuesTable from "./paiementEffectuesTable";
 
-import _ from "lodash";
 import Joi from "joi-browser";
 import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -264,14 +263,14 @@ class PaiementForm extends Form {
   };
   render() {
     const {
-      data,
+      // data,
       selectedPatient,
       loading,
       searchQuery,
       filteredPatients,
       actesEffectues,
       paiements,
-      devis,
+      // devis,
     } = this.state;
     return loading ? (
       <div className="spinner">
