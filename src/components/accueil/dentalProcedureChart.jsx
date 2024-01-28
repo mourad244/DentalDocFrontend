@@ -23,7 +23,6 @@ function DentalProcedureChart({ data }) {
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     const maxYValue = d3.max(data, (d) => d.number);
-
     svg.selectAll("*").remove();
     // Define the gradient
     const defs = svg.append("defs");

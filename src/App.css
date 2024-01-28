@@ -61,9 +61,14 @@
   width: 100%;
   min-height: 100%;
   background: linear-gradient(
-    356.08deg,
-    rgba(243, 241, 219, 0.44) 9.84%,
-    #b2ade2 92.37%
+    270deg,
+    #678994 0%,
+    #9dacb0 20%,
+    #b2c4c7 32%,
+    #c2d8dc 47%,
+    #b7d2d7 55%,
+    #89a8b0 72%,
+    #4f6873 100%
   );
   font-size: 1rem;
   font-family: "Roboto";

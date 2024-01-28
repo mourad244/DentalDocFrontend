@@ -27,14 +27,23 @@ module.exports = {
         component: "6px 13px 9px rgb(0 0 0 / 25%)",
         dayFull: "inset 0px 4px 4px rgba(0, 0, 0, 0.25)",
         daySelected: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        login: "0px 0px 9.3px 6px rgba(156, 197, 213, 0.63)",
+        "login-button": "0px 2px 4px rgba(0, 0, 0, 0.70)",
+        "login-button-selected": "0px 1px 5px rgba(0, 0, 0, 0.25) inset",
+        "login-button-inselectd": "0px 1px 5px rgba(0, 0, 0, 0.25)",
       },
       backgroundImage: {
         "gradient-radial":
           "linear-gradient(180deg, #6b33a0 0%, rgb(69 90 148) 100%)",
+        "login-background":
+          "linear-gradient(180deg, #FAF9F2 0%, #F0ECE4 13%, #DEE1DC 26%, #CBD9D7 40%, #C0DFE2 67%, #B0D8E1 81%, #83BCCD 100%)",
+        "authenfier-button":
+          "linear-gradient(180deg, #74BED1 0%, #4E9BB5 100%)",
       },
       borderRadius: {
         custom: "10px",
         "5px": "5px",
+        login: "51px",
       },
     },
   },
