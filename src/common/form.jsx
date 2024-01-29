@@ -179,7 +179,6 @@ class Form extends Component {
   fileUploadHandler = async () => {
     let fd = new FormData();
     const form = this.state.form;
-
     let data = { ...this.state.data };
     delete data._id;
     delete data.images;
@@ -215,8 +214,7 @@ class Form extends Component {
           fd,
         )
       : await axios.post(`${process.env.REACT_APP_API_URL}/${form}`, fd);
-    if (this.props.match)
-      this.props.history.push(`/${this.state.module}/${form}`);
+    if (this.props.match) this.props.history.push(`/${form}`);
     else {
       window.location.reload();
     }
@@ -244,15 +242,23 @@ class Form extends Component {
     }
   };
 
-  renderUpload(name, label, type = "file") {
-    const height = 200;
+  renderUpload(
+    name,
+    label,
+    type = "file",
+    widthLabel = 96,
+    width = 170,
+    height = 35,
+  ) {
     const image = this.state[name];
 
     return (
       <UploadImage
         name={name}
+        width={width}
         image={image}
         height={height}
+        widthLabel={widthLabel}
         type={type}
         label={label}
         onChange={this.fileSelectedHandler}
@@ -260,13 +266,12 @@ class Form extends Component {
     );
   }
 
-  renderImage(name, label) {
+  renderImage(name, label, height = 200) {
     const { data /* errors */ } = this.state;
-    const height = 200;
     return (
-      <div className="display-image">
-        <div className="upload-file">
-          <label className="upload-file-label" htmlFor={name}>
+      <div className="flec mt-2 flex-row">
+        <div className="flex flex-row">
+          <label className="mr-2 w-auto leading-8" htmlFor={name}>
             {label}
           </label>
         </div>

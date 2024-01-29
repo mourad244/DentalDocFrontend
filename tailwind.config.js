@@ -45,6 +45,9 @@ module.exports = {
         "5px": "5px",
         login: "51px",
       },
+      scale: {
+        600: "6",
+      },
     },
   },
   variants: {

@@ -15,7 +15,6 @@ class PatientForm extends Form {
   state = {
     data: {
       cin: "",
-      dateCreation: "",
       // medecinId: "",
       historiqueMedecins: [],
       nom: "",
@@ -25,6 +24,8 @@ class PatientForm extends Form {
       dateNaissance: "",
       telephone: "",
       ville: "",
+      images: [],
+      imagesDeletedIndex: [],
     },
     regions: [],
     filteredProvinces: [],
@@ -43,12 +44,13 @@ class PatientForm extends Form {
     dateNaissance: Joi.date().allow("").allow(null).label("Date Naissance"),
     telephone: Joi.string().allow("").label("profession"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
-    dateCreation: Joi.date().allow(null).label("Date Ouverture"),
     provinceId: Joi.string().allow("").allow(null).label("Province"),
     regionId: Joi.string().allow("").allow(null).label("Region"),
     // dateDerniereVisite: Joi.date().allow("").label("Date dernière visite"),
     // medecinId: Joi.string().allow("").label("Medecin"),
     historiqueMedecins: Joi.array().allow([]).label("Medecins"),
+    images: Joi.label("Images").optional(),
+    imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
     profession: Joi.string().allow("").label("profession"),
   };
 
@@ -99,7 +101,6 @@ class PatientForm extends Form {
     return {
       _id: patient._id,
       cin: patient.cin,
-      dateCreation: patient.dateCreation,
       // medecinId: patient.medecinId ? patient.medecinId._id : undefined,
       historiqueMedecins: patient.historiqueMedecins,
       nom: patient.nom,
@@ -111,6 +112,8 @@ class PatientForm extends Form {
       ville: patient.ville,
       provinceId: patient.provinceId ? patient.provinceId : "",
       regionId: patient.regionId ? patient.regionId : "",
+      images: patient.images ? patient.images : [],
+      imagesDeletedIndex: [],
       // dateDerniereVisite: patient.dateDerniereVisite,
     };
   }
@@ -130,7 +133,7 @@ class PatientForm extends Form {
     //   this.props.match.params.id
     // )
     //   patientId = this.props.match.params.id;
-    const { regions, filteredProvinces, loading } = this.state;
+    const { regions, filteredProvinces, loading, data } = this.state;
     return loading ? (
       <div className="spinner">
         <ClipLoader loading={loading} size={70} />
@@ -177,9 +180,11 @@ class PatientForm extends Form {
           <div className="mt-3">
             {this.renderSelect("provinceId", "Province", filteredProvinces)}
           </div>
-          <div className="mt-3">
-            {this.renderDate("dateCreation", "Date ouverture")}
-          </div>
+          {/* {this.renderInput("commentaire", "Commentaire", 360, 70)} */}
+          {console.log("data", data)}
+          <div className="mt-3">{this.renderUpload("image", "Photo")}</div>
+          {data.images.length !== 0 &&
+            this.renderImage("images", "Images", 200)}
           {this.renderButton("Sauvegarder")}
         </form>
         {/* {patientId ? (
