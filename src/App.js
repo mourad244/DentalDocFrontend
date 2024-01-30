@@ -105,7 +105,7 @@ function App() {
             {/* Devis */}
             {user.role === "admin" || user.role === "comptable" ? (
               <Route
-                path="/devis/new/:patientid/:rdvid"
+                path="/devis/:deviid/:patientid/:rdvid"
                 exact
                 component={DeviForm}
               />

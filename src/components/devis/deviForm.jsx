@@ -71,6 +71,7 @@ class DeviForm extends Form {
       const { data: medecins } = await getMedecins();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
+
       if (patientId) {
         const { data: patient } = await getPatient(patientId);
         let newData = { ...this.state.data };
@@ -102,7 +103,7 @@ class DeviForm extends Form {
             natureActes,
           });
         } else {
-          return this.setState({
+          this.setState({
             selectedPatient: patient,
             searchQuery: "",
             data: {
@@ -706,44 +707,55 @@ class DeviForm extends Form {
                             </td>
 
                             <td>
-                              <div className="m-2 flex justify-center">
-                                <Input
-                                  type="number"
-                                  name="prix"
-                                  value={
-                                    data.acteEffectues &&
-                                    data.acteEffectues[indexActe] &&
-                                    data.acteEffectues[indexActe].prix
-                                      ? data.acteEffectues[indexActe].prix
-                                      : (selectedActes[indexActe] &&
-                                          selectedActes[indexActe].prix) ||
-                                        0
-                                  }
-                                  onChange={(e) =>
-                                    this.definePrixActe(e, indexActe)
-                                  }
-                                  width={80}
-                                  height={35}
-                                />
-                              </div>
+                              {selectedActes[indexActe] ? (
+                                <div className="m-2 flex justify-center">
+                                  <Input
+                                    type="number"
+                                    name="prix"
+                                    value={
+                                      data.acteEffectues &&
+                                      data.acteEffectues[indexActe] &&
+                                      data.acteEffectues[indexActe].prix
+                                        ? data.acteEffectues[indexActe].prix
+                                        : (selectedActes[indexActe] &&
+                                            selectedActes[indexActe].prix) ||
+                                          0
+                                    }
+                                    onChange={(e) =>
+                                      this.definePrixActe(e, indexActe)
+                                    }
+                                    width={80}
+                                    height={35}
+                                  />
+                                </div>
+                              ) : (
+                                ""
+                              )}
                             </td>
                             <td>
-                              <div className="m-2 flex justify-center">
-                                <Input
-                                  type="number"
-                                  name="nombreDent"
-                                  value={
-                                    nombreDentsPerActe[indexActe]
-                                      ? nombreDentsPerActe[indexActe]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    this.defineNombreDentsPerActe(e, indexActe)
-                                  }
-                                  width={60}
-                                  height={35}
-                                />
-                              </div>
+                              {selectedActes[indexActe] ? (
+                                <div className="m-2 flex justify-center">
+                                  <Input
+                                    type="number"
+                                    name="nombreDent"
+                                    value={
+                                      nombreDentsPerActe[indexActe]
+                                        ? nombreDentsPerActe[indexActe]
+                                        : 0
+                                    }
+                                    onChange={(e) =>
+                                      this.defineNombreDentsPerActe(
+                                        e,
+                                        indexActe,
+                                      )
+                                    }
+                                    width={60}
+                                    height={35}
+                                  />
+                                </div>
+                              ) : (
+                                ""
+                              )}
                             </td>
 
                             {selectedActes[indexActe] ? (
