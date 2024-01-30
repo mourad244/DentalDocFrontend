@@ -266,22 +266,17 @@ class Form extends Component {
     );
   }
 
-  renderImage(name, label, height = 200) {
+  renderImage(name, label, width = 170, height = 200, widthLabel = 96) {
     const { data /* errors */ } = this.state;
     return (
-      <div className="flec mt-2 flex-row">
-        <div className="flex flex-row">
-          <label className="mr-2 w-auto leading-8" htmlFor={name}>
-            {label}
-          </label>
-        </div>
-        <DisplayImage
-          name={name}
-          images={data[name]}
-          label={label}
-          height={height}
-        />
-      </div>
+      <DisplayImage
+        name={name}
+        widthLabel={widthLabel}
+        images={data[name]}
+        label={label}
+        width={width}
+        height={height}
+      />
     );
   }
 

@@ -181,10 +181,14 @@ class PatientForm extends Form {
             {this.renderSelect("provinceId", "Province", filteredProvinces)}
           </div>
           {/* {this.renderInput("commentaire", "Commentaire", 360, 70)} */}
-          {console.log("data", data)}
-          <div className="mt-3">{this.renderUpload("image", "Photo")}</div>
-          {data.images.length !== 0 &&
-            this.renderImage("images", "Images", 200)}
+          <div className="mt-3 w-full  ">
+            {this.renderUpload("image", "Photo")}
+          </div>
+
+          <div className="  mt-3 flex w-full flex-wrap">
+            {data.images.length !== 0 &&
+              this.renderImage("images", "Images", 200)}
+          </div>
           {this.renderButton("Sauvegarder")}
         </form>
         {/* {patientId ? (

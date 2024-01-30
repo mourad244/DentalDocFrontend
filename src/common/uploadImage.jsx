@@ -11,7 +11,7 @@ const UploadImage = ({
   ...rest
 }) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-row">
       <div className="flex w-fit flex-wrap">
         <label
           className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
@@ -36,10 +36,10 @@ const UploadImage = ({
           multiple
         />
       </div>
-      <div className="ml-2 mt-2 flex flex-wrap">
+      <div className="ml-2 flex flex-wrap">
         {image
           ? image.map((url, index) => (
-              <img alt={url} key={index} src={url} height={height + "px"} />
+              <img alt={url} key={index} src={url} width={width} />
             ))
           : ""}
       </div>
