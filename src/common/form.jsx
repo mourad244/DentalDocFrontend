@@ -266,7 +266,16 @@ class Form extends Component {
       />
     );
   }
-
+  handleDeleteImage = (name, e, index) => {
+    e.preventDefault();
+    const { data } = this.state;
+    // console.log(data);
+    // add index to deletedImages if not existed
+    data[`${name}DeletedIndex`].indexOf(index) === -1 &&
+      data[`${name}DeletedIndex`].push(index);
+    // delete image from array
+    this.setState({ data });
+  };
   renderImage(name, label, width = 170, height = 200, widthLabel = 96) {
     const { data /* errors */ } = this.state;
     return (
@@ -274,6 +283,7 @@ class Form extends Component {
         name={name}
         widthLabel={widthLabel}
         images={data[name]}
+        deleteImage={this.handleDeleteImage}
         label={label}
         width={width}
         height={height}
