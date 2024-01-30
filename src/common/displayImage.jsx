@@ -37,6 +37,7 @@ const DisplayImage = ({
           src={`${process.env.REACT_APP_API_IMAGE_URL}/${images}`}
           alt={label}
           height={height + "px"}
+          width={height + "px"}
         />
       )}
     </div>

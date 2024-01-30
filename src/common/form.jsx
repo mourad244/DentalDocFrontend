@@ -208,7 +208,8 @@ class Form extends Component {
       }
     }
     this.props.match !== undefined &&
-    this.props.match.params.id /* && this.props.match.params.id != "new" */
+    this.props.match.params.id &&
+    this.props.match.params.id != "new"
       ? await axios.put(
           `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.id}`,
           fd,
