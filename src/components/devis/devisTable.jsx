@@ -98,7 +98,8 @@ function DevisTable({
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  {devi.medecinId.nom} {devi.medecinId.prenom}
+                  {devi.medecinId && devi.medecinId.nom}{" "}
+                  {devi.medecinId && devi.medecinId.prenom}
                 </td>
               );
 
