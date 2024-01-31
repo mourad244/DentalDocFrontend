@@ -31,6 +31,12 @@ const DisplayImage = ({
       </label>
       {images.length > 1 ? (
         images.map((img, index) => {
+          {
+            console.log(
+              "REACT_APP_API_IMAGE_URL",
+              process.env.REACT_APP_API_IMAGE_URL,
+            );
+          }
           return (
             <div className="flex flex-col items-center" key={uuidv4()}>
               <img
@@ -65,6 +71,10 @@ const DisplayImage = ({
         })
       ) : (
         <div className="flex flex-col items-center">
+          {console.log(
+            "REACT_APP_API_IMAGE_URL",
+            process.env.REACT_APP_API_IMAGE_URL,
+          )}
           <img
             className={`${
               !indexBluredImage.includes(0) ? "" : "blur-sm"
