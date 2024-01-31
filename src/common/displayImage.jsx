@@ -13,7 +13,6 @@ const DisplayImage = ({
   const [indexBluredImage, setIndexBluredImage] = useState([]);
   const handleImageDelete = (name, e, index) => {
     e.preventDefault();
-    //  add inedx to indexBluredImage if not exist in array or remove if exist
     indexBluredImage.includes(index)
       ? setIndexBluredImage(indexBluredImage.filter((i) => i !== index))
       : setIndexBluredImage([...indexBluredImage, index]);
@@ -31,12 +30,6 @@ const DisplayImage = ({
       </label>
       {images.length > 1 ? (
         images.map((img, index) => {
-          {
-            console.log(
-              "REACT_APP_API_IMAGE_URL",
-              process.env.REACT_APP_API_IMAGE_URL,
-            );
-          }
           return (
             <div className="flex flex-col items-center" key={uuidv4()}>
               <img
@@ -71,10 +64,6 @@ const DisplayImage = ({
         })
       ) : (
         <div className="flex flex-col items-center">
-          {console.log(
-            "REACT_APP_API_IMAGE_URL",
-            process.env.REACT_APP_API_IMAGE_URL,
-          )}
           <img
             className={`${
               !indexBluredImage.includes(0) ? "" : "blur-sm"
