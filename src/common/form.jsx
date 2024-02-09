@@ -77,7 +77,17 @@ class Form extends Component {
     data[array].splice(i, 1);
     this.setState({ data });
   };
-
+  handleCheckboxChange = (name, value, isChecked) => {
+    const data = { ...this.state.data };
+    if (isChecked) {
+      if (!data[name].includes(value)) {
+        data[name].push(value);
+      }
+    } else {
+      data[name] = data[name].filter((item) => item !== value);
+    }
+    this.setState({ data });
+  };
   filePathset = (e, destination) => {
     // e.stopPropagation();
     e.preventDefault();
@@ -371,7 +381,45 @@ class Form extends Component {
       />
     );
   }
-
+  renderCheckboxes(name, label, width, widthLabel, listItems, labelItems) {
+    const { data } = this.state;
+    return (
+      <div className="mt-3 flex flex-col">
+        <div className="flex w-fit flex-wrap">
+          {label && (
+            <label
+              className={`mr-3 text-right text-xs font-bold leading-9 text-[#72757c]`}
+              style={{ width: widthLabel }}
+            >
+              {label}
+            </label>
+          )}
+          <div className={`flex justify-between`} style={{ width }}>
+            {listItems.map((item, index) => (
+              <div key={item}>
+                <label
+                  htmlFor={item}
+                  className="mr-2 inline-flex items-center text-xs font-bold leading-9 text-[#72757c]"
+                >
+                  <input
+                    name={name}
+                    id={item}
+                    className="mr-2"
+                    type="checkbox"
+                    checked={data[name] ? data[name].includes(item) : false}
+                    onChange={(e) =>
+                      this.handleCheckboxChange(name, item, e.target.checked)
+                    }
+                  />
+                  {labelItems[index]}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
   renderInput(
     name,
     label,

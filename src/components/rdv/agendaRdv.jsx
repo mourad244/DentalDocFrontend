@@ -79,6 +79,7 @@ const AgendaRdv = (props) => {
     };
     filterRdvs();
   }, [rdvs, selectedPatient, time]);
+
   useEffect(() => {
     const daysInMonth = () => {
       const newNombreDays = new Date(
@@ -90,6 +91,7 @@ const AgendaRdv = (props) => {
     };
     daysInMonth();
   }, [time]);
+
   const navigateDate = (operation) => {
     const periode = new Date(time.setMonth(time.getMonth() + operation));
     setTime(periode);
@@ -98,6 +100,7 @@ const AgendaRdv = (props) => {
   const displayDate = () => {
     return mois[time.getMonth()] + " - " + time.getFullYear();
   };
+
   const handleSelectedDate = async (index) => {
     const date = new Date(time.getFullYear(), time.getMonth(), index + 1);
     let deletedDate = filteredRdvs.find(

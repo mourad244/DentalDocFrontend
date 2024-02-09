@@ -11,6 +11,8 @@ class ActeDentaireForm extends Form {
       natureId: "",
       code: "",
       prix: "",
+      duree: "",
+      moments: [],
     },
     formDisplay: false,
     errors: {},
@@ -30,6 +32,8 @@ class ActeDentaireForm extends Form {
     natureId: Joi.string().allow(""),
     code: Joi.number().allow(""),
     prix: Joi.number().allow(""),
+    duree: Joi.number().allow(""),
+    moments: Joi.array().allow(""),
   };
 
   async populateActeDentaires() {
@@ -70,6 +74,8 @@ class ActeDentaireForm extends Form {
       natureId: acteDentaire.natureId ? acteDentaire.natureId._id : "",
       code: acteDentaire.code,
       prix: acteDentaire.prix,
+      duree: acteDentaire.duree,
+      moments: acteDentaire.moments ? acteDentaire.moments : [],
     };
   }
   doSubmit = async () => {
@@ -91,14 +97,38 @@ class ActeDentaireForm extends Form {
               className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
               onSubmit={this.handleSubmit}
             >
-              {this.renderInput("nom", "Nom nature")}
-              {this.renderSelect(
-                "natureId",
-                "Couverture",
-                this.props.natureActes,
+              <div className="mt-3">{this.renderInput("nom", "Nom acte")}</div>
+              <div className="mt-3">
+                {this.renderSelect(
+                  "natureId",
+                  "Nature acte",
+                  this.props.natureActes,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("code", "Code", 170, 35, "number")}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("prix", "Prix", 170, 35, "number")}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "duree",
+                  "Duree en minutes",
+                  170,
+                  35,
+                  "number",
+                )}
+              </div>
+              {this.renderCheckboxes(
+                "moments",
+                "Temps préféré",
+                170,
+                96,
+                ["matin", "apres-midi"],
+                ["Matin", "Après-midi"],
               )}
-              {this.renderInput("code", "Code")}
-              {this.renderInput("prix", "Prix")}
+
               {this.renderButton("Sauvegarder")}
             </form>
           </div>
