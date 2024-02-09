@@ -110,34 +110,36 @@ const AgendaRdv = (props) => {
         new Date(e.datePrevu).getDate() === date.getDate(),
     );
     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
-      await deleteRdv(deletedDate._id);
+      /* await deleteRdv(deletedDate._id);
       setReload(true);
-      props.history.push("/rdvs");
-    } else if (window.confirm("Confirmer l'ajour du rdv")) {
+      props.history.push("/rdvs"); */
+      props.onDeleteRdv(deletedDate._id);
+    } /* if (window.confirm("Confirmer l'ajour du rdv"))  */ else {
       //
       // if ther is no selectedRdv
-      if (Object.keys(selectedRdv).length !== 0) {
-        let oldData = {
-          _id: selectedRdv._id,
-          patientId: selectedPatient._id,
-          datePrevu: selectedRdv.datePrevu,
-          isReporte: true,
-          dateNouveauRdv: date,
-        };
-        let newData = {
-          patientId: selectedPatient._id,
-          datePrevu: date,
-        };
+      props.onSelectDate(date);
+      // if (Object.keys(selectedRdv).length !== 0) {
+      //   let oldData = {
+      //     _id: selectedRdv._id,
+      //     patientId: selectedPatient._id,
+      //     datePrevu: selectedRdv.datePrevu,
+      //     isReporte: true,
+      //     dateNouveauRdv: date,
+      //   };
+      //   let newData = {
+      //     patientId: selectedPatient._id,
+      //     datePrevu: date,
+      //   };
 
-        await saveRdv(oldData);
-        await saveRdv(newData);
-      } else
-        await saveRdv({
-          patientId: selectedPatient._id,
-          datePrevu: date,
-        });
-      setReload(true);
-      props.history.push("/rdvs");
+      //   await saveRdv(oldData);
+      //   await saveRdv(newData);
+      // } else
+      //   await saveRdv({
+      //     patientId: selectedPatient._id,
+      //     datePrevu: date,
+      //   });
+      // setReload(true);
+      // props.history.push("/rdvs");
     }
   };
   const displayDates = () => {

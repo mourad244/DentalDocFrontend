@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { getRdv } from "../../services/rdvServices";
+import { getRdv, deleteRdv, saveRdv } from "../../services/rdvServices";
 import { getPatients } from "../../services/patientService";
 
 import { useHistory } from "react-router-dom";
@@ -24,6 +24,7 @@ function RdvForm(props) {
   const [filteredActes, setFilteredActes] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
 
+  const [reload, setReload] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   const history = useHistory();
@@ -82,6 +83,35 @@ function RdvForm(props) {
     filterActes();
   }, [selectedNatureActe]);
 
+  const onDateSelect = async (date) => {
+    if (Object.keys(selectedRdv).length !== 0) {
+      let oldData = {
+        _id: selectedRdv._id,
+        patientId: selectedPatient._id,
+        datePrevu: selectedRdv.datePrevu,
+        isReporte: true,
+        dateNouveauRdv: date,
+      };
+      let newData = {
+        patientId: selectedPatient._id,
+        datePrevu: date,
+      };
+
+      await saveRdv(oldData);
+      await saveRdv(newData);
+    } else
+      await saveRdv({
+        patientId: selectedPatient._id,
+        datePrevu: date,
+      });
+    setReload(true);
+    history.push("/rdvs");
+  };
+  const onRdvDelete = async (rdvId) => {
+    await deleteRdv(rdvId);
+    setReload(true);
+    history.push("/rdvs");
+  };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
       <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
@@ -208,6 +238,8 @@ function RdvForm(props) {
           <AgendaRdv
             selectedPatient={selectedPatient}
             selectedRdv={selectedRdv}
+            onSelectDate={onDateSelect}
+            onDeleteRdv={onRdvDelete}
           />
         </>
       )}
