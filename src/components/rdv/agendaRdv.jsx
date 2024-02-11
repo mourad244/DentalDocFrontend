@@ -39,12 +39,12 @@ const AgendaRdv = (props) => {
     selectedRdvDate,
   } = props;
 
-  const date = new Date();
   const [rdvs, setRdvs] = useState([]);
+  const [filteredRdvsPatient, setFilteredRdvsPatient] = useState([]);
   const [filteredRdvs, setFilteredRdvs] = useState([]);
 
+  const date = new Date();
   const [time, setTime] = useState(new Date());
-
   const [nombreDays, setNombreDays] = useState("");
 
   useEffect(() => {
@@ -58,34 +58,34 @@ const AgendaRdv = (props) => {
   useEffect(() => {
     const filterRdvs = async () => {
       let listRdvObj = {};
-      let newfilteredRdvs = [];
+      let newfilteredRdvsPatient = [];
       let newPatientRdvs = [];
-      rdvs
+      let filteredRdvs = rdvs
         .filter((e) => {
           return (
             new Date(e.datePrevu).getFullYear() === time.getFullYear() &&
             new Date(e.datePrevu).getMonth() === time.getMonth()
           );
         })
-
         .map((e) => {
           let date = `${new Date(e.datePrevu).getMonth() + 1}-${new Date(
             e.datePrevu,
           ).getDate()}-${new Date(e.datePrevu).getFullYear()}`;
           if (e.patientId._id === selectedPatient._id) {
-            newfilteredRdvs.push(e);
+            newfilteredRdvsPatient.push(e);
           }
           if (e.patientId._id) {
             newPatientRdvs.push(date);
           }
-          if (!listRdvObj[date]) return (listRdvObj[date] = 1);
-          else return (listRdvObj[date] += 1);
+          if (!listRdvObj[date]) listRdvObj[date] = 1;
+          else listRdvObj[date] += 1;
+          return e;
         });
-      setFilteredRdvs(newfilteredRdvs);
+      setFilteredRdvs(filteredRdvs);
+      setFilteredRdvsPatient(newfilteredRdvsPatient);
     };
     filterRdvs();
   }, [rdvs, selectedPatient, time]);
-
   useEffect(() => {
     const daysInMonth = () => {
       const newNombreDays = new Date(
@@ -109,7 +109,7 @@ const AgendaRdv = (props) => {
 
   const handleSelectedDate = async (index) => {
     const date = new Date(time.getFullYear(), time.getMonth(), index + 1);
-    let deletedDate = filteredRdvs.find(
+    let deletedDate = filteredRdvsPatient.find(
       (e) =>
         new Date(e.datePrevu).getFullYear() === date.getFullYear() &&
         new Date(e.datePrevu).getMonth() === date.getMonth() &&
@@ -134,7 +134,7 @@ const AgendaRdv = (props) => {
           t < nombreDays &&
           d.getDay() !== 0
         ) {
-          let found = filteredRdvs.find((e) => {
+          let found = filteredRdvsPatient.find((e) => {
             return new Date(e.datePrevu).getDate() === d.getDate();
           });
           if (
@@ -238,7 +238,6 @@ const AgendaRdv = (props) => {
               </div>,
             );
           }
-
           countTotal++;
         } else if (d.getDay() === 0) {
           arrayDiv.push(
@@ -261,6 +260,7 @@ const AgendaRdv = (props) => {
     } while (countTotal < nombreDays);
     return totalDiv;
   };
+
   return (
     <div className="m-auto my-2 flex h-fit w-fit min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
       <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
@@ -273,7 +273,6 @@ const AgendaRdv = (props) => {
         <p className="text-md m-auto mx-3 font-bold leading-5">
           {displayDate()}
         </p>
-
         <SuivantButton
           onClick={() => {
             navigateDate(1);
@@ -297,6 +296,30 @@ const AgendaRdv = (props) => {
         )}
       </div>
       <div className="flex w-[420px] flex-wrap">{displayDates()}</div>
+      {selectedRdvDate && (
+        <div>
+          {filteredRdvs
+            .filter((e) => {
+              return (
+                new Date(e.datePrevu).getDate() === selectedRdvDate.getDate() &&
+                new Date(e.datePrevu).getMonth() ===
+                  selectedRdvDate.getMonth() &&
+                new Date(e.datePrevu).getFullYear() ===
+                  selectedRdvDate.getFullYear()
+              );
+            })
+            .map((e) => {
+              return (
+                <div
+                  id={e._id}
+                  className="m-2 h-5  border-2 border-black text-center"
+                >
+                  {`${e.heureDebut.heure}h${e.heureDebut.minute} - ${e.heureFin.heure}h${e.heureFin.minute}`}
+                </div>
+              );
+            })}
+        </div>
+      )}
     </div>
   );
 };

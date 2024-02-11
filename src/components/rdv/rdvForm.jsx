@@ -370,7 +370,7 @@ function RdvForm(props) {
                   </div>
                 </div>
               </div>
-              <div className=" m-3 flex">
+              {/* <div className=" m-3 flex">
                 <label className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]">
                   Fin
                 </label>
@@ -418,7 +418,7 @@ function RdvForm(props) {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
