@@ -6,7 +6,7 @@ const Select = ({
   options = [],
   error,
   widthLabel,
-  width,
+  width = "auto",
   height,
   ...rest
 }) => {

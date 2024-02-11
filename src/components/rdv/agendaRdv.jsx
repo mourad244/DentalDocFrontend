@@ -31,23 +31,29 @@ const AgendaRdv = (props) => {
     "Samedi",
     "Dimanche",
   ];
-  const { selectedPatient, selectedRdv } = props;
+  const {
+    selectedRdv,
+    selectedDuree,
+    selectedMoments,
+    selectedPatient,
+    selectedRdvDate,
+  } = props;
+
   const date = new Date();
   const [rdvs, setRdvs] = useState([]);
   const [filteredRdvs, setFilteredRdvs] = useState([]);
 
   const [time, setTime] = useState(new Date());
-  const [reload, setReload] = useState(true);
+
   const [nombreDays, setNombreDays] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: rdvs } = await getRdvs();
       setRdvs(rdvs);
-      setReload(false);
     };
-    if (reload) fetchData();
-  }, [reload]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const filterRdvs = async () => {
@@ -110,36 +116,9 @@ const AgendaRdv = (props) => {
         new Date(e.datePrevu).getDate() === date.getDate(),
     );
     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
-      /* await deleteRdv(deletedDate._id);
-      setReload(true);
-      props.history.push("/rdvs"); */
       props.onDeleteRdv(deletedDate._id);
-    } /* if (window.confirm("Confirmer l'ajour du rdv"))  */ else {
-      //
-      // if ther is no selectedRdv
+    } else {
       props.onSelectDate(date);
-      // if (Object.keys(selectedRdv).length !== 0) {
-      //   let oldData = {
-      //     _id: selectedRdv._id,
-      //     patientId: selectedPatient._id,
-      //     datePrevu: selectedRdv.datePrevu,
-      //     isReporte: true,
-      //     dateNouveauRdv: date,
-      //   };
-      //   let newData = {
-      //     patientId: selectedPatient._id,
-      //     datePrevu: date,
-      //   };
-
-      //   await saveRdv(oldData);
-      //   await saveRdv(newData);
-      // } else
-      //   await saveRdv({
-      //     patientId: selectedPatient._id,
-      //     datePrevu: date,
-      //   });
-      // setReload(true);
-      // props.history.push("/rdvs");
     }
   };
   const displayDates = () => {
@@ -158,8 +137,24 @@ const AgendaRdv = (props) => {
           let found = filteredRdvs.find((e) => {
             return new Date(e.datePrevu).getDate() === d.getDate();
           });
-
-          if (found) {
+          if (
+            selectedRdvDate &&
+            selectedRdvDate.getDate() === d.getDate() &&
+            selectedRdvDate.getMonth() === d.getMonth() &&
+            selectedRdvDate.getFullYear() === d.getFullYear()
+          ) {
+            arrayDiv.push(
+              <div
+                key={"date-active" + countTotal}
+                className={`m-2 flex h-10 w-10 rounded-3xl bg-[#152961] text-white shadow-daySelected`}
+                // onClick={() => handleSelectedDate(t)}
+              >
+                <label className="m-auto align-middle text-sm font-bold">
+                  {countTotal + 1}
+                </label>
+              </div>,
+            );
+          } else if (found) {
             if (
               d.getFullYear() > date.getFullYear() ||
               (d.getFullYear() >= date.getFullYear() &&
@@ -176,7 +171,7 @@ const AgendaRdv = (props) => {
                       ? "bg-[#e49012]"
                       : found.isAnnule
                       ? " bg-[#ff6868]"
-                      : "bg-[#152961]"
+                      : "bg-[#506496]"
                   }  text-white shadow-daySelected`}
                   // onClick={() => handleSelectedDate(t)}
                 >

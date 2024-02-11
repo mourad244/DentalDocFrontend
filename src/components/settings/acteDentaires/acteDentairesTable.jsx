@@ -33,6 +33,21 @@ function DetailCouverturesTable(props) {
       path: "prix",
       label: "Prix",
     },
+    {
+      path: "duree",
+      label: "Durée",
+
+      content: (item) => {
+        return <label key={item._id}>{item.duree} min</label>;
+      },
+    },
+    {
+      path: "moments",
+      label: "Moments",
+      content: (item) => {
+        return <label key={item._id}>{item.moments.join(", ")}</label>;
+      },
+    },
   ];
 
   const {

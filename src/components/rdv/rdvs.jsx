@@ -237,7 +237,11 @@ function Rdvs() {
             onCancel={
               selectedRdv &&
               !selectedRdv.isReporte &&
-              new Date() <=
+              new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate(),
+              ) <=
                 new Date(
                   new Date(selectedRdv.datePrevu).getFullYear(),
                   new Date(selectedRdv.datePrevu).getMonth(),
@@ -249,7 +253,11 @@ function Rdvs() {
             onEdit={
               selectedRdv &&
               !selectedRdv.isReporte &&
-              new Date() <=
+              new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate(),
+              ) <=
                 new Date(
                   new Date(selectedRdv.datePrevu).getFullYear(),
                   new Date(selectedRdv.datePrevu).getMonth(),

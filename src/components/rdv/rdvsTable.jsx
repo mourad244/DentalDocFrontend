@@ -31,7 +31,8 @@ function RdvsTable(props) {
       content: (rdv) => {
         return (
           <label key={rdv._id}>
-            {rdv.patientId.nom} {rdv.patientId.prenom}
+            {rdv.patientId && rdv.patientId.nom}{" "}
+            {rdv.patientId && rdv.patientId.prenom}
           </label>
         );
       },

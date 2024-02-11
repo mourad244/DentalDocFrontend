@@ -291,7 +291,6 @@ function Accueil() {
         case "semaine":
           break;
         case "mois":
-          console.log("filteredDevis", filteredDevis);
           filteredDevis = filteredDevis
             .filter(
               (deviItem) =>
