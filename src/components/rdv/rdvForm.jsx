@@ -35,6 +35,9 @@ function RdvForm(props) {
     minute: 0,
   });
 
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [filteredStartTimes, setFilteredStartTimes] = useState([]);
+
   const [filteredActes, setFilteredActes] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
 
@@ -97,34 +100,12 @@ function RdvForm(props) {
     };
     filterActes();
   }, [selectedNatureActe]);
-
+  // Effect hook to recalculate start times whenever relevant dependencies change
+  useEffect(() => {
+    filterStartTimesByDuration();
+  }, [availableTimes, selectedDuree]);
   const onDateSelect = async (date) => {
     setSelectedRdvDate(date);
-    /* if (Object.keys(selectedRdv).length !== 0) {
-      let oldData = {
-        _id: selectedRdv._id,
-        patientId: selectedPatient._id,
-        datePrevu: selectedRdv.datePrevu,
-
-        isReporte: true,
-        dateNouveauRdv: date,
-      };
-      let newData = {
-        patientId: selectedPatient._id,
-
-        datePrevu: date,
-      };
-
-      await saveRdv(oldData);
-      await saveRdv(newData);
-    } else
-      await saveRdv({
-        patientId: selectedPatient._id,
-        datePrevu: date,
-      });
-
-    setReload(true);
-    history.push("/rdvs"); */
   };
   const onRdvDelete = async (rdvId) => {
     await deleteRdv(rdvId);
@@ -152,6 +133,43 @@ function RdvForm(props) {
       minute: endMinuteStr,
     });
   };
+  // Function to filter available start times based on selected duration
+  const filterStartTimesByDuration = () => {
+    const durationInMinutes = parseInt(selectedDuree); // Assuming selectedDuree is in minutes
+    let validStartTimes = [];
+
+    availableTimes.forEach((timeSlot) => {
+      let slotStartInMinutes = timeSlot.startHour * 60 + timeSlot.startMinute;
+      let slotEndInMinutes = timeSlot.endHour * 60 + timeSlot.endMinute;
+
+      // Check if the slot duration is greater than or equal to the selected duration
+      if (slotEndInMinutes - slotStartInMinutes >= durationInMinutes) {
+        validStartTimes.push({
+          startHour: timeSlot.startHour,
+          startMinute: timeSlot.startMinute,
+          // You could add more information here if necessary
+        });
+      }
+    });
+
+    setFilteredStartTimes(validStartTimes);
+  };
+  // Example of handling start time selection
+  const handleStartTimeChange = (hour, minute) => {
+    setSelectedHeureDebut({ heure: hour, minute: minute });
+    // Additional logic to set end time based on start time and duration
+  };
+
+  // Assuming filteredStartTimes is structured appropriately
+  // Convert availableTimes to a suitable structure if necessary
+  const startTimeOptions = filteredStartTimes.map((time) => ({
+    label: `${time.startHour.toString().padStart(2, "0")}:${time.startMinute
+      .toString()
+      .padStart(2, "0")}`,
+    value: `${time.startHour}-${time.startMinute}`,
+  }));
+
+  console.log("filteredStartTimes", filteredStartTimes);
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
       <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
@@ -311,117 +329,43 @@ function RdvForm(props) {
             selectedPatient={selectedPatient}
             selectedRdvDate={selectedRdvDate}
             selectedMoments={selectedMomemts}
+            onAvailableTimesChange={setAvailableTimes}
           />
           {/* heure debut includes two inputs: heure et minute */}
           {selectedRdvDate && (
             <div>
-              <div className=" m-3 flex">
-                <label className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]">
-                  Début
-                </label>
-                <div className="flex items-center">
-                  <div className="ml-2">
-                    <Input
-                      name="heureDebut"
-                      value={
-                        selectedRdv && selectedRdv.heureDebut
-                          ? selectedRdv.heureDebut.heure
-                          : selectedHeureDebut.heure
-                      }
-                      onChange={(e) => {
-                        const newHour = e.target.value;
-                        setSelectedHeureDebut((prevState) => ({
-                          ...prevState,
-                          heure: newHour,
-                        }));
-                        // Directly use newHour in calculateEndTime call to ensure up-to-date calculation
-                        calculateEndTime(newHour, selectedHeureDebut.minute);
-                      }}
-                      type="number"
-                      width={80}
-                      max={23}
-                      label="Heure"
-                      height={35}
-                    />
-                  </div>
-                  <div className="ml-2">
-                    <Input
-                      name="minuteDebut"
-                      value={
-                        selectedRdv && selectedRdv.heureDebut
-                          ? selectedRdv.heureDebut.minute
-                          : selectedHeureDebut.minute
-                      }
-                      onChange={(e) => {
-                        const newMinute = e.target.value;
-                        setSelectedHeureDebut((prevState) => ({
-                          ...prevState,
-                          minute: newMinute,
-                        }));
-                        // Directly use newMinute in calculateEndTime call to ensure up-to-date calculation
-                        calculateEndTime(selectedHeureDebut.heure, newMinute);
-                      }}
-                      label="Min"
-                      type="number"
-                      width={80}
-                      max={59}
-                      height={35}
-                    />
-                  </div>
+              {console.log("availableTimes", availableTimes)}
+              <div className=" flex flex-col">
+                <div className="flex w-fit flex-wrap">
+                  <label
+                    style={{
+                      width: 96,
+                    }}
+                    className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
+                  >
+                    Début
+                  </label>
+                  <select
+                    className=" rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                    name="heuredebut"
+                    // value={value}
+                    onChange={(e) => {
+                      const [hour, minute] = e.target.value.split("-");
+                      handleStartTimeChange(hour, minute);
+                    }}
+                    style={{ height: 35 }}
+                  >
+                    <option value="" />
+                    {startTimeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              {/* <div className=" m-3 flex">
-                <label className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]">
-                  Fin
-                </label>
-                <div className="flex items-center">
-                  <div className="ml-2">
-                    <Input
-                      name="heure"
-                      value={
-                        selectedRdv && selectedRdv.heureFin
-                          ? selectedRdv.heureFin.heure
-                          : selectedHeureFin.heure
-                      }
-                      onChange={(e) => {
-                        setSelectedHeureFin({
-                          ...selectedHeureFin,
-                          heure: e.target.value,
-                        });
-                      }}
-                      type="number"
-                      width={80}
-                      label="Heure"
-                      height={35}
-                      max={23}
-                    />
-                  </div>
-                  <div className="ml-2">
-                    <Input
-                      name="minute"
-                      value={
-                        selectedRdv && selectedRdv.heureFin
-                          ? selectedRdv.heureFin.minute
-                          : selectedHeureFin.minute
-                      }
-                      onChange={(e) => {
-                        setSelectedHeureFin({
-                          ...selectedHeureFin,
-                          minute: e.target.value,
-                        });
-                      }}
-                      label="Min"
-                      type="number"
-                      width={80}
-                      height={35}
-                      max={59}
-                    />
-                  </div>
-                </div>
-              </div> */}
             </div>
           )}
-
           <button
             className="m-2 mt-3 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
             onClick={async () => {
