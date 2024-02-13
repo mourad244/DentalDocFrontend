@@ -10,7 +10,10 @@ import AgendaRdv from "./agendaRdv";
 import SearchBox from "../../common/searchBox";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 import { getNatureActes } from "../../services/natureActeService";
-import { getActeDentaires } from "../../services/acteDentaireService";
+import {
+  getActeDentaires,
+  saveActeDentaire,
+} from "../../services/acteDentaireService";
 import Select from "../../common/select";
 import Input from "../../common/input";
 import Checkbox from "../../common/checkbox";
@@ -37,7 +40,7 @@ function RdvForm(props) {
 
   const [availableTimes, setAvailableTimes] = useState([]);
   const [filteredStartTimes, setFilteredStartTimes] = useState([]);
-
+  const [startTimeOptions, setStartTimeOptions] = useState([]);
   const [filteredActes, setFilteredActes] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
 
@@ -104,12 +107,33 @@ function RdvForm(props) {
   useEffect(() => {
     filterStartTimesByDuration();
   }, [availableTimes, selectedDuree]);
+  // Use the new function to generate startTimeOptions
+  // Use this updated function when setting startTimeOptions
+  useEffect(() => {
+    // Generate the start time options based on the available times and selected duration
+    const options = generateTimeOptions(availableTimes, selectedDuree);
+    setStartTimeOptions(options);
+  }, [availableTimes, selectedDuree]);
+
   const onDateSelect = async (date) => {
     setSelectedRdvDate(date);
   };
   const onRdvDelete = async (rdvId) => {
     await deleteRdv(rdvId);
     history.push("/rdvs");
+  };
+  const arraysEqual = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) return false;
+
+    // Create copies of the arrays to avoid modifying the original arrays
+    const sortedArr1 = [...arr1].sort();
+    const sortedArr2 = [...arr2].sort();
+
+    for (let i = 0; i < sortedArr1.length; i++) {
+      if (sortedArr1[i] !== sortedArr2[i]) return false;
+    }
+
+    return true;
   };
   const calculateEndTime = (startHour, startMinute) => {
     // Convert parameters to integers to ensure proper calculations
@@ -158,18 +182,62 @@ function RdvForm(props) {
   const handleStartTimeChange = (hour, minute) => {
     setSelectedHeureDebut({ heure: hour, minute: minute });
     // Additional logic to set end time based on start time and duration
+    calculateEndTime(hour, minute);
   };
 
-  // Assuming filteredStartTimes is structured appropriately
-  // Convert availableTimes to a suitable structure if necessary
-  const startTimeOptions = filteredStartTimes.map((time) => ({
-    label: `${time.startHour.toString().padStart(2, "0")}:${time.startMinute
-      .toString()
-      .padStart(2, "0")}`,
-    value: `${time.startHour}-${time.startMinute}`,
-  }));
+  // Function to generate options in 15-minute intervals until the end of the available slot
+  const generateTimeOptions = (availableTimes, selectedDuree) => {
+    let options = [];
 
-  console.log("filteredStartTimes", filteredStartTimes);
+    for (let i = 0; i < availableTimes.length; i++) {
+      let startHour = availableTimes[i].startHour;
+      let startMinute = availableTimes[i].startMinute;
+      let endHour = availableTimes[i].endHour;
+      let endMinute = availableTimes[i].endMinute;
+
+      // Create Date objects for easier time manipulation
+      let currentSlotStartTime = new Date(0, 0, 0, startHour, startMinute);
+      let currentSlotEndTime = new Date(0, 0, 0, endHour, endMinute);
+
+      // Check if there is a next slot available to extend the current slot
+      let nextSlot = availableTimes[i + 1];
+      let nextSlotStartTime = nextSlot
+        ? new Date(0, 0, 0, nextSlot.startHour, nextSlot.startMinute)
+        : null;
+
+      // Generate times in 15-minute intervals within the current slot
+      while (currentSlotStartTime < currentSlotEndTime) {
+        let appointmentEndTime = new Date(
+          currentSlotStartTime.getTime() + selectedDuree * 60000,
+        );
+
+        // Check if the end time of the appointment is within the current slot
+        // or if it extends into the next slot, ensure it does not exceed the start of the next slot
+        if (
+          appointmentEndTime <= currentSlotEndTime ||
+          (nextSlotStartTime && appointmentEndTime <= nextSlotStartTime)
+        ) {
+          let hour = currentSlotStartTime
+            .getHours()
+            .toString()
+            .padStart(2, "0");
+          let minute = currentSlotStartTime
+            .getMinutes()
+            .toString()
+            .padStart(2, "0");
+          options.push({
+            label: `${hour}:${minute}`,
+            value: `${hour}-${minute}`,
+          });
+        }
+
+        // Increment by 15 minutes
+        currentSlotStartTime.setMinutes(currentSlotStartTime.getMinutes() + 15);
+      }
+    }
+
+    return options;
+  };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
       <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
@@ -320,21 +388,21 @@ function RdvForm(props) {
               </div>
             )}
           </div>
-
-          <AgendaRdv
-            selectedRdv={selectedRdv}
-            onDeleteRdv={onRdvDelete}
-            onSelectDate={onDateSelect}
-            selectedDuree={selectedDuree}
-            selectedPatient={selectedPatient}
-            selectedRdvDate={selectedRdvDate}
-            selectedMoments={selectedMomemts}
-            onAvailableTimesChange={setAvailableTimes}
-          />
+          {selectedDuree > 0 && (
+            <AgendaRdv
+              selectedRdv={selectedRdv}
+              onDeleteRdv={onRdvDelete}
+              onSelectDate={onDateSelect}
+              selectedDuree={selectedDuree}
+              selectedPatient={selectedPatient}
+              selectedRdvDate={selectedRdvDate}
+              selectedMoments={selectedMomemts}
+              onAvailableTimesChange={setAvailableTimes}
+            />
+          )}
           {/* heure debut includes two inputs: heure et minute */}
-          {selectedRdvDate && (
+          {selectedRdvDate && selectedDuree > 0 && (
             <div>
-              {console.log("availableTimes", availableTimes)}
               <div className=" flex flex-col">
                 <div className="flex w-fit flex-wrap">
                   <label
@@ -353,6 +421,7 @@ function RdvForm(props) {
                       const [hour, minute] = e.target.value.split("-");
                       handleStartTimeChange(hour, minute);
                     }}
+                    value={`${selectedHeureDebut.heure}-${selectedHeureDebut.minute}`}
                     style={{ height: 35 }}
                   >
                     <option value="" />
@@ -366,8 +435,23 @@ function RdvForm(props) {
               </div>
             </div>
           )}
+          {/* disable the button and make it gray if selectedDuree, selectedDateRdv, selectedHeureDebut are not precised */}
           <button
-            className="m-2 mt-3 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            disabled={
+              !selectedDuree ||
+              selectedDuree <= 0 ||
+              !selectedRdvDate ||
+              !selectedHeureDebut.heure ||
+              !selectedHeureDebut.minute
+            }
+            className={`m-2 ml-auto mt-3 flex w-fit cursor-pointer list-none rounded-lg p-3 text-center text-xs font-bold text-white no-underline ${
+              selectedDuree <= 0 ||
+              !selectedDuree ||
+              !selectedRdvDate ||
+              !selectedHeureDebut.heure
+                ? "cursor-default bg-gray-400"
+                : "bg-[#455a94]"
+            } `}
             onClick={async () => {
               if (isRdvModified) {
                 let oldData = {
@@ -386,6 +470,22 @@ function RdvForm(props) {
                 await saveRdv(oldData);
                 await saveRdv(newData);
               } else {
+                // save duree to acteDentaire if it have not an save moments to acteDentaire it is different from acte
+                if (selectedActe && selectedActe._id) {
+                  let acteDentaire = { ...selectedActe };
+                  acteDentaire.natureId = acteDentaire.natureId._id;
+                  if (!acteDentaire.duree) {
+                    acteDentaire.duree = selectedDuree;
+                    !arraysEqual(acteDentaire.moments, selectedMomemts) &&
+                      (acteDentaire.moments = selectedMomemts);
+                    await saveActeDentaire(acteDentaire);
+                  } else {
+                    !arraysEqual(acteDentaire.moments, selectedMomemts) &&
+                      (acteDentaire.moments = selectedMomemts);
+                    await saveActeDentaire(acteDentaire);
+                  }
+                }
+
                 await saveRdv({
                   patientId: selectedPatient._id,
                   datePrevu: selectedRdvDate,
@@ -396,7 +496,7 @@ function RdvForm(props) {
               history.push("/rdvs");
             }}
           >
-            save
+            Sauvegarder
           </button>
         </>
       )}

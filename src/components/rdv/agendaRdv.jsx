@@ -86,6 +86,7 @@ const AgendaRdv = (props) => {
     };
     filterRdvs();
   }, [rdvs, selectedPatient, time]);
+
   useEffect(() => {
     const daysInMonth = () => {
       const newNombreDays = new Date(
@@ -99,11 +100,10 @@ const AgendaRdv = (props) => {
   }, [time]);
   useEffect(() => {
     const segments = createHourlySegments(filteredRdvs);
-    // You might want to set this to state if the rendering depends on state
-    setHourlySegments(segments); // Assuming you have a useState hook for this
+    setHourlySegments(segments);
     const availableTimes = calculateAvailableTimes(segments);
-    props.onAvailableTimesChange(availableTimes); // Pass available times up to parent component
-  }, [filteredRdvs, selectedRdvDate]); // Ensure this runs whenever filteredRdvs changes
+    props.onAvailableTimesChange(availableTimes);
+  }, [filteredRdvs, selectedRdvDate]);
   const navigateDate = (operation) => {
     const periode = new Date(time.setMonth(time.getMonth() + operation));
     setTime(periode);
@@ -111,7 +111,6 @@ const AgendaRdv = (props) => {
   const displayDate = () => {
     return mois[time.getMonth()] + " - " + time.getFullYear();
   };
-
   const handleSelectedDate = async (index) => {
     const date = new Date(time.getFullYear(), time.getMonth(), index + 1);
     let deletedDate = filteredRdvsPatient.find(
@@ -265,7 +264,6 @@ const AgendaRdv = (props) => {
     } while (countTotal < nombreDays);
     return totalDiv;
   };
-
   const createHourlySegments = (filteredRdvs) => {
     const workHoursStart = 9;
     const workHoursEnd = 19;
@@ -312,7 +310,6 @@ const AgendaRdv = (props) => {
             }
           }
         });
-
     // Step 3: Merge contiguous minutes into segments
     let mergedSegments = {};
     Object.keys(hourlySegments).forEach((hour) => {
@@ -341,7 +338,6 @@ const AgendaRdv = (props) => {
         }
       });
     });
-
     return mergedSegments;
   };
   const calculateAvailableTimes = (hourlySegments) => {
@@ -384,8 +380,8 @@ const AgendaRdv = (props) => {
       (hour) => hour >= 9 && hour < 12,
     );
     return (
-      <div>
-        <p>Matinée</p>
+      <div className="m-2">
+        <p className=" text-sm font-bold text-slate-800">Matinée</p>
         {renderHourlySegments(hourlySegments, morningHours)}
       </div>
     );
@@ -393,75 +389,57 @@ const AgendaRdv = (props) => {
   const AfternoonSessions = ({ hourlySegments }) => {
     // Filter and render only the afternoon segments
     const afternoonHours = Object.keys(hourlySegments).filter(
-      (hour) => hour >= 12 && hour < 19,
+      (hour) => hour >= 12 && hour < 16,
     );
     return (
-      <div>
-        <p>Après midi</p>
+      <div className="m-2">
+        <p className="text-sm font-bold text-slate-800">Après midi</p>
         {renderHourlySegments(hourlySegments, afternoonHours)}
+      </div>
+    );
+  };
+  const EveningSessions = ({ hourlySegments }) => {
+    // Filter and render only the evening segments
+    const eveningHours = Object.keys(hourlySegments).filter(
+      (hour) => hour >= 16 && hour < 19,
+    );
+    return (
+      <div className="m-2">
+        <p className="text-sm font-bold text-slate-800">Soirée</p>
+        {renderHourlySegments(hourlySegments, eveningHours)}
       </div>
     );
   };
   const renderHourlySegments = (hourlySegments, hours) => {
     return hours.map((hour) => {
       const segments = hourlySegments[hour];
-      const isWholeHourAvailable =
-        segments.length === 1 && segments[0].available;
-
       return (
         <div
           key={hour}
           style={{ display: "flex", alignItems: "center", margin: "5px 0" }}
         >
-          {isWholeHourAvailable ? (
-            <div
-              className="segment available"
-              style={{
-                backgroundColor: "green",
-                padding: "5px",
-                width: "100%", // Full hour available
-              }}
-            >
-              {hour}:00 - {parseInt(hour) + 1}:00
-            </div>
-          ) : (
-            segments.map((segment, index) => {
-              const startTime = formatSegmentTime(
-                parseInt(hour),
-                segment.start,
-              );
-              const endTime = formatSegmentTime(parseInt(hour), segment.end);
+          {segments.map((segment, index) => {
+            const startTime = formatSegmentTime(parseInt(hour), segment.start);
+            const endTime = formatSegmentTime(parseInt(hour), segment.end);
+            const durationInMinutes = segment.end - segment.start;
+            const segmentWidth = `${((durationInMinutes / 60) * 100).toFixed(
+              2,
+            )}%`;
 
-              // Correctly calculate the duration for the last segment ending at the hour mark
-              const durationInMinutes =
-                segment.end === 60
-                  ? segment.end - segment.start
-                  : segment.end - segment.start;
-
-              // Calculate the width of the segment as a percentage of the hour
-              // To increase precision, calculate the fraction and multiply by 100
-              const segmentWidth = `${((durationInMinutes / 60) * 100).toFixed(
-                2,
-              )}%`;
-
-              return (
-                <div
-                  key={index}
-                  className={`segment ${
-                    segment.available ? "available" : "not-available"
-                  }`}
-                  style={{
-                    backgroundColor: segment.available ? "green" : "gray",
-                    padding: "5px",
-                    width: segmentWidth, // Width based on segment duration
-                    display: "inline-block", // Ensure segments are side by side
-                  }}
-                >
-                  {startTime} - {endTime}
-                </div>
-              );
-            })
-          )}
+            return (
+              <div
+                key={index}
+                className={` p-2 text-center text-xs font-bold text-zinc-700 ${
+                  segment.available ? "bg-green-500" : "bg-gray-300"
+                }`}
+                style={{
+                  width: segmentWidth,
+                }}
+              >
+                {startTime} - {endTime}
+              </div>
+            );
+          })}
         </div>
       );
     });
@@ -474,10 +452,12 @@ const AgendaRdv = (props) => {
     }
     // Ensure we don't go over 24 hours and reset to 0 if we do
     hour = hour % 24;
-    // Pad the hour and minute with leading zeros if necessary and return the formatted time
-    return `${hour.toString().padStart(2, "0")}:${minute
-      .toString()
-      .padStart(2, "0")}`;
+    // Format time. If minutes are '00', display only the hour with 'h'
+    return minute === 0
+      ? `${hour}h`
+      : `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
   };
   return (
     <div className="flex flex-wrap">
@@ -516,14 +496,13 @@ const AgendaRdv = (props) => {
         </div>
         <div className="flex w-[420px] flex-wrap">{displayDates()}</div>
       </div>
-      <div className="m-auto my-2 flex h-fit flex-col rounded-5px border border-white bg-white shadow-component ">
-        <div className="morning-sessions">
+      {selectedRdvDate && (
+        <div className="m-auto my-2 flex h-fit w-96 flex-col rounded-5px border border-white bg-white shadow-component ">
           <MorningSessions hourlySegments={hourlySegments} />
-        </div>
-        <div className="afternoon-sessions">
           <AfternoonSessions hourlySegments={hourlySegments} />
+          <EveningSessions hourlySegments={hourlySegments} />
         </div>
-      </div>
+      )}
     </div>
   );
 };
