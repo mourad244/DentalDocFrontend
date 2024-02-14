@@ -1,9 +1,6 @@
 import React from "react";
 
 function TableHeader(props) {
-  const renderCell = (item, column) => {
-    if (column.content) return column.content(item);
-  };
   const raiseSort = (path) => {
     const sortColumn = { ...props.sortColumn };
     if (sortColumn.path === path)

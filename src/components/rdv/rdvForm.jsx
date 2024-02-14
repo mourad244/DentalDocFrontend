@@ -17,7 +17,6 @@ import {
 import Select from "../../common/select";
 import Input from "../../common/input";
 import Checkbox from "../../common/checkbox";
-import { log } from "joi-browser";
 
 function RdvForm(props) {
   const [actes, setActes] = useState([]);
@@ -58,10 +57,29 @@ function RdvForm(props) {
 
       if (props.match.params.id !== "new") {
         const { data: rdvData } = await getRdv(props.match.params.id);
+        let newSelectedActe = rdvData.acteId
+          ? actesData.find((a) => a._id === rdvData.acteId)
+          : {};
         setActes(actesData);
         setSelectedRdv(rdvData);
         setNatureActes(natureActesData);
         setSelectedPatient(rdvData.patientId);
+        setSelectedNatureActe(
+          rdvData.natureId
+            ? natureActesData.find((n) => n._id === rdvData.natureId)
+            : {},
+        );
+        setSelectedActe(newSelectedActe);
+        setSelectedDuree(
+          rdvData.heureFin.heure * 60 +
+            rdvData.heureFin.minute -
+            (rdvData.heureDebut.heure * 60 + rdvData.heureDebut.minute),
+        );
+        setSelectedMoments(
+          newSelectedActe && newSelectedActe.moments
+            ? newSelectedActe.moments
+            : [],
+        );
       } else {
         const { data: patientsData } = await getPatients();
         setActes(actesData);
@@ -487,6 +505,8 @@ function RdvForm(props) {
                 let oldData = {
                   _id: selectedRdv._id,
                   patientId: selectedPatient._id,
+                  natureId: selectedNatureActe ? selectedNatureActe._id : null,
+                  acteId: selectedActe ? selectedActe._id : null,
                   datePrevu: selectedRdv.datePrevu,
                   isReporte: true,
                   dateNouveauRdv: selectedRdvDate,
@@ -494,6 +514,8 @@ function RdvForm(props) {
                 let newData = {
                   patientId: selectedPatient._id,
                   datePrevu: selectedRdvDate,
+                  natureId: selectedNatureActe ? selectedNatureActe._id : null,
+                  acteId: selectedActe ? selectedActe._id : null,
                   heureDebut: selectedHeureDebut,
                   heureFin: selectedHeureFin,
                 };
@@ -519,6 +541,8 @@ function RdvForm(props) {
                 await saveRdv({
                   patientId: selectedPatient._id,
                   datePrevu: selectedRdvDate,
+                  natureId: selectedNatureActe ? selectedNatureActe._id : null,
+                  acteId: selectedActe ? selectedActe._id : null,
                   heureDebut: selectedHeureDebut,
                   heureFin: selectedHeureFin,
                 });

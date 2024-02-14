@@ -9,7 +9,14 @@ import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
 
 import Moment from "react-moment";
+const formatTime = (hour, minute) => {
+  // Ensure hour and minute are treated as strings and properly padded
+  let hourStr = hour.toString().padStart(2, "0");
+  let minuteStr = minute.toString().padStart(2, "0");
 
+  // Return formatted time
+  return minuteStr === "00" ? `${hourStr}h` : `${hourStr}:${minuteStr}`;
+};
 function RdvsTable(props) {
   const columns = [
     {
@@ -26,7 +33,7 @@ function RdvsTable(props) {
       },
     },
     {
-      path: "heureDebut",
+      path: "heureDebut.heure",
       label: "Heure",
       content: (rdv) => {
         /* 
@@ -45,10 +52,13 @@ function RdvsTable(props) {
         return (
           <div key={rdv._id}>
             <label>
-              {rdv.heureDebut && rdv.heureDebut.heure}:
-              {rdv.heureDebut && rdv.heureDebut.minute} -{" "}
-              {rdv.heureFin && rdv.heureFin.heure}:
-              {rdv.heureFin && rdv.heureFin.minute}
+              {rdv.heureDebut
+                ? formatTime(rdv.heureDebut.heure, rdv.heureDebut.minute)
+                : ""}{" "}
+              -{" "}
+              {rdv.heureFin
+                ? formatTime(rdv.heureFin.heure, rdv.heureFin.minute)
+                : ""}
             </label>
           </div>
         );
@@ -116,7 +126,6 @@ function RdvsTable(props) {
     selectedItem,
     onDelete,
   } = props;
-  console.log("rdvs", rdvs);
   const itemActions = (
     <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
       <TbDental
