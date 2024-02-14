@@ -497,7 +497,7 @@ const AgendaRdv = (props) => {
         <div className="flex w-[420px] flex-wrap">{displayDates()}</div>
       </div>
       {selectedRdvDate && (
-        <div className="m-auto my-2 flex h-fit w-96 flex-col rounded-5px border border-white bg-white shadow-component ">
+        <div className="m-auto my-2 flex h-fit w-[600px] flex-col rounded-5px border border-white bg-white shadow-component ">
           <MorningSessions hourlySegments={hourlySegments} />
           <AfternoonSessions hourlySegments={hourlySegments} />
           <EveningSessions hourlySegments={hourlySegments} />

@@ -17,6 +17,7 @@ import {
 import Select from "../../common/select";
 import Input from "../../common/input";
 import Checkbox from "../../common/checkbox";
+import { log } from "joi-browser";
 
 function RdvForm(props) {
   const [actes, setActes] = useState([]);
@@ -185,46 +186,71 @@ function RdvForm(props) {
     calculateEndTime(hour, minute);
   };
 
-  // Function to generate options in 15-minute intervals until the end of the available slot
   const generateTimeOptions = (availableTimes, selectedDuree) => {
     let options = [];
+    const durationInMinutes = parseInt(selectedDuree);
+    // Function to check if a time range is available
+    const isRangeAvailable = (
+      startHour,
+      startMinute,
+      duration,
+      availableTimes,
+    ) => {
+      const startTime = startHour * 60 + startMinute;
+      const endTime = startTime + duration;
 
-    for (let i = 0; i < availableTimes.length; i++) {
-      let startHour = availableTimes[i].startHour;
-      let startMinute = availableTimes[i].startMinute;
-      let endHour = availableTimes[i].endHour;
-      let endMinute = availableTimes[i].endMinute;
+      // Check if start time is within any slot
+      const startSlotIndex = availableTimes.findIndex((slot) => {
+        const slotStart = slot.startHour * 60 + slot.startMinute;
+        const slotEnd = slot.endHour * 60 + slot.endMinute;
+        return startTime >= slotStart && startTime < slotEnd;
+      });
 
-      // Create Date objects for easier time manipulation
-      let currentSlotStartTime = new Date(0, 0, 0, startHour, startMinute);
-      let currentSlotEndTime = new Date(0, 0, 0, endHour, endMinute);
+      // If start time is not within any slot, it's not available
+      if (startSlotIndex === -1) return false;
 
-      // Check if there is a next slot available to extend the current slot
-      let nextSlot = availableTimes[i + 1];
-      let nextSlotStartTime = nextSlot
-        ? new Date(0, 0, 0, nextSlot.startHour, nextSlot.startMinute)
-        : null;
+      // Check if the end time is within the same slot or extends to the next slot
+      const startSlot = availableTimes[startSlotIndex];
+      const startSlotEnd = startSlot.endHour * 60 + startSlot.endMinute;
 
-      // Generate times in 15-minute intervals within the current slot
-      while (currentSlotStartTime < currentSlotEndTime) {
-        let appointmentEndTime = new Date(
-          currentSlotStartTime.getTime() + selectedDuree * 60000,
-        );
+      // If the end time is within the same slot, it's available
+      if (endTime <= startSlotEnd) return true;
 
-        // Check if the end time of the appointment is within the current slot
-        // or if it extends into the next slot, ensure it does not exceed the start of the next slot
+      // If the end time extends to the next slot, check if the next slot is available
+      if (startSlotIndex + 1 < availableTimes.length) {
+        const nextSlot = availableTimes[startSlotIndex + 1];
+        const nextSlotStart = nextSlot.startHour * 60 + nextSlot.startMinute;
+        const nextSlotEnd = nextSlot.endHour * 60 + nextSlot.endMinute;
+
+        // Check if the next slot directly follows the current slot and accommodates the end time
+        return nextSlotStart === startSlotEnd && endTime <= nextSlotEnd;
+      }
+
+      // If there is no next slot or the end time does not fit within it, it's not available
+      return false;
+    };
+    availableTimes.forEach((timeSlot, i) => {
+      let currentHour = timeSlot.startHour;
+      let currentMinute = timeSlot.startMinute;
+      // Ensure the first option starts at a quarter-hour if not already
+      if (currentMinute % 15 !== 0) {
+        currentMinute += 15 - (currentMinute % 15);
+      }
+      while (
+        currentHour < timeSlot.endHour ||
+        (currentHour === timeSlot.endHour && currentMinute < timeSlot.endMinute)
+      ) {
         if (
-          appointmentEndTime <= currentSlotEndTime ||
-          (nextSlotStartTime && appointmentEndTime <= nextSlotStartTime)
+          isRangeAvailable(
+            currentHour,
+            currentMinute,
+            durationInMinutes,
+            availableTimes,
+            i,
+          )
         ) {
-          let hour = currentSlotStartTime
-            .getHours()
-            .toString()
-            .padStart(2, "0");
-          let minute = currentSlotStartTime
-            .getMinutes()
-            .toString()
-            .padStart(2, "0");
+          let hour = currentHour.toString().padStart(2, "0");
+          let minute = currentMinute.toString().padStart(2, "0");
           options.push({
             label: `${hour}:${minute}`,
             value: `${hour}-${minute}`,
@@ -232,9 +258,13 @@ function RdvForm(props) {
         }
 
         // Increment by 15 minutes
-        currentSlotStartTime.setMinutes(currentSlotStartTime.getMinutes() + 15);
+        currentMinute += 15;
+        if (currentMinute >= 60) {
+          currentMinute -= 60;
+          currentHour += 1;
+        }
       }
-    }
+    });
 
     return options;
   };

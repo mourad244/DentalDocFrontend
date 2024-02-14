@@ -26,6 +26,35 @@ function RdvsTable(props) {
       },
     },
     {
+      path: "heureDebut",
+      label: "Heure",
+      content: (rdv) => {
+        /* 
+        rdv :{
+          heureDebut:{
+            heure: 10,
+            minute: 30
+          },
+          heureFin:{
+            heure: 11,
+            minute: 30
+          
+          }
+        }
+        */
+        return (
+          <div key={rdv._id}>
+            <label>
+              {rdv.heureDebut && rdv.heureDebut.heure}:
+              {rdv.heureDebut && rdv.heureDebut.minute} -{" "}
+              {rdv.heureFin && rdv.heureFin.heure}:
+              {rdv.heureFin && rdv.heureFin.minute}
+            </label>
+          </div>
+        );
+      },
+    },
+    {
       path: "patientId.nom",
       label: "Patient",
       content: (rdv) => {
@@ -87,6 +116,7 @@ function RdvsTable(props) {
     selectedItem,
     onDelete,
   } = props;
+  console.log("rdvs", rdvs);
   const itemActions = (
     <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
       <TbDental
