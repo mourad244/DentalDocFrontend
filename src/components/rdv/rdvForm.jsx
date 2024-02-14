@@ -39,7 +39,6 @@ function RdvForm(props) {
   });
 
   const [availableTimes, setAvailableTimes] = useState([]);
-  const [filteredStartTimes, setFilteredStartTimes] = useState([]);
   const [startTimeOptions, setStartTimeOptions] = useState([]);
   const [filteredActes, setFilteredActes] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -80,6 +79,12 @@ function RdvForm(props) {
             ? newSelectedActe.moments
             : [],
         );
+        setSelectedRdvDate(new Date(rdvData.datePrevu));
+
+        setSelectedHeureDebut({
+          heure: rdvData.heureDebut.heure,
+          minute: rdvData.heureDebut.minute,
+        });
       } else {
         const { data: patientsData } = await getPatients();
         setActes(actesData);
@@ -122,12 +127,7 @@ function RdvForm(props) {
     };
     filterActes();
   }, [selectedNatureActe]);
-  // Effect hook to recalculate start times whenever relevant dependencies change
-  useEffect(() => {
-    filterStartTimesByDuration();
-  }, [availableTimes, selectedDuree]);
-  // Use the new function to generate startTimeOptions
-  // Use this updated function when setting startTimeOptions
+
   useEffect(() => {
     // Generate the start time options based on the available times and selected duration
     const options = generateTimeOptions(availableTimes, selectedDuree);
@@ -177,26 +177,7 @@ function RdvForm(props) {
     });
   };
   // Function to filter available start times based on selected duration
-  const filterStartTimesByDuration = () => {
-    const durationInMinutes = parseInt(selectedDuree); // Assuming selectedDuree is in minutes
-    let validStartTimes = [];
 
-    availableTimes.forEach((timeSlot) => {
-      let slotStartInMinutes = timeSlot.startHour * 60 + timeSlot.startMinute;
-      let slotEndInMinutes = timeSlot.endHour * 60 + timeSlot.endMinute;
-
-      // Check if the slot duration is greater than or equal to the selected duration
-      if (slotEndInMinutes - slotStartInMinutes >= durationInMinutes) {
-        validStartTimes.push({
-          startHour: timeSlot.startHour,
-          startMinute: timeSlot.startMinute,
-          // You could add more information here if necessary
-        });
-      }
-    });
-
-    setFilteredStartTimes(validStartTimes);
-  };
   // Example of handling start time selection
   const handleStartTimeChange = (hour, minute) => {
     setSelectedHeureDebut({ heure: hour, minute: minute });
@@ -464,7 +445,6 @@ function RdvForm(props) {
                   <select
                     className=" rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                     name="heuredebut"
-                    // value={value}
                     onChange={(e) => {
                       const [hour, minute] = e.target.value.split("-");
                       handleStartTimeChange(hour, minute);
@@ -481,6 +461,7 @@ function RdvForm(props) {
                   </select>
                 </div>
               </div>
+              {console.log("selectedHeureDebut", selectedHeureDebut)}
             </div>
           )}
           {/* disable the button and make it gray if selectedDuree, selectedDateRdv, selectedHeureDebut are not precised */}

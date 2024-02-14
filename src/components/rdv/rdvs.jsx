@@ -46,7 +46,6 @@ function Rdvs() {
 
   useEffect(() => {
     let filtered = rdvs;
-    console.log("filtered", filtered);
     const filterRdvs = async () => {
       filtered = filtered.filter(
         (e) =>

@@ -38,7 +38,6 @@ const AgendaRdv = (props) => {
     selectedPatient,
     selectedRdvDate,
   } = props;
-
   const [rdvs, setRdvs] = useState([]);
   const [filteredRdvsPatient, setFilteredRdvsPatient] = useState([]);
   const [filteredRdvs, setFilteredRdvs] = useState([]);
@@ -113,15 +112,15 @@ const AgendaRdv = (props) => {
   };
   const handleSelectedDate = async (index) => {
     const date = new Date(time.getFullYear(), time.getMonth(), index + 1);
-    let deletedDate = filteredRdvsPatient.find(
+    /*let deletedDate = filteredRdvsPatient.find(
       (e) =>
         new Date(e.datePrevu).getFullYear() === date.getFullYear() &&
         new Date(e.datePrevu).getMonth() === date.getMonth() &&
         new Date(e.datePrevu).getDate() === date.getDate(),
     );
-    if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
+     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
       props.onDeleteRdv(deletedDate._id);
-    } else {
+    } else */ {
       props.onSelectDate(date);
     }
   };
@@ -170,16 +169,16 @@ const AgendaRdv = (props) => {
               arrayDiv.push(
                 <div
                   key={"date-active" + countTotal}
-                  className={`m-2 flex h-10 w-10 rounded-3xl  ${
+                  className={`m-2 flex h-10 w-10 cursor-pointer rounded-3xl ${
                     found.isReporte
                       ? "bg-[#e49012]"
                       : found.isAnnule
                       ? " bg-[#ff6868]"
                       : "bg-[#506496]"
                   }  text-white shadow-daySelected`}
-                  // onClick={() => handleSelectedDate(t)}
+                  onClick={() => handleSelectedDate(t)}
                 >
-                  <label className="m-auto align-middle text-sm font-bold">
+                  <label className="m-auto cursor-pointer align-middle text-sm font-bold">
                     {countTotal + 1}
                   </label>
                 </div>,
@@ -301,7 +300,6 @@ const AgendaRdv = (props) => {
             if (hourlySegments[currentHour]) {
               hourlySegments[currentHour][currentMinute].available = false;
             }
-
             // Increment minutes and handle the overflow by moving to the next hour
             currentMinute++;
             if (currentMinute === 60) {
@@ -341,11 +339,18 @@ const AgendaRdv = (props) => {
     return mergedSegments;
   };
   const calculateAvailableTimes = (hourlySegments) => {
+    console.log("hourlySegments", hourlySegments);
     let availableTimes = [];
     Object.keys(hourlySegments).forEach((hour) => {
       let startMinute = null;
       hourlySegments[hour].forEach((segment, index) => {
-        if (segment.available) {
+        if (
+          segment.available ||
+          // case of selectedRdv
+          (selectedRdv &&
+            selectedRdv.heureDebut.heure === parseInt(hour) &&
+            selectedRdv.heureDebut.minute === segment.start)
+        ) {
           if (startMinute === null) {
             startMinute = segment.start; // Begin a new available slot
           }
