@@ -273,6 +273,7 @@ const AgendaRdv = (props) => {
       hourlySegments[hour] = Array.from({ length: 60 }, (_, index) => ({
         minute: index,
         available: true,
+        isSelected: false,
       }));
     }
     if (!selectedRdvDate) filteredRdvs = [];
@@ -289,16 +290,42 @@ const AgendaRdv = (props) => {
         })
         .forEach((rdv) => {
           const startHour = rdv.heureDebut.heure;
+
           const endHour = rdv.heureFin.heure;
+          const endMinute = rdv.heureFin.minute;
+
           let currentHour = startHour;
           let currentMinute = rdv.heureDebut.minute;
 
           while (
             currentHour < endHour ||
-            (currentHour === endHour && currentMinute < rdv.heureFin.minute)
+            (currentHour === endHour && currentMinute < endMinute)
           ) {
             if (hourlySegments[currentHour]) {
               hourlySegments[currentHour][currentMinute].available = false;
+              // if current hour and current minute are between heure debut et fin de selectedRdv even if is not in the same hour
+              // then make is selected true
+              if (
+                currentHour === selectedRdv.heureDebut.heure &&
+                currentHour === selectedRdv.heureFin.heure
+              ) {
+                if (
+                  currentMinute >= selectedRdv.heureDebut.minute &&
+                  currentMinute < selectedRdv.heureFin.minute
+                ) {
+                  hourlySegments[currentHour][currentMinute].isSelected = true;
+                }
+              } else if (currentHour === selectedRdv.heureDebut.heure) {
+                if (currentMinute >= selectedRdv.heureDebut.minute) {
+                  hourlySegments[currentHour][currentMinute].isSelected = true;
+                }
+              } else if (currentHour === selectedRdv.heureFin.heure) {
+                if (currentMinute < selectedRdv.heureFin.minute) {
+                  hourlySegments[currentHour][currentMinute].isSelected = true;
+                }
+              } else {
+                hourlySegments[currentHour][currentMinute].isSelected = true;
+              }
             }
             // Increment minutes and handle the overflow by moving to the next hour
             currentMinute++;
@@ -308,6 +335,7 @@ const AgendaRdv = (props) => {
             }
           }
         });
+    console.log("hourlySegments", hourlySegments);
     // Step 3: Merge contiguous minutes into segments
     let mergedSegments = {};
     Object.keys(hourlySegments).forEach((hour) => {
@@ -339,7 +367,6 @@ const AgendaRdv = (props) => {
     return mergedSegments;
   };
   const calculateAvailableTimes = (hourlySegments) => {
-    console.log("hourlySegments", hourlySegments);
     let availableTimes = [];
     Object.keys(hourlySegments).forEach((hour) => {
       let startMinute = null;
@@ -348,6 +375,7 @@ const AgendaRdv = (props) => {
           segment.available ||
           // case of selectedRdv
           (selectedRdv &&
+            selectedRdv.heureDebut &&
             selectedRdv.heureDebut.heure === parseInt(hour) &&
             selectedRdv.heureDebut.minute === segment.start)
         ) {
@@ -504,8 +532,8 @@ const AgendaRdv = (props) => {
       {selectedRdvDate && (
         <div className="m-auto my-2 flex h-fit w-[600px] flex-col rounded-5px border border-white bg-white shadow-component ">
           <MorningSessions hourlySegments={hourlySegments} />
-          <AfternoonSessions hourlySegments={hourlySegments} />
-          <EveningSessions hourlySegments={hourlySegments} />
+          {/* <AfternoonSessions hourlySegments={hourlySegments} />
+          <EveningSessions hourlySegments={hourlySegments} /> */}
         </div>
       )}
     </div>

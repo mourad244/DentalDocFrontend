@@ -449,8 +449,12 @@ function RdvForm(props) {
                       const [hour, minute] = e.target.value.split("-");
                       handleStartTimeChange(hour, minute);
                     }}
-                    value={`${selectedHeureDebut.heure}-${selectedHeureDebut.minute}`}
                     style={{ height: 35 }}
+                    value={
+                      selectedHeureDebut.heure.toString().padStart(2, "0") +
+                      "-" +
+                      selectedHeureDebut.minute.toString().padStart(2, "0")
+                    }
                   >
                     <option value="" />
                     {startTimeOptions.map((option) => (
@@ -461,7 +465,6 @@ function RdvForm(props) {
                   </select>
                 </div>
               </div>
-              {console.log("selectedHeureDebut", selectedHeureDebut)}
             </div>
           )}
           {/* disable the button and make it gray if selectedDuree, selectedDateRdv, selectedHeureDebut are not precised */}
