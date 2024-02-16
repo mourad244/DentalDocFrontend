@@ -385,6 +385,8 @@ function RdvForm(props) {
                   }
                   onChange={(e) => {
                     setSelectedDuree(e.target.value);
+                    setSelectedHeureDebut({ heure: 0, minute: 0 });
+                    setSelectedHeureFin({ heure: 0, minute: 0 });
                   }}
                   type="number"
                   widthLabel={96}
@@ -398,9 +400,9 @@ function RdvForm(props) {
                   name={"moments"}
                   label={"Moments"}
                   widthLabel={96}
-                  width={150}
-                  listItems={["matin", "apres-midi"]}
-                  labelItems={["Matin", "Après-midi"]}
+                  width={200}
+                  listItems={["matin", "apres-midi", "soir"]}
+                  labelItems={["Matin", "Après-midi", "Soir"]}
                   value={selectedMomemts}
                   onChange={(name, value, isChecked) => {
                     let data = [...selectedMomemts];
@@ -429,7 +431,6 @@ function RdvForm(props) {
               onAvailableTimesChange={setAvailableTimes}
             />
           )}
-          {/* heure debut includes two inputs: heure et minute */}
           {selectedRdvDate && selectedDuree > 0 && (
             <div>
               <div className=" flex flex-col">
@@ -451,9 +452,11 @@ function RdvForm(props) {
                     }}
                     style={{ height: 35 }}
                     value={
-                      selectedHeureDebut.heure.toString().padStart(2, "0") +
-                      "-" +
-                      selectedHeureDebut.minute.toString().padStart(2, "0")
+                      selectedHeureDebut && selectedHeureDebut.heure
+                        ? selectedHeureDebut.heure.toString().padStart(2, "0") +
+                          "-" +
+                          selectedHeureDebut.minute.toString().padStart(2, "0")
+                        : ""
                     }
                   >
                     <option value="" />

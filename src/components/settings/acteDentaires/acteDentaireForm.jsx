@@ -123,10 +123,10 @@ class ActeDentaireForm extends Form {
               {this.renderCheckboxes(
                 "moments",
                 "Temps préféré",
-                170,
+                200,
                 96,
-                ["matin", "apres-midi"],
-                ["Matin", "Après-midi"],
+                ["matin", "apres-midi", "soir"],
+                ["Matin", "Après-midi", "Soir"],
               )}
 
               {this.renderButton("Sauvegarder")}

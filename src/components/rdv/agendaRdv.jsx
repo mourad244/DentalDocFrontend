@@ -100,9 +100,9 @@ const AgendaRdv = (props) => {
   useEffect(() => {
     const segments = createHourlySegments(filteredRdvs);
     setHourlySegments(segments);
-    const availableTimes = calculateAvailableTimes(segments);
+    const availableTimes = calculateAvailableTimes(segments, selectedMoments);
     props.onAvailableTimesChange(availableTimes);
-  }, [filteredRdvs, selectedRdvDate]);
+  }, [filteredRdvs, selectedRdvDate, selectedMoments]);
   const navigateDate = (operation) => {
     const periode = new Date(time.setMonth(time.getMonth() + operation));
     setTime(periode);
@@ -268,32 +268,12 @@ const AgendaRdv = (props) => {
     const workHoursEnd = 19;
     let mergedSegments = {};
     // make all segments available
-    for (let i = workHoursStart; i <= workHoursEnd; i++) {
+    for (let i = workHoursStart; i < workHoursEnd; i++) {
       mergedSegments[i] = [
-        { start: 0, end: 60, available: true, isSelected: false, rdvId: "" },
+        { start: 0, end: 60, available: true, isSelected: false },
       ];
     }
-    /* example:
-    rdvs = [
-      {
-        ... , heureDebut: { heure: 9, minute: 0 }, heureFin: { heure: 9, minute: 15 } },
-        ..., heureDebut: { heure: 9, minute: 45 }, heureFin: { heure: 10, minute: 15 } },
-    ],
-    
-    and selectedRdv = { heureDebut: { heure: 9, minute: 45 }, heureFin: { heure: 10, minute: 15 } }
-    mergedSegments = {
-      9(hour): [
-        { start: 0, end: 15, available: false, isSelected: false, rdvId: "..." },
-        { start: 15, end: 45, available: true, isSelected: false, rdvId: "..." },
-        { start: 45, end: 60, available: false, isSelected: true, rdvId: "..." },
-      ],
-      10(hour): [
-        { start: 0, end: 60, available: true, isSelected: true, rdvId: "..." },
-        { start: 15, end: 60, available: false, isSelected: false, rdvId: "..." },
-      ],
 
-    }
-    */
     if (!selectedRdvDate) filteredRdvs = [];
     // Step 2: Mark the minutes covered by RDVs as not available
     else
@@ -303,15 +283,18 @@ const AgendaRdv = (props) => {
             new Date(e.datePrevu).getDate() === selectedRdvDate.getDate() &&
             new Date(e.datePrevu).getMonth() === selectedRdvDate.getMonth() &&
             new Date(e.datePrevu).getFullYear() ===
-              selectedRdvDate.getFullYear()
+              selectedRdvDate.getFullYear() &&
+            !e.isAnnule &&
+            !e.isReporte
           );
         })
         .forEach((rdv) => {
           const startHour = rdv.heureDebut.heure;
           const startMinute = rdv.heureDebut.minute;
+
           const endHour = rdv.heureFin.heure;
           const endMinute = rdv.heureFin.minute;
-
+          const isSelected = selectedRdv && selectedRdv._id === rdv._id;
           // Handle single-hour RDVs
           if (startHour === endHour) {
             // Find the segment that needs to be updated
@@ -325,12 +308,14 @@ const AgendaRdv = (props) => {
               // Check if RDV starts at the beginning of a segment
               if (segment.start === startMinute) {
                 segment.available = false;
+                segment.isSelected = isSelected;
                 if (segment.end !== endMinute) {
                   // Split the segment if RDV does not end at the end of a segment
                   mergedSegments[startHour].splice(segmentIndex + 1, 0, {
                     start: endMinute,
                     end: segment.end,
                     available: true,
+                    isSelected: false,
                   });
                   segment.end = endMinute;
                 }
@@ -340,11 +325,13 @@ const AgendaRdv = (props) => {
                   start: segment.start,
                   end: startMinute,
                   available: true,
+                  isSelected: false,
                 });
                 mergedSegments[startHour][segmentIndex + 1] = {
                   start: startMinute,
                   end: endMinute,
                   available: false,
+                  isSelected: isSelected,
                 };
                 // Add a new segment for the remaining time if there's any
                 if (segment.end !== endMinute) {
@@ -352,6 +339,7 @@ const AgendaRdv = (props) => {
                     start: endMinute,
                     end: segment.end,
                     available: true,
+                    isSelected: false,
                   });
                 }
               }
@@ -376,6 +364,7 @@ const AgendaRdv = (props) => {
                     return {
                       ...segment,
                       available: false,
+                      isSelected: isSelected,
                     };
                   } else if (
                     segmentStart > segment.start &&
@@ -386,6 +375,7 @@ const AgendaRdv = (props) => {
                       start: segmentStart,
                       end: segment.end,
                       available: false,
+                      isSelected: isSelected,
                     };
                     // Adjust the original segment to end where the RDV starts
                     segment.end = segmentStart;
@@ -399,6 +389,7 @@ const AgendaRdv = (props) => {
                       start: segment.start,
                       end: segmentEnd,
                       available: false,
+                      isSelected: isSelected,
                     };
                     // Adjust the original segment to start where the RDV ends
                     segment.start = segmentEnd;
@@ -411,50 +402,70 @@ const AgendaRdv = (props) => {
             }
           }
         });
-
-    // Step 3: Mark the minutes covered by the selected RDV as selected
-    console.log("mergedSegments", mergedSegments);
     return mergedSegments;
   };
-  const calculateAvailableTimes = (hourlySegments) => {
+  const calculateAvailableTimes = (hourlySegments, selectedMomemts) => {
+    console.log("hourlySegments", hourlySegments);
+    console.log("selectedMomemts", selectedMomemts);
     let availableTimes = [];
-    Object.keys(hourlySegments).forEach((hour) => {
-      let startMinute = null;
-      hourlySegments[hour].forEach((segment, index) => {
-        if (
-          segment.available ||
-          // case of selectedRdv
-          (selectedRdv &&
-            selectedRdv.heureDebut &&
-            selectedRdv.heureDebut.heure === parseInt(hour) &&
-            selectedRdv.heureDebut.minute === segment.start)
-        ) {
-          if (startMinute === null) {
-            startMinute = segment.start; // Begin a new available slot
-          }
-          // Check if this is the last minute in the hour or the next segment is not available
-          if (
-            index === hourlySegments[hour].length - 1 ||
-            !hourlySegments[hour][index + 1]?.available
-          ) {
-            let endMinute = segment.end;
-            // Adjust for crossing into the next hour
-            let endHour = hour;
-            if (endMinute === 60) {
-              endHour = (parseInt(hour) + 1).toString();
-              endMinute = 0;
-            }
-            availableTimes.push({
-              startHour: parseInt(hour),
-              startMinute: startMinute,
-              endHour: parseInt(endHour),
-              endMinute: endMinute,
-            });
-            startMinute = null; // Reset for the next available slot
+    Object.keys(hourlySegments)
+      .filter((hour) => {
+        // return only the hours that are in the selected moments
+        // matin => 9h - 12h
+        // apres-midi => 12h - 16h
+        // soir => 16h - 19h
+
+        if (selectedMomemts.includes("matin")) {
+          if (hour >= 9 && hour < 12) {
+            return hour;
           }
         }
+        if (selectedMomemts.includes("apres-midi")) {
+          if (hour >= 12 && hour < 16) {
+            return hour;
+          }
+        }
+        if (selectedMomemts.includes("soir")) {
+          if (hour >= 16 && hour < 19) {
+            return hour;
+          }
+        }
+      })
+      .forEach((hour) => {
+        console.log("hour", hour);
+        let startMinute = null;
+        hourlySegments[hour].forEach((segment, index) => {
+          if (
+            segment.available ||
+            // case of selectedRdv
+            segment.isSelected
+          ) {
+            if (startMinute === null) {
+              startMinute = segment.start; // Begin a new available slot
+            }
+            // Check if this is the last minute in the hour or the next segment is not available
+            if (
+              index === hourlySegments[hour].length - 1 ||
+              !hourlySegments[hour][index + 1]?.available
+            ) {
+              let endMinute = segment.end;
+              // Adjust for crossing into the next hour
+              let endHour = hour;
+              if (endMinute === 60) {
+                endHour = (parseInt(hour) + 1).toString();
+                endMinute = 0;
+              }
+              availableTimes.push({
+                startHour: parseInt(hour),
+                startMinute: startMinute,
+                endHour: parseInt(endHour),
+                endMinute: endMinute,
+              });
+              startMinute = null; // Reset for the next available slot
+            }
+          }
+        });
       });
-    });
     return availableTimes;
   };
   const MorningSessions = ({ hourlySegments }) => {
@@ -513,7 +524,11 @@ const AgendaRdv = (props) => {
               <div
                 key={index}
                 className={` p-2 text-center text-xs font-bold text-zinc-700 ${
-                  segment.available ? "bg-green-500" : "bg-gray-300"
+                  segment.available
+                    ? "bg-green-500"
+                    : segment.isSelected
+                    ? "bg-blue-500"
+                    : "bg-gray-300"
                 }`}
                 style={{
                   width: segmentWidth,
@@ -562,6 +577,7 @@ const AgendaRdv = (props) => {
             className="cursor-pointer"
           />
         </div>
+
         <div className="mb-3 ml-14 mt-6 flex">
           {days.map((e) =>
             e !== "Dimanche" ? (
@@ -581,9 +597,15 @@ const AgendaRdv = (props) => {
       </div>
       {selectedRdvDate && (
         <div className="m-auto my-2 flex h-fit w-[600px] flex-col rounded-5px border border-white bg-white shadow-component ">
-          <MorningSessions hourlySegments={hourlySegments} />
-          {/* <AfternoonSessions hourlySegments={hourlySegments} />
-          <EveningSessions hourlySegments={hourlySegments} /> */}
+          {selectedMoments.includes("matin") && (
+            <MorningSessions hourlySegments={hourlySegments} />
+          )}
+          {selectedMoments.includes("apres-midi") && (
+            <AfternoonSessions hourlySegments={hourlySegments} />
+          )}
+          {selectedMoments.includes("soir") && (
+            <EveningSessions hourlySegments={hourlySegments} />
+          )}
         </div>
       )}
     </div>
