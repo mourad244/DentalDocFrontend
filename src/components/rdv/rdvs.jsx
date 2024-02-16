@@ -22,12 +22,13 @@ function Rdvs() {
 
   const [loading, setLoading] = useState(false);
   const [sortColumn, setSortColumn] = useState({
-    path: "datePrevu",
     order: "asc",
+    path: "heureDebut",
   });
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemOffset, setItemOffset] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const pageSize = 15;
   const history = useHistory();
 
@@ -38,6 +39,7 @@ function Rdvs() {
     const fetchData = async () => {
       setLoading(true);
       const { data: rdvs } = await getRdvs();
+      console.log("rdvs", rdvs);
       setRdvs(rdvs);
       setLoading(false);
     };
@@ -53,7 +55,13 @@ function Rdvs() {
           new Date(e.datePrevu).getMonth() === time.getMonth() &&
           new Date(e.datePrevu).getDate() === time.getDate(),
       );
-      const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+      const sortBy =
+        sortColumn.path === "heureDebut"
+          ? (rdv) => rdv.heureDebut.heure * 60 + rdv.heureDebut.minute
+          : sortColumn.path;
+
+      const sorted = _.orderBy(filtered, [sortBy], [sortColumn.order]);
+
       const endOffset = itemOffset + pageSize;
       setFilteredRdvs(sorted.slice(itemOffset, endOffset));
       setCurrentPage(Math.ceil(sorted.length / pageSize));
@@ -64,9 +72,9 @@ function Rdvs() {
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * pageSize) % totalCount;
-
     setItemOffset(newOffset);
   };
+
   const displayDate = () => {
     return (
       time.getDate() +
@@ -122,18 +130,24 @@ function Rdvs() {
     setSelectedRdvs(newSelectedRdvs);
     setSelectedRdv(newSelectedRdvs.length === 1 ? selectedRdv : null);
   };
+
   const handleSelectRdvs = () => {
     let newSelectedRdvs =
       selectedRdvs.length === filteredRdvs.length ? [] : [...filteredRdvs];
     setSelectedRdvs(newSelectedRdvs);
     setSelectedRdv(newSelectedRdvs.length === 1 ? newSelectedRdvs[0] : null);
   };
+
   const handleEdit = () => {
     history.push(`/rdvs/${selectedRdv._id}`);
+  };
+  const handlePostpone = () => {
+    history.push(`/rdvs/postpone/${selectedRdv._id}`);
   };
   const handleAddDevi = () => {
     history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
   };
+
   const handleCancel = () => {
     let newRdvs = [...rdvs];
     let data = { ...selectedRdv };
@@ -149,10 +163,11 @@ function Rdvs() {
       } else return false;
     });
     saveRdv(data);
-    setSelectedRdv(null);
-    setSelectedRdvs([]);
     setRdvs(newRdvs);
+    setSelectedRdvs([]);
+    setSelectedRdv(null);
   };
+
   const handleDelete = async (items) => {
     const originalRdvs = rdvs;
     setRdvs(
@@ -175,6 +190,7 @@ function Rdvs() {
       setRdvs(originalRdvs);
     }
   };
+
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
       <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
@@ -234,6 +250,22 @@ function Rdvs() {
             }
             selectedItems={selectedRdvs}
             selectedItem={selectedRdv}
+            onPostpone={
+              selectedRdv &&
+              !selectedRdv.isReporte &&
+              new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate(),
+              ) <=
+                new Date(
+                  new Date(selectedRdv.datePrevu).getFullYear(),
+                  new Date(selectedRdv.datePrevu).getMonth(),
+                  new Date(selectedRdv.datePrevu).getDate(),
+                )
+                ? handlePostpone
+                : undefined
+            }
             onCancel={
               selectedRdv &&
               !selectedRdv.isReporte &&

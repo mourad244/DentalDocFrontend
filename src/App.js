@@ -159,6 +159,11 @@ function App() {
             )}
             {/* rdvs */}
             {user.role === "admin" || user.role === "assistante" ? (
+              <Route path="/rdvs/postpone/:id" exact component={RdvForm} />
+            ) : (
+              ""
+            )}
+            {user.role === "admin" || user.role === "assistante" ? (
               <Route path="/rdvs/:id" exact component={RdvForm} />
             ) : (
               ""

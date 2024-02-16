@@ -7,14 +7,12 @@ import { TbDental } from "react-icons/tb";
 import { TiCancel } from "react-icons/ti";
 import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
+import { MdOutlineScheduleSend } from "react-icons/md";
 
 import Moment from "react-moment";
 const formatTime = (hour, minute) => {
-  // Ensure hour and minute are treated as strings and properly padded
   let hourStr = hour.toString().padStart(2, "0");
   let minuteStr = minute.toString().padStart(2, "0");
-
-  // Return formatted time
   return minuteStr === "00" ? `${hourStr}h` : `${hourStr}:${minuteStr}`;
 };
 function RdvsTable(props) {
@@ -33,7 +31,7 @@ function RdvsTable(props) {
       },
     },
     {
-      path: "heureDebut.heure",
+      path: "heureDebut",
       label: "Heure",
       content: (rdv) => {
         /* 
@@ -117,6 +115,7 @@ function RdvsTable(props) {
     onSort,
     sortColumn,
     onEdit,
+    onPostpone,
     onCancel,
     onAddDevi,
     onItemSelect,
@@ -142,6 +141,13 @@ function RdvsTable(props) {
         }`}
         onClick={onEdit}
         title="Modifier"
+      />
+      <MdOutlineScheduleSend
+        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
+          onPostpone === undefined ? "pointer-events-none opacity-50 " : ""
+        }`}
+        onClick={onPostpone}
+        title="Reporter"
       />
 
       <TiCancel

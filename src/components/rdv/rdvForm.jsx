@@ -30,12 +30,12 @@ function RdvForm(props) {
   const [selectedDuree, setSelectedDuree] = useState(0);
   const [selectedMomemts, setSelectedMoments] = useState([]);
   const [selectedHeureDebut, setSelectedHeureDebut] = useState({
-    heure: 0,
-    minute: 0,
+    heure: "00",
+    minute: "00",
   });
   const [selectedHeureFin, setSelectedHeureFin] = useState({
-    heure: 0,
-    minute: 0,
+    heure: "00",
+    minute: "00",
   });
 
   const [availableTimes, setAvailableTimes] = useState([]);
@@ -47,13 +47,13 @@ function RdvForm(props) {
 
   const [selectedRdvDate, setSelectedRdvDate] = useState("");
   const isRdvModified = props.match.params.id !== "new";
+  const isPostponed = props.match.path === "/rdvs/postpone/:id";
   const history = useHistory();
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: actesData } = await getActeDentaires();
       const { data: natureActesData } = await getNatureActes();
-
       if (props.match.params.id !== "new") {
         const { data: rdvData } = await getRdv(props.match.params.id);
         let newSelectedActe = rdvData.acteId
@@ -82,8 +82,12 @@ function RdvForm(props) {
         setSelectedRdvDate(new Date(rdvData.datePrevu));
 
         setSelectedHeureDebut({
-          heure: rdvData.heureDebut.heure,
-          minute: rdvData.heureDebut.minute,
+          heure: rdvData.heureDebut.heure
+            ? rdvData.heureDebut.heure.toString().padStart(2, "0")
+            : "00",
+          minute: rdvData.heureDebut.minute
+            ? rdvData.heureDebut.minute.toString().padStart(2, "0")
+            : "00",
         });
       } else {
         const { data: patientsData } = await getPatients();
@@ -180,7 +184,11 @@ function RdvForm(props) {
 
   // Example of handling start time selection
   const handleStartTimeChange = (hour, minute) => {
-    setSelectedHeureDebut({ heure: hour, minute: minute });
+    console.log("hour", hour);
+    setSelectedHeureDebut({
+      heure: hour,
+      minute: minute,
+    });
     // Additional logic to set end time based on start time and duration
     calculateEndTime(hour, minute);
   };
@@ -470,7 +478,6 @@ function RdvForm(props) {
               </div>
             </div>
           )}
-          {/* disable the button and make it gray if selectedDuree, selectedDateRdv, selectedHeureDebut are not precised */}
           <button
             disabled={
               !selectedDuree ||
@@ -489,25 +496,45 @@ function RdvForm(props) {
             } `}
             onClick={async () => {
               if (isRdvModified) {
-                let oldData = {
-                  _id: selectedRdv._id,
-                  patientId: selectedPatient._id,
-                  natureId: selectedNatureActe ? selectedNatureActe._id : null,
-                  acteId: selectedActe ? selectedActe._id : null,
-                  datePrevu: selectedRdv.datePrevu,
-                  isReporte: true,
-                  dateNouveauRdv: selectedRdvDate,
-                };
-                let newData = {
-                  patientId: selectedPatient._id,
-                  datePrevu: selectedRdvDate,
-                  natureId: selectedNatureActe ? selectedNatureActe._id : null,
-                  acteId: selectedActe ? selectedActe._id : null,
-                  heureDebut: selectedHeureDebut,
-                  heureFin: selectedHeureFin,
-                };
-                await saveRdv(oldData);
-                await saveRdv(newData);
+                if (isPostponed) {
+                  let oldData = {
+                    _id: selectedRdv._id,
+                    patientId: selectedPatient._id,
+                    datePrevu: selectedRdv.datePrevu,
+                    natureId: selectedNatureActe
+                      ? selectedNatureActe._id
+                      : null,
+                    acteId: selectedActe ? selectedActe._id : null,
+                    isReporte: true,
+                    dateNouveauRdv: selectedRdvDate,
+                  };
+                  let newData = {
+                    patientId: selectedPatient._id,
+                    datePrevu: selectedRdvDate,
+                    lastRdvId: selectedRdv._id,
+                    natureId: selectedNatureActe
+                      ? selectedNatureActe._id
+                      : null,
+                    acteId: selectedActe ? selectedActe._id : null,
+                    heureDebut: selectedHeureDebut,
+                    heureFin: selectedHeureFin,
+                  };
+                  await saveRdv(oldData);
+                  await saveRdv(newData);
+                } else {
+                  await saveRdv({
+                    _id: selectedRdv._id,
+                    patientId: selectedPatient._id,
+                    datePrevu: selectedRdvDate,
+                    natureId: selectedNatureActe
+                      ? selectedNatureActe._id
+                      : null,
+                    acteId: selectedActe ? selectedActe._id : null,
+                    heureDebut: selectedHeureDebut,
+                    heureFin: selectedHeureFin,
+                    lastRdvId: selectedRdv.lastRdvId,
+                  });
+                }
               } else {
                 // save duree to acteDentaire if it have not an save moments to acteDentaire it is different from acte
                 if (selectedActe && selectedActe._id) {

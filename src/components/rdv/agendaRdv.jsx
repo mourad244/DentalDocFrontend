@@ -405,16 +405,9 @@ const AgendaRdv = (props) => {
     return mergedSegments;
   };
   const calculateAvailableTimes = (hourlySegments, selectedMomemts) => {
-    console.log("hourlySegments", hourlySegments);
-    console.log("selectedMomemts", selectedMomemts);
     let availableTimes = [];
     Object.keys(hourlySegments)
       .filter((hour) => {
-        // return only the hours that are in the selected moments
-        // matin => 9h - 12h
-        // apres-midi => 12h - 16h
-        // soir => 16h - 19h
-
         if (selectedMomemts.includes("matin")) {
           if (hour >= 9 && hour < 12) {
             return hour;
@@ -432,7 +425,6 @@ const AgendaRdv = (props) => {
         }
       })
       .forEach((hour) => {
-        console.log("hour", hour);
         let startMinute = null;
         hourlySegments[hour].forEach((segment, index) => {
           if (
@@ -523,7 +515,7 @@ const AgendaRdv = (props) => {
             return (
               <div
                 key={index}
-                className={` p-2 text-center text-xs font-bold text-zinc-700 ${
+                className={`min-w-fit  border-2  p-1 text-center text-xs font-bold text-zinc-700 ${
                   segment.available
                     ? "bg-green-500"
                     : segment.isSelected
