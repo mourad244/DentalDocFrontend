@@ -39,7 +39,6 @@ function Rdvs() {
     const fetchData = async () => {
       setLoading(true);
       const { data: rdvs } = await getRdvs();
-      console.log("rdvs", rdvs);
       setRdvs(rdvs);
       setLoading(false);
     };

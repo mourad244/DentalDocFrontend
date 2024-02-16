@@ -309,7 +309,6 @@ class DeviForm extends Form {
     let selecteDActes = [...this.state.selecteDActes];
     let montant = 0;
     data.acteEffectues.map((acteItem, index) => {
-      console.log("acteItem", acteItem);
       if (acteItem.prix) {
         return (montant += acteItem.prix);
       } else if (selecteDActes[index] && selecteDActes[index].prix) {
@@ -479,7 +478,6 @@ class DeviForm extends Form {
       devis,
     } = this.state;
     let colorDents = {};
-    console.log("data", data);
     selecteDDents.map((acteDentItems, indexActeDents) => {
       for (const dentItem in acteDentItems) {
         if (acteDentItems[dentItem])

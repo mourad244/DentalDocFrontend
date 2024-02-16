@@ -184,7 +184,6 @@ function RdvForm(props) {
 
   // Example of handling start time selection
   const handleStartTimeChange = (hour, minute) => {
-    console.log("hour", hour);
     setSelectedHeureDebut({
       heure: hour,
       minute: minute,
