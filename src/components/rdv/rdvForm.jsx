@@ -89,6 +89,14 @@ function RdvForm(props) {
             ? rdvData.heureDebut.minute.toString().padStart(2, "0")
             : "00",
         });
+        setSelectedHeureFin({
+          heure: rdvData.heureFin.heure
+            ? rdvData.heureFin.heure.toString().padStart(2, "0")
+            : "00",
+          minute: rdvData.heureFin.minute
+            ? rdvData.heureFin.minute.toString().padStart(2, "0")
+            : "00",
+        });
       } else {
         const { data: patientsData } = await getPatients();
         setActes(actesData);
@@ -477,6 +485,9 @@ function RdvForm(props) {
               </div>
             </div>
           )}
+          {console.log("selectedHeureFin", selectedHeureFin)}
+          {console.log("selectedHeureDebut", selectedHeureDebut)}
+          {console.log("selectedDuree", selectedDuree)}
           <button
             disabled={
               !selectedDuree ||
