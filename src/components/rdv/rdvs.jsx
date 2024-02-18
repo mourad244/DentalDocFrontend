@@ -144,6 +144,8 @@ function Rdvs() {
     history.push(`/rdvs/postpone/${selectedRdv._id}`);
   };
   const handleAddDevi = () => {
+    console.log("selectedRdv", selectedRdv);
+
     history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
   };
 

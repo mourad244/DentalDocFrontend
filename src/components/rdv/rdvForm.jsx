@@ -485,9 +485,6 @@ function RdvForm(props) {
               </div>
             </div>
           )}
-          {console.log("selectedHeureFin", selectedHeureFin)}
-          {console.log("selectedHeureDebut", selectedHeureDebut)}
-          {console.log("selectedDuree", selectedDuree)}
           <button
             disabled={
               !selectedDuree ||

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Route, /*  Redirect, */ Switch } from "react-router-dom";
 
 import { getRoles } from "./services/roleService";
+import { RiLogoutCircleRLine } from "react-icons/ri";
 
 import NavBar from "./common/navBar";
 import auth from "./services/authService";
@@ -62,22 +63,32 @@ function App() {
   return (
     <React.Fragment>
       <ToastContainer />
-      <div className="m-0 flex h-16 bg-gradient-radial p-1 ">
-        <img src={logo} alt="" />
-        <p className="m-auto ml-9 flex h-12 items-center text-center text-lg font-bold text-white">
+      <div className="m-0 flex h-24 bg-gradient-radial p-1 ">
+        <p className=" ml-5 flex w-48 items-center text-center text-2xl font-bold text-white">
           Cabinet dentaire
         </p>
-        <p className="user-name m-auto ml-9 mr-9 flex h-12 items-center text-center  text-base font-bold text-white">
-          {user.role}
-        </p>
-        <svg
+        <img
+          // i want that the image be at the center of the header even if the screen is small
+          className="z-10 m-auto h-28 "
+          src={logo}
+          alt=""
+        />
+        <div className="flex w-48 flex-row">
+          <p className="user-name m-auto ml-5 mr-9 flex  items-center text-center text-2xl font-bold text-white">
+            {user.role}
+          </p>
+          <RiLogoutCircleRLine
+            className="mr-5 cursor-pointer self-center"
+            size="30"
+            onClick={logOut}
+            color="#FFAFAF"
+          />
+        </div>
+        {/* <svg
           className="cursor-pointer self-center"
           width="30"
           height="30"
           onClick={logOut}
-          onMouseOver={(e) => {
-            // on mouse over display a div and  text : "Déconnexion"
-          }}
         >
           <path
             d="M10.7583 1.3987V13.2098C11.4755 14.7639 13.4221 14.8675 14.2418 13.2098V1.3987C13.627 -0.46623 11.373 -0.466228 10.7583 1.3987Z"
@@ -87,7 +98,7 @@ function App() {
             d="M8.81159 2.43474V6.26817C0.615135 9.68718 2.15197 23.5705 13.0123 23.5705C22.0284 23.5705 24.6923 9.89439 16.1884 6.26817V2.43474C20.3891 3.16001 24.9554 8.53946 24.9996 14.3495C25.0516 21.1886 19.77 26.7091 13.0123 26.9894C5.97197 27.2815 -0.0555108 21.4746 0.000385693 14.3495C0.000385693 8.0295 5.63547 2.74558 8.81159 2.43474Z"
             fill="#FFAFAF"
           />
-        </svg>
+        </svg> */}
       </div>
       <div className=" flex flex-row">
         <NavBar user={user} />

@@ -39,6 +39,26 @@ module.exports = {
           "linear-gradient(180deg, #FAF9F2 0%, #F0ECE4 13%, #DEE1DC 26%, #CBD9D7 40%, #C0DFE2 67%, #B0D8E1 81%, #83BCCD 100%)",
         "authenfier-button":
           "linear-gradient(180deg, #74BED1 0%, #4E9BB5 100%)",
+        "header-radial": `linear-gradient(
+          to left, 
+          #F1F7FC 0%, 
+          #E5F1FA 5.93%, 
+          #D5EAF8 13.71%, 
+          #AFC9D3 20.42%, 
+          #789299 27.44%, 
+          #516B74 35.14%, 
+          #566D78 42.02%, 
+          #526C76 48.44%, 
+          #526C75 55.51%, 
+          #566E76 62.22%, 
+          #58727B 69.91%, 
+          #66828A 75.44%, 
+          #8AA5B3 79.30%, 
+          #9FBDCA 81.57%, 
+          #CAE3F1 87.49%, 
+          #E2F2FD 92.81%, 
+          #F3F9FE 100%
+        )`,
       },
       borderRadius: {
         custom: "10px",

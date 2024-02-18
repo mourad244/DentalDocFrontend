@@ -70,9 +70,9 @@ class DeviForm extends Form {
     const patientId = this.props.match.params.patientid;
     const deviId = this.props.match.params.deviid;
     const rdvId = this.props.match.params.rdvid;
+
     if (deviId === "new" || deviId === undefined) {
       const { data: dents } = await getDents();
-      const { data: patients } = await getPatients();
       const { data: medecins } = await getMedecins();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
@@ -80,7 +80,6 @@ class DeviForm extends Form {
       if (patientId) {
         const { data: patient } = await getPatient(patientId);
         let newData = { ...this.state.data };
-
         if (
           patient.deviIds !== undefined &&
           patient.deviIds !== null &&
@@ -93,7 +92,7 @@ class DeviForm extends Form {
 
           const devisResults = await Promise.all(promises);
           newSelecteDDevis = devisResults.map(({ data: devi }) => devi);
-          return this.setState({
+          this.setState({
             devis: [...newSelecteDDevis],
             selecteDPatient: patient,
             searchQuery: "",
@@ -123,14 +122,16 @@ class DeviForm extends Form {
             natureActes,
           });
         }
+      } else {
+        const { data: patients } = await getPatients();
+        this.setState({
+          dents,
+          medecins,
+          acteDentaires,
+          natureActes,
+          patients,
+        });
       }
-      this.setState({
-        dents,
-        medecins,
-        acteDentaires,
-        natureActes,
-        patients,
-      });
     } else if (deviId) {
       const { data: devi } = await getDevi(deviId);
       const { data: dents } = await getDents();
@@ -191,7 +192,6 @@ class DeviForm extends Form {
     }
     this.setState({ loading: false });
   }
-
   onSelectPatient = async (patient) => {
     let data = { ...this.state.data };
     if (
@@ -458,6 +458,7 @@ class DeviForm extends Form {
     this.setState({ selecteDDents, data: devi });
   };
   render() {
+    console.log("loading", this.state.loading);
     const {
       medecins,
       nombreActes,
