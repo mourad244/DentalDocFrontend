@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "custom-blue": "#455a94",
+        "custom-blue": "#4F6874",
         "grey-c0": "#c0c0c0",
         "grey-ea": "#eaeaea",
         "blue-40": "#406aa1",
@@ -34,6 +34,8 @@ module.exports = {
       },
       backgroundImage: {
         "gradient-radial": "linear-gradient(180deg, #CBD9D7 0%, #83BCCD 100%)",
+        "gradient-navbar":
+          "linear-gradient(to bottom, #74BED1 0%, #FAF9F1 100%)",
         "login-background":
           "linear-gradient(180deg, #FAF9F2 0%, #F0ECE4 13%, #DEE1DC 26%, #CBD9D7 40%, #C0DFE2 67%, #B0D8E1 81%, #83BCCD 100%)",
         "authenfier-button":

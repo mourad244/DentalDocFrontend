@@ -25,7 +25,7 @@ function RdvTableBody(props) {
                 ? "bg-[#ff8c8c]"
                 : item.isReporte
                 ? "bg-[#e49012]"
-                : "bg-[#dedcf1]"
+                : "bg-[#D6E1E3]"
             }  text-center`}
           >
             {columns.map((column) => {

@@ -619,7 +619,7 @@ class DeviForm extends Form {
         </p>
         <div className="ml-2  flex justify-start">
           <button
-            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
             onClick={() => {
               this.props.history.push("/devis");
             }}
@@ -739,7 +739,7 @@ class DeviForm extends Form {
                 <div className="m-2 flex justify-between">
                   <table className="my-0 mr-2 h-fit w-fit">
                     <thead className="h-12  text-[#4f5361]">
-                      <tr className="h-8 w-[100%] bg-[#869ad3] text-center">
+                      <tr className="h-8 w-[100%] bg-[#8DC0CF] text-center">
                         <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
                           Nature Acte
                         </th>
@@ -766,7 +766,7 @@ class DeviForm extends Form {
                         return (
                           <tr
                             key={"acte" + indexActe}
-                            className="h-12 bg-[#dedcf1] text-center"
+                            className="h-12 bg-[#D6E1E3] text-center"
                             style={
                               selecteDNatureActes[indexActe]
                                 ? {

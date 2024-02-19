@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const MenuPatient = ({ toggleForm }) => {
   const [url, setUrl] = useState("");
   const inactiveButton =
-    "mr-2 h-8 min-w-fit flex cursor-pointer list-none rounded-lg bg-[#455a94] pl-3 pr-3 pt-2 text-xs text-center font-bold text-white no-underline";
+    "mr-2 h-8 min-w-fit flex cursor-pointer list-none rounded-lg bg-[#4F6874] pl-3 pr-3 pt-2 text-xs text-center font-bold text-white no-underline";
   const activeButton =
     "text-custom-blue h-8 min-w-fit shadow-custom rounded-custom mr-2 flex  cursor-pointer text-xs list-none bg-white pl-3  pr-3 pt-2 text-base font-bold no-underline";
 

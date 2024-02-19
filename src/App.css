@@ -60,7 +60,8 @@
 :root {
   width: 100%;
   min-height: 100%;
-  background: linear-gradient(
+  background-color: #e5eeeb;
+  /* background: linear-gradient(
     270deg,
     #678994 0%,
     #9dacb0 20%,
@@ -69,14 +70,14 @@
     #b7d2d7 55%,
     #89a8b0 72%,
     #4f6873 100%
-  );
+  ); */
   font-size: 1rem;
   font-family: "Roboto";
   height: fit-content;
   user-select: none;
   --text-primary: #b6b6b6;
   --text-secondary: #ececec;
-  --bg-primary: #455a94;
+  --bg-primary: #4f6874;
   --bg-secondary: #141418;
   --transition-speed: 600ms;
   /* cursor: pointer; */
@@ -93,7 +94,7 @@
   width: fit-content;
   max-width: 92%;
   justify-content: space-evenly;
-  background-color: #5a6b99;
+  background-color: #d6e1e3;
   border-radius: 12px;
   padding: 3px;
   margin: 2px auto;
@@ -114,7 +115,7 @@
   border: 1px solid white;
   border-radius: 20px;
   background-color: aliceblue;
-  color: #5a6b99;
+  color: #d6e1e3;
 }
 
 /* 

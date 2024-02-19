@@ -1,6 +1,6 @@
 <svg width="127" height="111" viewBox="0 0 127 111" fill="none">
   <g filter="url(#filter0_d_423:355)">
-    <rect x="20" y="12" width="87" height="71" rx="10" fill="#455a94" />
+    <rect x="20" y="12" width="87" height="71" rx="10" fill="#4F6874" />
   </g>
   <text fill="white" fontSize="18" fontWeight="bold">
     <tspan x="36.1748" y="77.6523">Report</tspan>
@@ -68,7 +68,7 @@
         in="SourceAlpha"
         result="effect1_dropShadow_423:355"
       />
-    <feOffset dy="4" dx="1" />
+      <feOffset dy="4" dx="1" />
       <feGaussianBlur stdDeviation="2" />
       <feColorMatrix
         type="matrix"

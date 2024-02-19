@@ -289,7 +289,7 @@ function RdvForm(props) {
       </p>
       <div className="ml-2  flex justify-start">
         <button
-          className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+          className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
           onClick={() => {
             history.push("/rdvs");
           }}
@@ -499,7 +499,7 @@ function RdvForm(props) {
               !selectedRdvDate ||
               !selectedHeureDebut.heure
                 ? "cursor-default bg-gray-400"
-                : "bg-[#455a94]"
+                : "bg-[#4F6874]"
             } `}
             onClick={async () => {
               if (isRdvModified) {

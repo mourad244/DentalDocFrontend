@@ -10,7 +10,7 @@ const ButtonType = (text, isActive) => {
       fill="none"
     >
       <g id="button-date-active" filter="url(#filterButtonDate)">
-        <text fill="#455a94" fontSize="12" fontWeight="bold">
+        <text fill="#4F6874" fontSize="12" fontWeight="bold">
           <tspan x="27" y="17.6523">
             {text.toLocaleUpperCase()}
           </tspan>
@@ -22,13 +22,13 @@ const ButtonType = (text, isActive) => {
             cy="12"
             r="11"
             fill="white"
-            stroke="#455a94"
+            stroke="#4F6874"
             strokeWidth="2"
           />
           <path
             id="Vector"
             d="M25.9485 2.13888C24.9402 0.574555 11.3284 12.7415 11.3284 12.7415C11.3284 12.7415 6.79116 7.70064 5.27873 8.74381C3.76631 9.78698 8.80777 18.8247 10.8244 18.9985C12.841 19.1724 26.9568 3.70321 25.9485 2.13888Z"
-            fill="#455a94"
+            fill="#4F6874"
           />
         </g>
       </g>
@@ -112,7 +112,7 @@ const ButtonType = (text, isActive) => {
       fill="none"
     >
       <g id="button-date">
-        <text fill="#455a94" fontSize="12" fontWeight="bold">
+        <text fill="#4F6874" fontSize="12" fontWeight="bold">
           <tspan x="27" y="17.6523">
             {text.toLocaleUpperCase()}
           </tspan>
@@ -124,7 +124,7 @@ const ButtonType = (text, isActive) => {
             cy="12"
             r="11"
             fill="white"
-            stroke="#455a94"
+            stroke="#4F6874"
             strokeWidth="2"
           />
         </g>

@@ -62,10 +62,10 @@ function PatientsTable({
   const tableRows = patients.map((patient) => {
     return (
       <tr
-        className=" h-12  border-y-2 border-y-gray-300 bg-[#dedcf1]  text-center"
+        className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center"
         key={uuidv4()}
       >
-        <td className=" h-12  border-y-2 border-y-gray-300 bg-[#dedcf1]  text-center">
+        <td className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center">
           <input
             type="checkbox"
             checked={

@@ -48,7 +48,7 @@ const ButtonPage = (page, isActive) => {
   ) : (
     <svg width="40" height="40" fill="none">
       <g filter="url(#filter-inactive-page)">
-        <rect width="40" height="40" rx="20" fill="#455a94" />
+        <rect width="40" height="40" rx="20" fill="#4F6874" />
       </g>
       {/* <rect
         x="1"

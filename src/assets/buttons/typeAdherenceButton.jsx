@@ -19,12 +19,12 @@ const typeAdherenceButton = (text, isActive) => {
       width="180" /*  width="203" height="28" viewBox="0 0 203 28" */
     >
       <g filter="url(#filter0_i)">
-        <text fill="#455a94" fontSize="20" fontWeight="bold">
+        <text fill="#4F6874" fontSize="20" fontWeight="bold">
           <tspan x="25" y="20">
             {text}
           </tspan>
         </text>
-        <circle cx="9.5" cy="14.5" r="9.5" fill="#455a94" />
+        <circle cx="9.5" cy="14.5" r="9.5" fill="#4F6874" />
       </g>
       <defs>
         <filter

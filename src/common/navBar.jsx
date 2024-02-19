@@ -52,7 +52,7 @@ const NavBar = ({ user }) => {
   };
 
   return (
-    <nav className="flex flex-col gap-2 bg-[#5a6b99] ">
+    <nav className="bg-gradient-navbar flex flex-col gap-2 ">
       {user.role === "admin" || user.role === "autorite" ? (
         <ul className="flex w-20">
           <li className=" m-auto my-1 w-fit">

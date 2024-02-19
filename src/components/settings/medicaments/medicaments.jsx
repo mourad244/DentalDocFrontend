@@ -159,7 +159,7 @@ function Medicaments(props) {
     return (
       <>
         <button
-          className="no-underlin mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+          className="no-underlin mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           onClick={toggleForm}
         >
           + Nouveau medicament
@@ -174,13 +174,13 @@ function Medicaments(props) {
         {!filterDisplay ? (
           <button
             onClick={toggleFilter}
-            className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+            className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           >
             <svg className="mr-2" width="15" height="15" fill="none">
               <rect width="15" height="15" rx="3" fill="#ffffff" />
               <path
                 d="M3 9V7H6.5V3.5H8.5V7H12.5V9H8.5V13H6.5V9H3Z"
-                fill="#455a94"
+                fill="#4F6874"
               />
             </svg>
             Critère de recherche
@@ -189,11 +189,11 @@ function Medicaments(props) {
           <div className="w-full min-w-fit  rounded-md        bg-white  pb-2 shadow-component  ">
             <button
               onClick={toggleFilter}
-              className=" mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+              className=" mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
             >
               <svg className="mr-2" width="15" height="15" viewBox="0 0 15 15">
                 <rect width="15" height="15" rx="3" fill="#ffffff" />
-                <path d="M3 9V7H12.5V9H3Z" fill="#455a94" />
+                <path d="M3 9V7H12.5V9H3Z" fill="#4F6874" />
               </svg>
               Critère de recherche
             </button>
@@ -217,7 +217,7 @@ function Medicaments(props) {
   return (
     <>
       <button
-        className="no-underlin mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+        className="no-underlin mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
         onClick={toggleForm}
       >
         + Nouveau medicament
@@ -233,13 +233,13 @@ function Medicaments(props) {
       {!filterDisplay ? (
         <button
           onClick={toggleFilter}
-          className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+          className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
         >
           <svg className="mr-2" width="15" height="15" fill="none">
             <rect width="15" height="15" rx="3" fill="#ffffff" />
             <path
               d="M3 9V7H6.5V3.5H8.5V7H12.5V9H8.5V13H6.5V9H3Z"
-              fill="#455a94"
+              fill="#4F6874"
             />
           </svg>
           Critère de recherche
@@ -248,11 +248,11 @@ function Medicaments(props) {
         <div className="w-full min-w-fit rounded-md bg-white  pb-2 shadow-component">
           <button
             onClick={toggleFilter}
-            className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+            className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           >
             <svg className="mr-2" width="15" height="15" viewBox="0 0 15 15">
               <rect width="15" height="15" rx="3" fill="#ffffff" />
-              <path d="M3 9V7H12.5V9H3Z" fill="#455a94" />
+              <path d="M3 9V7H12.5V9H3Z" fill="#4F6874" />
             </svg>
             Critère de recherche
           </button>
@@ -294,7 +294,7 @@ function Medicaments(props) {
             marginPagesDisplayed={1}
             pageRangeDisplayed={2}
             onPageChange={handlePageClick}
-            // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#5a6b99] p-3 font-bold text-white"
+            // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#D6E1E3] p-3 font-bold text-white"
             previousLabel={"<"}
             renderOnZeroPageCount={null}
             containerClassName={"pagination"}

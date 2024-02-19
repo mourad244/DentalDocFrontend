@@ -8,7 +8,7 @@ const SearchButton = ({ handleSearch }) => {
       height="48"
       viewBox="0 0 47 48"
     >
-      <circle cx="23.5" cy="23.5" r="23.5" fill="#455a94" />
+      <circle cx="23.5" cy="23.5" r="23.5" fill="#4F6874" />
       <g filter="url(#filterSearch)">
         <path
           fillRule="evenodd"

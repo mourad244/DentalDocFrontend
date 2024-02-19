@@ -198,7 +198,7 @@ function Rdvs() {
       </div>
       <div className="ml-2 flex justify-start">
         <button
-          className="no-underlin mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+          className="no-underlin mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           onClick={() => {
             history.push("/rdvs/new");
           }}

@@ -63,7 +63,7 @@ function App() {
   return (
     <React.Fragment>
       <ToastContainer />
-      <div className="m-0 flex h-24 bg-gradient-radial p-1 ">
+      <div className="m-0 flex h-24  bg-gradient-radial p-1 shadow-xl ">
         <p className=" ml-5 flex w-48 items-center text-center text-xl font-bold text-[#424746]">
           Cabinet dentaire
         </p>

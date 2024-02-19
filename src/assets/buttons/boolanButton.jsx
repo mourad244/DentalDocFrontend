@@ -20,7 +20,7 @@ const BooleanButton = ({
       fill="none"
     >
       <text
-        fill={value ? "#455a94" : "#A3A8B6"}
+        fill={value ? "#4F6874" : "#A3A8B6"}
         fontFamily="Roboto"
         fontSize="12"
         fontWeight="bold"
@@ -31,7 +31,7 @@ const BooleanButton = ({
       </text>
       {value ? (
         <g filter="url(#filterButton)">
-          <circle cx="10" cy="10.5" r="7" fill={"#455a94"} />
+          <circle cx="10" cy="10.5" r="7" fill={"#4F6874"} />
         </g>
       ) : (
         <circle cx="10" cy="10.5" r="7" fill={"#A3A8B6"} />

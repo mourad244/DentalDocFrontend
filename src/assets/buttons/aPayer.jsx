@@ -12,7 +12,7 @@ const APayer = (text) => {
       <g filter="url(#filterAPayer1)">
         <path
           d="M4 27C4 12.0883 16.0883 3.39575e-06 31 7.58461e-06L159 4.35413e-05C173.912 4.77301e-05 186 12.0884 186 27V63.0001H4V27Z"
-          fill="#455a94"
+          fill="#4F6874"
         />
       </g>
       <g filter="url(#filterAPayer2)">

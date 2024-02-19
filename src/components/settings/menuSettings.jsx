@@ -2,13 +2,13 @@ import React from "react";
 
 const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
   return (
-    <nav className="mt-2  w-fit rounded-sm bg-[#5a6b99]">
+    <nav className="mt-2  w-fit rounded-sm bg-[#D6E1E3]">
       <ul className="  flex flex-wrap ">
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("roles")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("roles");
@@ -19,8 +19,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("users")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("users");
@@ -31,8 +31,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("regions")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("regions");
@@ -44,8 +44,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("provinces")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("provinces");
@@ -56,8 +56,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("allergies")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("allergies");
@@ -68,8 +68,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("couvertures")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("couvertures");
@@ -80,8 +80,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("detailCouvertures")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("detailCouvertures");
@@ -92,8 +92,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("dents")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("dents");
@@ -104,8 +104,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("categorieMedicaments")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("categorieMedicaments");
@@ -116,8 +116,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("medicaments")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("medicaments");
@@ -128,8 +128,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("pathologies")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("pathologies");
@@ -140,8 +140,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("natureActes")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("natureActes");
@@ -152,8 +152,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("acteDentaires")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("acteDentaires");
@@ -164,8 +164,8 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("medecins")
-              ? " bg-[#455A94] text-white"
-              : " bg-white text-[#455A94]"
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
           }`}
           onClick={() => {
             onSelectSetting("medecins");

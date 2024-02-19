@@ -57,6 +57,8 @@ class PaiementForm extends Form {
     this.setState({ loading: true });
     const paiementId = this.props.match.params.paiementid;
     const patientId = this.props.match.params.patientid;
+    console.log("paiementId", paiementId);
+    console.log("patientId", patientId);
     if (paiementId === "new" || paiementId === undefined) {
       const { data: patients } = await getPatients();
       const { data: natureActes } = await getNatureActes();
@@ -91,7 +93,7 @@ class PaiementForm extends Form {
           );
         }
         newData.patientId = patient._id;
-        return this.setState({
+        this.setState({
           data: newData,
           selectedPatient: patient,
           devis: newSelectedDevis,
@@ -283,7 +285,7 @@ class PaiementForm extends Form {
         </p>
         <div className="ml-2  flex justify-start">
           <button
-            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#455a94] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
             onClick={() => {
               this.props.history.push("/paiements");
             }}

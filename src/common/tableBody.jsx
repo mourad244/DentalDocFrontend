@@ -21,7 +21,7 @@ function TableBody(props) {
         return (
           <tr
             key={item._id || uuidv4()}
-            className=" h-12 bg-[#dedcf1]  text-center"
+            className=" h-12 bg-[#D6E1E3]  text-center"
             style={
               colorsNatureActe[item.nature]
                 ? { backgroundColor: colorsNatureActe[item.nature] }

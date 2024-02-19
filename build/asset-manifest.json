@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.2ebe580a.css",
-    "main.js": "/static/js/main.6914ea9e.js",
+    "main.css": "/static/css/main.777a01a6.css",
+    "main.js": "/static/js/main.b17be6b6.js",
     "static/media/icon-dental.png": "/static/media/icon-dental.bc4ba4dce2d20450ea73.png",
     "static/media/roboto-latin-900italic.woff": "/static/media/roboto-latin-900italic.c20d916c1a1b094c1cec.woff",
     "static/media/roboto-latin-300italic.woff": "/static/media/roboto-latin-300italic.bd5b7a13f2c52b531a2a.woff",
@@ -27,26 +27,26 @@
     "static/media/roboto-latin-300.woff2": "/static/media/roboto-latin-300.37a7069dc30fc663c878.woff2",
     "static/media/roboto-latin-400.woff2": "/static/media/roboto-latin-400.176f8f5bd5f02b3abfcf.woff2",
     "static/media/roboto-latin-900.woff2": "/static/media/roboto-latin-900.870c8c1486f76054301a.woff2",
-    "static/media/paiement-active.svg": "/static/media/paiement-active.38e770d8cab72e27fe51f2c724e79a01.svg",
-    "static/media/paiement.svg": "/static/media/paiement.92a8fcf7392ec8e25e7db27dd3495160.svg",
-    "static/media/settings-active.svg": "/static/media/settings-active.ddc027dabec7348f04273c2892fca49a.svg",
-    "static/media/settings.svg": "/static/media/settings.c4a397948b89e602990826cc17e2b85b.svg",
-    "static/media/patient-active.svg": "/static/media/patient-active.f2274a7547826cbb49ea41bb43972809.svg",
-    "static/media/patient.svg": "/static/media/patient.fab76bcb6bb2f61e1aa78d0782682db5.svg",
-    "static/media/accueil-active.svg": "/static/media/accueil-active.30d24c95276975bca7fc464f663648bd.svg",
-    "static/media/accueil.svg": "/static/media/accueil.34393c7aa109d596cc865037ae3d750c.svg",
-    "static/media/devi-active.svg": "/static/media/devi-active.3a951895a3aef1f074442ac99da391b9.svg",
-    "static/media/devi.svg": "/static/media/devi.c03413f26b08250249f293ac8ac5efdc.svg",
-    "static/media/rdv-active.svg": "/static/media/rdv-active.41347ac263bd1b5641d515bf5ec21941.svg",
-    "static/media/rdv.svg": "/static/media/rdv.17bdd8bc1244d1f8105f381070e88b3c.svg",
+    "static/media/paiement-active.svg": "/static/media/paiement-active.b9e74eab3ea1272a6605d55d417f52cb.svg",
+    "static/media/paiement.svg": "/static/media/paiement.b1817bc1f93252401648cc063fe4ceaf.svg",
+    "static/media/settings-active.svg": "/static/media/settings-active.2ac73d36b3ca32832496114798c708f3.svg",
+    "static/media/settings.svg": "/static/media/settings.569ee4ee399861f2fb49b6bb8bc8426d.svg",
+    "static/media/patient-active.svg": "/static/media/patient-active.8c5c64841ae460d2b1566965d0b466a1.svg",
+    "static/media/patient.svg": "/static/media/patient.5212a953924e65776baea237b94d1156.svg",
+    "static/media/accueil-active.svg": "/static/media/accueil-active.a1db53d8df3369e8b370a5d19e9e7ff0.svg",
+    "static/media/accueil.svg": "/static/media/accueil.472f34bcafeffecfbc705556873fe54a.svg",
+    "static/media/devi-active.svg": "/static/media/devi-active.658d3f9f7876c94bad53aecd7cdcbd8e.svg",
+    "static/media/devi.svg": "/static/media/devi.2e8837bb269f8c59142e2343225f3c20.svg",
+    "static/media/rdv-active.svg": "/static/media/rdv-active.99422cb12c40bf19f1ba3ca9d9a0c978.svg",
+    "static/media/rdv.svg": "/static/media/rdv.36ad4120ae8b1ba73a1999727366a01e.svg",
     "index.html": "/index.html",
-    "static/media/precedent-btn.svg": "/static/media/precedent-btn.81abb3b4ac743a9c64f01592c5222358.svg",
-    "static/media/suivant-btn.svg": "/static/media/suivant-btn.558a791d03245badd74d8aa419f4a5c9.svg",
-    "main.2ebe580a.css.map": "/static/css/main.2ebe580a.css.map",
-    "main.6914ea9e.js.map": "/static/js/main.6914ea9e.js.map"
+    "static/media/precedent-btn.svg": "/static/media/precedent-btn.0af0347189689b646dac7e52f0e33343.svg",
+    "static/media/suivant-btn.svg": "/static/media/suivant-btn.0f1c22a734a32e254adc1ae30ddfab9a.svg",
+    "main.777a01a6.css.map": "/static/css/main.777a01a6.css.map",
+    "main.b17be6b6.js.map": "/static/js/main.b17be6b6.js.map"
   },
   "entrypoints": [
-    "static/css/main.2ebe580a.css",
-    "static/js/main.6914ea9e.js"
+    "static/css/main.777a01a6.css",
+    "static/js/main.b17be6b6.js"
   ]
 }
