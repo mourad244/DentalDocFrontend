@@ -6,14 +6,16 @@ import { getMedecins } from "../../services/medecinService";
 import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getActeDentaires } from "../../services/acteDentaireService";
-
+import { getRdv } from "../../services/rdvService";
 import Form from "../../common/form";
 import Input from "../../common/input";
 import Select from "../../common/select";
 import SearchBox from "../../common/searchBox";
 import ActesEffectuesTable from "./actesEffectuesTable";
+import { jsonToFormData } from "../../utils/jsonToFormData";
 
 import _ from "lodash";
+import axios from "axios";
 import Joi from "joi-browser";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
@@ -70,8 +72,12 @@ class DeviForm extends Form {
     const patientId = this.props.match.params.patientid;
     const deviId = this.props.match.params.deviid;
     const rdvId = this.props.match.params.rdvid;
-
     if (deviId === "new" || deviId === undefined) {
+      let rdvDate = new Date();
+      if (rdvId) {
+        const { data: rdv } = await getRdv(rdvId);
+        rdvDate = rdv.datePrevu;
+      }
       const { data: dents } = await getDents();
       const { data: medecins } = await getMedecins();
       const { data: natureActes } = await getNatureActes();
@@ -100,6 +106,7 @@ class DeviForm extends Form {
               ...newData,
               patientId: patient._id,
               rdvIds: rdvId ? [rdvId] : [],
+              dateDevi: rdvDate,
             },
             dents,
             medecins,
@@ -114,6 +121,7 @@ class DeviForm extends Form {
               ...newData,
               patientId: patient._id,
               rdvIds: rdvId ? [rdvId] : [],
+              dateDevi: rdvDate,
             },
             devis: [],
             dents,
@@ -290,6 +298,51 @@ class DeviForm extends Form {
       });
       this.setState({ actesEffectues: actes });
     }
+    if (prevState.nombreActes !== this.state.nombreActes) {
+      let selecteDNatureActes = [...this.state.selecteDNatureActes];
+      let selecteDActes = [...this.state.selecteDActes];
+      let nombreDentsPerActe = [...this.state.nombreDentsPerActe];
+      let selecteDDents = [...this.state.selecteDDents];
+      let filteredActeDentaires = [...this.state.filteredActeDentaires];
+      let data = { ...this.state.data };
+      let acteEffectues = [...this.state.data.acteEffectues];
+      if (prevState.nombreActes > this.state.nombreActes) {
+        selecteDNatureActes.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+        selecteDActes.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+        nombreDentsPerActe.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+        selecteDDents.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+        filteredActeDentaires.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+        acteEffectues.splice(
+          this.state.nombreActes,
+          prevState.nombreActes - this.state.nombreActes,
+        );
+      }
+      data.acteEffectues = acteEffectues;
+      this.setState({
+        selecteDNatureActes,
+        selecteDActes,
+        nombreDentsPerActe,
+        selecteDDents,
+        filteredActeDentaires,
+        data,
+        nombreActes: this.state.nombreActes,
+      });
+    }
   }
   mapToViewModel(devi) {
     return {
@@ -303,7 +356,73 @@ class DeviForm extends Form {
       imagesDeletedIndex: [],
     };
   }
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = this.validate();
 
+    this.setState({ errors: errors || {} });
+    const sendFile = this.state.sendFile;
+    if (sendFile) {
+      return this.fileUploadHandler();
+    }
+    if (errors) return;
+    this.doSubmit();
+  };
+  fileUploadHandler = async () => {
+    let fd = new FormData();
+    const form = this.state.form;
+    let data = { ...this.state.data };
+    let selecteDActes = [...this.state.selecteDActes];
+
+    let montant = 0;
+    data.acteEffectues.map((acteItem, index) => {
+      if (acteItem.prix) {
+        return (montant += acteItem.prix);
+      } else if (selecteDActes[index] && selecteDActes[index].prix) {
+        return (montant += selecteDActes[index].prix);
+      } else return (montant += 0);
+    });
+    delete data._id;
+    delete data.images;
+    fd = jsonToFormData(data);
+    // for (const item in data) {
+    //   if (Array.isArray(data[item])) {
+    //     data[item].map((i, index) => fd.append(item + `[${index}]`, i));
+    //   } else if (typeof data[item] === "object") {
+    //     for (let key in data[item]) {
+    //       console.log(data[item], data[item][key]);
+    //       fd.append(key, data[item][key]);
+    //     }
+    //   } else {
+    //     fd.append(item, data[item]);
+    //   }
+    // }
+    for (const item in this.state) {
+      if (item.includes("selected")) {
+        let filename = item.replace("selected", "");
+        for (let i = 0; i < this.state[item][0].length; i++) {
+          fd.append(
+            filename,
+            this.state[item][0][i],
+            this.state[item][0][i].name,
+          );
+        }
+      }
+    }
+    fd.append("montant", montant);
+    this.props.match !== undefined &&
+    this.props.match.params.deviid &&
+    this.props.match.params.deviid != "new"
+      ? await axios.put(
+          `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.deviid}`,
+          fd,
+        )
+      : await axios.post(`${process.env.REACT_APP_API_URL}/${form}`, fd);
+    if (this.props.match) this.props.history.push(`/${form}`);
+    else {
+      window.location.reload();
+    }
+  };
   doSubmit = async () => {
     let data = { ...this.state.data };
     let selecteDActes = [...this.state.selecteDActes];
@@ -458,7 +577,6 @@ class DeviForm extends Form {
     this.setState({ selecteDDents, data: devi });
   };
   render() {
-    console.log("loading", this.state.loading);
     const {
       medecins,
       nombreActes,
@@ -478,6 +596,9 @@ class DeviForm extends Form {
       data,
       devis,
     } = this.state;
+    const rdvId = this.props.match.params.rdvid;
+    const deviId = this.props.match.params.deviid;
+    const patientId = this.props.match.params.patientid;
     let colorDents = {};
     selecteDDents.map((acteDentItems, indexActeDents) => {
       for (const dentItem in acteDentItems) {
@@ -507,7 +628,7 @@ class DeviForm extends Form {
             Retour à la Liste
           </button>
         </div>
-        {this.props.match.params.deviid === "new" && (
+        {deviId === "new" && !patientId && !rdvId && (
           <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
             <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
               Chercher un patient
@@ -557,7 +678,7 @@ class DeviForm extends Form {
               <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
                 Actes à éffectuer
               </p>
-              <form onSubmit={this.handleSubmit}>
+              <form /* onSubmit={this.handleSubmit} */>
                 <div className="flex flex-wrap">
                   <div className="mt-3">
                     <Input
@@ -846,7 +967,20 @@ class DeviForm extends Form {
                   </table>
                   <SchemaDent className="min-w-fit" dents={colorDents} />
                 </div>
-                {this.renderButton("Sauvegarder")}
+                {
+                  <div className="mr-6 mt-3 flex w-full justify-end">
+                    <button
+                      onClick={this.handleSubmit}
+                      className={
+                        !this.validate()
+                          ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
+                          : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
+                      }
+                    >
+                      Sauvegarder
+                    </button>
+                  </div>
+                }
               </form>
             </div>
           </>

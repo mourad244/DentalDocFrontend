@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Joi, { log } from "joi-browser";
+import Joi from "joi-browser";
 import Input from "./input";
 import axios from "axios";
 import DisplayImage from "./displayImage";

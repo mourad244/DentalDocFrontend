@@ -24,7 +24,7 @@ import { ToastContainer } from "react-toastify";
 
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
-import logo from "./assets/images/logo-dental-doc.png";
+import logo from "./assets/icons/icon-dental.png";
 
 function App() {
   const [user, setUser] = useState();
@@ -64,24 +64,24 @@ function App() {
     <React.Fragment>
       <ToastContainer />
       <div className="m-0 flex h-24 bg-gradient-radial p-1 ">
-        <p className=" ml-5 flex w-48 items-center text-center text-2xl font-bold text-white">
+        <p className=" ml-5 flex w-48 items-center text-center text-xl font-bold text-[#424746]">
           Cabinet dentaire
         </p>
         <img
           // i want that the image be at the center of the header even if the screen is small
-          className="z-10 m-auto h-28 "
+          className="z-10 m-auto h-24 "
           src={logo}
           alt=""
         />
         <div className="flex w-48 flex-row">
-          <p className="user-name m-auto ml-5 mr-9 flex  items-center text-center text-2xl font-bold text-white">
+          <p className="user-name m-auto ml-5 mr-9 flex  items-center text-center text-xl font-bold text-[#424746]">
             {user.role}
           </p>
           <RiLogoutCircleRLine
             className="mr-5 cursor-pointer self-center"
-            size="30"
+            size="35"
             onClick={logOut}
-            color="#FFAFAF"
+            color="#FF4D4D"
           />
         </div>
         {/* <svg

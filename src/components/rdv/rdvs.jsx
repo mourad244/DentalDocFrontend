@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import { withRouter, useHistory } from "react-router-dom";
 
-import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
+import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvService";
 
 import RdvsTable from "./rdvsTable";
 
@@ -144,8 +144,6 @@ function Rdvs() {
     history.push(`/rdvs/postpone/${selectedRdv._id}`);
   };
   const handleAddDevi = () => {
-    console.log("selectedRdv", selectedRdv);
-
     history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
   };
 

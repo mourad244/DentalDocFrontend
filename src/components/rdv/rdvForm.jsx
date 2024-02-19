@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { getRdv, deleteRdv, saveRdv } from "../../services/rdvServices";
+import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
 import { getPatients } from "../../services/patientService";
 
 import { useHistory } from "react-router-dom";

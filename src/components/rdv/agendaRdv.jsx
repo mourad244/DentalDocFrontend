@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 
-import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvServices";
+import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvService";
 
 // import _ from "lodash";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";

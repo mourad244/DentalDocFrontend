@@ -33,8 +33,7 @@ module.exports = {
         "login-button-inselectd": "0px 1px 5px rgba(0, 0, 0, 0.25)",
       },
       backgroundImage: {
-        "gradient-radial":
-          "linear-gradient(180deg, #6b33a0 0%, rgb(69 90 148) 100%)",
+        "gradient-radial": "linear-gradient(180deg, #CBD9D7 0%, #83BCCD 100%)",
         "login-background":
           "linear-gradient(180deg, #FAF9F2 0%, #F0ECE4 13%, #DEE1DC 26%, #CBD9D7 40%, #C0DFE2 67%, #B0D8E1 81%, #83BCCD 100%)",
         "authenfier-button":

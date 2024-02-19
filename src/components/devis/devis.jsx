@@ -135,7 +135,7 @@ function Devis() {
     setSelectedDevi(null);
     setSelectedDevis([]);
     try {
-      await Promise.all(items.map((item) => deleteDevi(item._id)));
+      await Promise.all(items.map(async (item) => await deleteDevi(item._id)));
       toast.success("Devi(s) supprimé(s)");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
