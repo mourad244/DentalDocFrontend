@@ -79,7 +79,7 @@ function PatientsTable({
           const key = header.name;
           switch (key) {
             case "select":
-              break;
+              return null;
             case "age":
               if (patient.dateNaissance !== undefined) {
                 var today = new Date();
@@ -101,6 +101,7 @@ function PatientsTable({
                   </td>
                 );
               }
+              return "";
             case "dateNaissance":
               if (patient.dateNaissance === undefined)
                 return <td key={uuidv4()} />;
@@ -196,7 +197,7 @@ function PatientsTable({
   );
 
   const filterFunctions = (
-    <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <div className="m-2">
         <Select
           options={[
@@ -268,7 +269,7 @@ function PatientsTable({
   );
 
   const itemActions = (
-    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""

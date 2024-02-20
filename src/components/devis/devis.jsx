@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { getDevis, deleteDevi } from "../../services/deviService";
 import { getMedecins } from "../../services/medecinService";
@@ -323,7 +323,7 @@ function Devis() {
           id="classification-medecins"
           onClick={handleMedecinSelect}
           name="classification"
-          className=" h-9  rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+          className=" h-9  rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
         >
           {datas.medecins.map((option) => {
             return (

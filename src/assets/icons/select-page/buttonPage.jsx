@@ -4,7 +4,7 @@ const ButtonPage = (page, isActive) => {
   return isActive ? (
     <svg width="40" height="40">
       <g filter="url(#filter-active-page)">
-        <rect width="40" height="40" rx="20" fill="#6d71be47" />
+        <rect width="40" height="40" rx="20" fill="#D6E1E3" />
       </g>
       <text fill="#474a52" fontSize="16" fontWeight="bold">
         <tspan x="8" y="28">

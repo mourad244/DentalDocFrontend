@@ -41,7 +41,7 @@ function PaiementsTable({
           const key = header.name;
           switch (key) {
             case "select":
-              break;
+              return null;
             case "patientId":
               return (
                 <td
@@ -78,48 +78,9 @@ function PaiementsTable({
       </tr>
     );
   });
-  const columns = [
-    {
-      path: "patientId.adherenceId.nom",
-      label: "Adherence",
-    },
-    {
-      path: "patientId.nom",
-      label: "Nom",
-    },
-    {
-      path: "patientId.prenom",
-      label: "Prenom",
-    },
-    { path: "cabinetId.nom", label: "Cabinet" },
-    { path: "natureActeId.nom", label: "Acte" },
-    {
-      path: "modePaiement",
-      label: "Mode Paiement",
-    },
-    {
-      path: "datePaiement",
-      label: "Date",
-      date: (paiement) => {
-        if (
-          paiement.datePaiement !== undefined &&
-          paiement.datePaiement !== null
-        )
-          return (
-            <Moment date={paiement.datePaiement} format="DD/MM/YYYY">
-              {paiement.datePaiement}
-            </Moment>
-          );
-      },
-    },
 
-    {
-      path: "montant",
-      label: "Montant",
-    },
-  ];
   const itemActions = (
-    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""

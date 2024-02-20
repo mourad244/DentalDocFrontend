@@ -412,7 +412,7 @@ class DeviForm extends Form {
     fd.append("montant", montant);
     this.props.match !== undefined &&
     this.props.match.params.deviid &&
-    this.props.match.params.deviid != "new"
+    this.props.match.params.deviid !== "new"
       ? await axios.put(
           `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.deviid}`,
           fd,
@@ -629,7 +629,7 @@ class DeviForm extends Form {
           </button>
         </div>
         {deviId === "new" && !patientId && !rdvId && (
-          <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
+          <div className="m-2 flex w-fit rounded-sm  bg-[#83BCCD] p-2 shadow-md ">
             <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
               Chercher un patient
             </div>
@@ -707,7 +707,7 @@ class DeviForm extends Form {
                         <select
                           name="medecinId"
                           id="medecinId"
-                          className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                           onChange={this.handleChange}
                           style={{
                             height: 35,
@@ -739,7 +739,7 @@ class DeviForm extends Form {
                 <div className="m-2 flex justify-between">
                   <table className="my-0 mr-2 h-fit w-fit">
                     <thead className="h-12  text-[#4f5361]">
-                      <tr className="h-8 w-[100%] bg-[#8DC0CF] text-center">
+                      <tr className="h-8 w-[100%] bg-[#D6E1E3] text-center">
                         <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
                           Nature Acte
                         </th>
@@ -804,7 +804,7 @@ class DeviForm extends Form {
                                     <select
                                       name="codeActe"
                                       id="codeActe"
-                                      className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                      className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                                       onChange={(e) =>
                                         this.handleSelecteDActe(e, indexActe)
                                       }
@@ -913,7 +913,7 @@ class DeviForm extends Form {
                                             "dent" +
                                             indexDent
                                           }
-                                          className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                                           onChange={(e) =>
                                             this.handleSelecteDDent(
                                               e,

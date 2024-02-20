@@ -295,7 +295,7 @@ class PaiementForm extends Form {
           </button>
         </div>
         {this.props.match.params.paiementid === "new" && (
-          <div className="m-2 flex w-fit rounded-sm  bg-[#aab9d1] p-2 shadow-md ">
+          <div className="m-2 flex w-fit rounded-sm  bg-[#83BCCD] p-2 shadow-md ">
             <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
               Chercher un patient
             </div>
@@ -386,7 +386,7 @@ class PaiementForm extends Form {
                             height: 35,
                             width: 170,
                           }}
-                          className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                           onChange={(e) => this.handleModePaiementSelect(e)}
                         >
                           {["Espèce", "Chèque"].map((option) => {

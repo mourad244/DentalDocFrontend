@@ -21,7 +21,7 @@ const Input = ({
         </label>
         <input
           className={`rounded-md	border-0  pl-3 pr-3 text-xs font-bold text-[#1f2037]  ${
-            disabled ? "bg-[#b1b1b1]" : "bg-[#dddbf3] shadow-inner"
+            disabled ? "bg-[#b1b1b1]" : "bg-[#D6E1E3] shadow-inner"
           }`}
           {...rest}
           name={name}

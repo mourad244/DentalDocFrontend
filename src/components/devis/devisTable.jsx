@@ -69,7 +69,7 @@ function DevisTable({
           const key = header.name;
           switch (key) {
             case "select":
-              break;
+              return null;
             case "patientId":
               return (
                 <td
@@ -118,7 +118,7 @@ function DevisTable({
     );
   });
   const filterFunctions = (
-    <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <div className="m-2">
         <div className=" flex w-fit flex-wrap">
           <label
@@ -128,7 +128,7 @@ function DevisTable({
             Medecin
           </label>
           <select
-            className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+            className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
             id="medecinId"
             name="medecinId"
             style={{ width: 200, height: 40 }}
@@ -175,7 +175,7 @@ function DevisTable({
     </div>
   );
   const itemActions = (
-    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbReportMoney
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onAddPaiement === undefined ? "pointer-events-none opacity-50 " : ""

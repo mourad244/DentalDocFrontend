@@ -105,7 +105,7 @@ function RdvForm(props) {
       }
     };
     fetchData();
-  }, []);
+  }, [props.match.params.id]);
 
   useEffect(() => {
     const filterPatients = () => {
@@ -120,7 +120,7 @@ function RdvForm(props) {
         : setFilteredPatients(newFilteredPatients);
     };
     filterPatients();
-  }, [searchQuery]);
+  }, [searchQuery, patients]);
   useEffect(() => {
     //  set filteredActes based on selectedNatureActe
     const filterActes = () => {
@@ -138,7 +138,7 @@ function RdvForm(props) {
       setFilteredActes(newFilteredActes);
     };
     filterActes();
-  }, [selectedNatureActe]);
+  }, [selectedNatureActe, actes]);
 
   useEffect(() => {
     // Generate the start time options based on the available times and selected duration
@@ -301,7 +301,7 @@ function RdvForm(props) {
       {/* get the params.id */}
 
       {props.match.params.id === "new" && (
-        <div className="m-2 flex min-w-fit  rounded-sm bg-[#aab9d1] pb-2  pt-2 shadow-md ">
+        <div className="m-2 flex min-w-fit  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
           <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
             Chercher un patient
           </div>
@@ -337,7 +337,7 @@ function RdvForm(props) {
           <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
             <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
           </div>
-          <div className="m-2 flex flex-wrap  rounded-sm bg-[#aab9d1] pb-2  pt-2 shadow-md ">
+          <div className="m-2 flex flex-wrap  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
             <div className="mt-3">
               <Select
                 name="natureActe"
@@ -459,7 +459,7 @@ function RdvForm(props) {
                     Début
                   </label>
                   <select
-                    className=" rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                    className=" rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                     name="heuredebut"
                     onChange={(e) => {
                       const [hour, minute] = e.target.value.split("-");

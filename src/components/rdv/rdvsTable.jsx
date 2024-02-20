@@ -122,11 +122,11 @@ function RdvsTable(props) {
     onItemsSelect,
     // onViewDetails,
     selectedItems,
-    selectedItem,
+    // selectedItem,
     onDelete,
   } = props;
   const itemActions = (
-    <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#6d71be47] shadow-md ">
+    <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbDental
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onAddDevi === undefined ? "pointer-events-none opacity-50 " : ""

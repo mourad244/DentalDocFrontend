@@ -21,7 +21,7 @@ function TableHeader(props) {
 
   return (
     <thead className="h-12  text-[#4f5361]">
-      <tr className="h-8 w-[100%] bg-[#8DC0CF] text-center">
+      <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
         {props.columns.map((column) => {
           if (column.path === "select") {
             return (

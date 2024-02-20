@@ -21,7 +21,7 @@ const Select = ({
           {label}
         </label>
         <select
-          className=" w-24 rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
           {...rest}
           id={name}
           name={name}

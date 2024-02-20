@@ -98,7 +98,7 @@
   border-radius: 12px;
   padding: 3px;
   margin: 2px auto;
-  color: white;
+  color: #2f2f2f;
   font-weight: bold;
 }
 .pagination li {
@@ -115,7 +115,7 @@
   border: 1px solid white;
   border-radius: 20px;
   background-color: aliceblue;
-  color: #d6e1e3;
+  color: #2f2f2f;
 }
 
 /* 

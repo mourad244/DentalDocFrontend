@@ -60,7 +60,7 @@ const CustomeTable = ({
       {itemActions}
       <table className="my-0 w-full">
         <thead className="h-12  text-[#4f5361]">
-          <tr className="h-8 w-[100%] bg-[#8DC0CF] text-center">
+          <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
             {tableHeaders.map((header, index) => {
               return header;
             })}

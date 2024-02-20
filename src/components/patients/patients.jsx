@@ -64,7 +64,7 @@ function Patients() {
   // const [formDisplay, setFormDisplay] = useState(false);
 
   // const [showDetails, setShowDetails] = useState(false);
-  const pageSize = 15;
+  const pageSize = 5;
   const history = useHistory();
 
   useEffect(() => {

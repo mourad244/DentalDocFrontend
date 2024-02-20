@@ -220,7 +220,7 @@ class Form extends Component {
     }
     this.props.match !== undefined &&
     this.props.match.params.id &&
-    this.props.match.params.id != "new"
+    this.props.match.params.id !== "new"
       ? await axios.put(
           `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.id}`,
           fd,
@@ -436,7 +436,7 @@ class Form extends Component {
           </label>
           {/* <Calendar onChange={this.handleChange} value={data[name]} /> */}
           <input
-            className=" rounded-md	border-0 bg-[#dddbf3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+            className=" rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
             name={name}
             style={{ width: width, height: height }}
             id={name}
@@ -547,7 +547,7 @@ class Form extends Component {
   }
 
   renderList(name, label, width = 170, height = 35, widthLabel = 96) {
-    const { data, errors /* , inputItem  */ } = this.state;
+    const { data /* , errors  */ /* , inputItem  */ } = this.state;
     return (
       <div className="mt-3">
         {data[name] &&
