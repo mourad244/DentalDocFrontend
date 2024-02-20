@@ -3,7 +3,7 @@ const SearchBox = ({ value, onChange, width = 170, height = 35 }) => {
   return (
     <div className="flex items-center ">
       <input
-        className=" rounded-md bg-[#D6E1E3] bg-[#D6E1E3] pl-2 pr-3 text-xs font-medium shadow-inner focus:outline-none"
+        className=" rounded-md bg-[#D6E1E3] pl-2 pr-3 text-xs font-medium shadow-inner focus:outline-none"
         type="text"
         style={{ width: width, height: height }}
         name="query"
