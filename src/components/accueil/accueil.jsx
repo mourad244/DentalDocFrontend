@@ -692,7 +692,7 @@ function Accueil() {
         )}
       </div>
       {loading ? (
-        <div className="spinner">
+        <div className="m-auto my-4">
           <ClipLoader loading={loading} size={70} />
         </div>
       ) : (

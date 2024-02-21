@@ -83,11 +83,6 @@
   /* cursor: pointer; */
 }
 
-.spinner {
-  margin: 24px auto;
-
-  width: fit-content;
-}
 .pagination {
   display: flex;
   list-style: none;

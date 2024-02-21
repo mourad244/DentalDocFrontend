@@ -2,7 +2,7 @@ import React from "react";
 
 const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
   return (
-    <nav className="mt-2  w-fit rounded-sm bg-[#D6E1E3]">
+    <nav className="mt-2  w-fit rounded-sm bg-[#83BCCD] p-2">
       <ul className="  flex flex-wrap ">
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${

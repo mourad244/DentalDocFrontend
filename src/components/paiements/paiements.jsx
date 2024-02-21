@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, useHistory } from "react-router-dom";
+import { /*  withRouter, */ useHistory } from "react-router-dom";
 
 import { getPaiements, deletePaiement } from "../../services/paiementService";
 
@@ -43,7 +43,7 @@ function Paiements() {
 
   const [paiements, setPaiements] = useState([]);
   const [filteredPaiements, setFilteredPaiements] = useState([]);
-  const [totalFilteredPaiements, setTotalFilteredPaiements] = useState([]);
+  // const [totalFilteredPaiements, setTotalFilteredPaiements] = useState([]);
   const pageSize = 20;
   const history = useHistory();
   const fields = [
@@ -99,10 +99,10 @@ function Paiements() {
         default:
           break;
       }
-      const totalFilteredPaiements = filtered;
+      // const totalFilteredPaiements = filtered;
       const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
       const endOffset = itemOffset + pageSize;
-      setTotalFilteredPaiements(totalFilteredPaiements);
+      // setTotalFilteredPaiements(totalFilteredPaiements);
       setFilteredPaiements(sorted.slice(itemOffset, endOffset));
       setCurrentPage(Math.ceil(sorted.length / pageSize));
     };
@@ -129,7 +129,9 @@ function Paiements() {
     setSelectedPaiement(null);
     setSelectedPaiements([]);
     try {
-      await Promise.all(items.map((item) => deletePaiement(item._id)));
+      await Promise.all(
+        items.map(async (item) => await deletePaiement(item._id)),
+      );
       toast.success("Paiement(s) supprimé(s)");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
@@ -323,7 +325,7 @@ function Paiements() {
         </div>
       </div> */}
       {loading ? (
-        <div className="spinner">
+        <div className="m-auto my-4">
           <ClipLoader loading={loading} size={70} />
         </div>
       ) : (

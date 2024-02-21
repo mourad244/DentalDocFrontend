@@ -180,6 +180,7 @@ function DevisTable({
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onAddPaiement === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onAddPaiement}
         title="Ajouter un paiement"
       />
@@ -188,6 +189,7 @@ function DevisTable({
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onEdit}
         title="Modifier"
       />
@@ -199,6 +201,7 @@ function DevisTable({
         className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
           onDelete === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#FF4D4D"
         onClick={() => {
           window.confirm("Confirmer la suppression") && onDelete(selectedItems);
         }}
@@ -208,6 +211,7 @@ function DevisTable({
         className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
           onPrint === undefined ? "pointer-events-none opacity-50" : ""
         }`}
+        color="#474a52"
         title="Imprimer"
         onClick={onPrint}
       />

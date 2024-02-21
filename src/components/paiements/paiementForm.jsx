@@ -12,10 +12,10 @@ import PaiementActesTable from "./paiementActesTable";
 import PaiementEffectuesTable from "./paiementEffectuesTable";
 
 import Joi from "joi-browser";
-import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
 
 import { IoChevronBackCircleSharp } from "react-icons/io5";
+import SearchPatient from "../../common/searchPatient";
 // import RecuPaiement from "../../documents/recuPaiement";
 
 class PaiementForm extends Form {
@@ -31,8 +31,6 @@ class PaiementForm extends Form {
     errors: {},
     patients: [],
     selectedPatient: {},
-    filteredPatients: [],
-    searchQuery: "",
     acteDentaires: [],
     natureActes: [],
     sortColumn: { path: "date", order: "desc" },
@@ -41,6 +39,7 @@ class PaiementForm extends Form {
     actesEffectues: [],
     nombreActes: 1,
     loading: false,
+    loadingPatient: false,
   };
 
   schema = {
@@ -60,7 +59,6 @@ class PaiementForm extends Form {
     console.log("paiementId", paiementId);
     console.log("patientId", patientId);
     if (paiementId === "new" || paiementId === undefined) {
-      const { data: patients } = await getPatients();
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();
       if (patientId) {
@@ -98,14 +96,12 @@ class PaiementForm extends Form {
           selectedPatient: patient,
           devis: newSelectedDevis,
           paiements: newSelectedPaiements,
-          // patients,
           natureActes,
           acteDentaires,
           loaded: true,
         });
       }
       this.setState({
-        patients,
         natureActes,
         acteDentaires,
       });
@@ -124,25 +120,31 @@ class PaiementForm extends Form {
   }
 
   onSelectPatient = async (patient) => {
+    this.setState({
+      loadingPatient: true,
+    });
     let data = { ...this.state.data };
+    const { data: fetchedPatient } = await getPatient(patient._id);
     let newSelectedPaiements = [];
     let newSelectedDevis = [];
 
     if (
-      patient.deviIds !== undefined &&
-      patient.deviIds !== null &&
-      patient.deviIds.length !== 0
+      fetchedPatient.deviIds !== undefined &&
+      fetchedPatient.deviIds !== null &&
+      fetchedPatient.deviIds.length !== 0
     ) {
-      const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
+      const promises = fetchedPatient.deviIds.map((item) =>
+        getDevi(item.deviId._id),
+      );
       const devisResults = await Promise.all(promises);
       newSelectedDevis = devisResults.map(({ data: devi }) => devi);
     }
     if (
-      patient.paiementIds !== undefined &&
-      patient.paiementIds !== null &&
-      patient.paiementIds.length !== 0
+      fetchedPatient.paiementIds !== undefined &&
+      fetchedPatient.paiementIds !== null &&
+      fetchedPatient.paiementIds.length !== 0
     ) {
-      const promises = patient.paiementIds.map((item) =>
+      const promises = fetchedPatient.paiementIds.map((item) =>
         getPaiement(item.paiementId._id),
       );
       const paiementsResults = await Promise.all(promises);
@@ -150,13 +152,13 @@ class PaiementForm extends Form {
         ({ data: paiement }) => paiement,
       );
     }
-    data.patientId = patient._id;
+    data.patientId = fetchedPatient._id;
     this.setState({
       data,
-      selectedPatient: patient,
+      selectedPatient: fetchedPatient,
       devis: newSelectedDevis,
       paiements: newSelectedPaiements,
-      searchQuery: "",
+      loadingPatient: false,
     });
   };
   async componentDidMount() {
@@ -165,21 +167,7 @@ class PaiementForm extends Form {
 
   async componentDidUpdate(prevProps, prevState) {
     // if searchQuery change filteredPatients
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      const newFilteredPatients = this.state.patients.filter((patient) => {
-        return (
-          patient.nom
-            .toLowerCase()
-            .includes(this.state.searchQuery.toLowerCase()) ||
-          patient.prenom
-            .toLowerCase()
-            .includes(this.state.searchQuery.toLowerCase())
-        );
-      });
-      this.state.searchQuery === ""
-        ? this.setState({ filteredPatients: [] })
-        : this.setState({ filteredPatients: newFilteredPatients });
-    }
+
     if (prevState.devis !== this.state.devis) {
       let actes = [];
       const totalPaiements = this.state.selectedPatient.totalPaiements;
@@ -268,14 +256,15 @@ class PaiementForm extends Form {
       // data,
       selectedPatient,
       loading,
-      searchQuery,
-      filteredPatients,
+      loadingPatient,
       actesEffectues,
       paiements,
       // devis,
     } = this.state;
+    const paiementId = this.props.match.params.paiementid;
+    const patientId = this.props.match.params.patientid;
     return loading ? (
-      <div className="spinner">
+      <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
       </div>
     ) : (
@@ -294,119 +283,97 @@ class PaiementForm extends Form {
             Retour à la Liste
           </button>
         </div>
-        {this.props.match.params.paiementid === "new" && (
-          <div className="m-2 flex w-fit rounded-sm  bg-[#83BCCD] p-2 shadow-md ">
-            <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
-              Chercher un patient
-            </div>
-            <div className="flex w-fit items-start ">
-              <SearchBox
-                value={searchQuery}
-                onChange={(e) => {
-                  this.setState({
-                    searchQuery: e,
-                  });
-                }}
-              />
-              <div className="flex flex-wrap">
-                {filteredPatients.map((patient) => (
-                  <div
-                    className=" w-fit cursor-pointer  items-center justify-between pl-2  hover:bg-[#e6e2d613]"
-                    key={patient._id}
-                    onClick={() => {
-                      this.onSelectPatient(patient);
-                    }}
-                  >
-                    <p className=" mb-1 rounded-md bg-slate-400 p-2 text-xs font-bold leading-4">
-                      {`${patient.nom} ${patient.prenom}`}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        {paiementId === "new" && (
+          <SearchPatient onPatientSelect={this.onSelectPatient} />
         )}
-        {Object.keys(selectedPatient).length !== 0 ? (
-          <>
-            <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
-              <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
-            </div>
-            {(this.props.match.params.paiementid === "new" ||
-              this.props.match.params.patientid) && (
-              <div className="flex flex-wrap">
-                <PaiementActesTable
-                  actesEffectuees={actesEffectues}
-                  onSort={this.handleSort}
-                  sortColumn={this.state.sortColumn}
-                  totalDevis={selectedPatient.totalDevis}
-                  totalPaiements={selectedPatient.totalPaiements}
-                />
-
-                <PaiementEffectuesTable
-                  paiements={paiements}
-                  onSort={this.handleSort}
-                  sortColumn={this.state.sortColumn}
-                  totalPaiements={selectedPatient.totalPaiements}
-                />
+        {loadingPatient ? (
+          <div className="m-auto my-4">
+            <ClipLoader loading={loadingPatient} size={70} />
+          </div>
+        ) : (
+          Object.keys(selectedPatient).length !== 0 && (
+            <>
+              <div className="m-2  rounded-sm bg-[#4F6874] p-2">
+                <p className="text-center text-base font-bold text-white">{`${
+                  selectedPatient.nom && selectedPatient.nom.toUpperCase()
+                } ${
+                  selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
+                }`}</p>
               </div>
-            )}
-            <div className="m-2 bg-[#a2bdc5]">
-              <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
-                Paiement
-              </p>
-              <form onSubmit={this.handleSubmit}>
+              {(paiementId === "new" || patientId) && (
                 <div className="flex flex-wrap">
-                  <div className="mt-3">
-                    {this.renderDate("date", "Date", 170, 35, 140)}
-                  </div>
-                  <div className="mt-3">
-                    {this.renderInput(
-                      "montant",
-                      "Montant",
-                      170,
-                      35,
-                      "number",
-                      140,
-                    )}
-                  </div>
-                  <div className="mt-3">
-                    <div className=" flex w-fit flex-wrap">
-                      <label
-                        className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
-                        htmlFor={"modePaiement"}
-                        style={{ width: 140 }}
-                      >
-                        Mode Paiement
-                      </label>
-                      <div className="flex w-fit flex-wrap">
-                        <select
-                          id={"modePaiement"}
-                          name="mode"
-                          style={{
-                            height: 35,
-                            width: 170,
-                          }}
-                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                          onChange={(e) => this.handleModePaiementSelect(e)}
+                  <PaiementActesTable
+                    actesEffectuees={actesEffectues}
+                    onSort={this.handleSort}
+                    sortColumn={this.state.sortColumn}
+                    totalDevis={selectedPatient.totalDevis}
+                    totalPaiements={selectedPatient.totalPaiements}
+                  />
+
+                  <PaiementEffectuesTable
+                    paiements={paiements}
+                    onSort={this.handleSort}
+                    sortColumn={this.state.sortColumn}
+                    totalPaiements={selectedPatient.totalPaiements}
+                  />
+                </div>
+              )}
+              <div className="m-2 bg-[#a2bdc5]">
+                <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
+                  Paiement
+                </p>
+                <form onSubmit={this.handleSubmit}>
+                  <div className="flex flex-wrap">
+                    <div className="mt-3">
+                      {this.renderDate("date", "Date", 170, 35, 140)}
+                    </div>
+                    <div className="mt-3">
+                      {this.renderInput(
+                        "montant",
+                        "Montant",
+                        170,
+                        35,
+                        "number",
+                        140,
+                      )}
+                    </div>
+                    <div className="mt-3">
+                      <div className=" flex w-fit flex-wrap">
+                        <label
+                          className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
+                          htmlFor={"modePaiement"}
+                          style={{ width: 140 }}
                         >
-                          {["Espèce", "Chèque"].map((option) => {
-                            return (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            );
-                          })}
-                        </select>
+                          Mode Paiement
+                        </label>
+                        <div className="flex w-fit flex-wrap">
+                          <select
+                            id={"modePaiement"}
+                            name="mode"
+                            style={{
+                              height: 35,
+                              width: 170,
+                            }}
+                            className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                            onChange={(e) => this.handleModePaiementSelect(e)}
+                          >
+                            {["Espèce", "Chèque"].map((option) => {
+                              return (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="m-3">{this.renderButton("Sauvegarder")}</div>
-              </form>
-            </div>
-          </>
-        ) : (
-          ""
+                  <div className="m-3">{this.renderButton("Sauvegarder")}</div>
+                </form>
+              </div>
+            </>
+          )
         )}
 
         {/* {data.patientId ? (

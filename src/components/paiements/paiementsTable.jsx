@@ -86,6 +86,7 @@ function PaiementsTable({
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
         onClick={onEdit}
+        color="#474a52"
         title="Modifier"
       />
       {/*  <GrFormView
@@ -99,12 +100,14 @@ function PaiementsTable({
         onClick={() => {
           window.confirm("Confirmer la suppression") && onDelete(selectedItems);
         }}
+        color="#FF4D4D"
         title="Supprimer"
       />
       <FaPrint
         className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
           onPrint === undefined ? "pointer-events-none opacity-50" : ""
         }`}
+        color="#474a52"
         title="Imprimer"
         onClick={onPrint}
       />

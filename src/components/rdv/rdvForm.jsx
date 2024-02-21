@@ -17,6 +17,7 @@ import {
 import Select from "../../common/select";
 import Input from "../../common/input";
 import Checkbox from "../../common/checkbox";
+import SearchPatient from "../../common/searchPatient";
 
 function RdvForm(props) {
   const [actes, setActes] = useState([]);
@@ -41,9 +42,9 @@ function RdvForm(props) {
   const [availableTimes, setAvailableTimes] = useState([]);
   const [startTimeOptions, setStartTimeOptions] = useState([]);
   const [filteredActes, setFilteredActes] = useState([]);
-  const [filteredPatients, setFilteredPatients] = useState([]);
+  // const [filteredPatients, setFilteredPatients] = useState([]);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedRdvDate, setSelectedRdvDate] = useState("");
   const isRdvModified = props.match.params.id !== "new";
@@ -107,20 +108,20 @@ function RdvForm(props) {
     fetchData();
   }, [props.match.params.id]);
 
-  useEffect(() => {
-    const filterPatients = () => {
-      const newFilteredPatients = patients.filter((patient) => {
-        return (
-          patient.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          patient.prenom.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      });
-      searchQuery === ""
-        ? setFilteredPatients([])
-        : setFilteredPatients(newFilteredPatients);
-    };
-    filterPatients();
-  }, [searchQuery, patients]);
+  // useEffect(() => {
+  //   const filterPatients = () => {
+  //     const newFilteredPatients = patients.filter((patient) => {
+  //       return (
+  //         patient.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //         patient.prenom.toLowerCase().includes(searchQuery.toLowerCase())
+  //       );
+  //     });
+  //     searchQuery === ""
+  //       ? setFilteredPatients([])
+  //       : setFilteredPatients(newFilteredPatients);
+  //   };
+  //   filterPatients();
+  // }, [searchQuery, patients]);
   useEffect(() => {
     //  set filteredActes based on selectedNatureActe
     const filterActes = () => {
@@ -301,41 +302,20 @@ function RdvForm(props) {
       {/* get the params.id */}
 
       {props.match.params.id === "new" && (
-        <div className="m-2 flex min-w-fit  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
-          <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
-            Chercher un patient
-          </div>
-          <div className="flex w-fit items-start ">
-            <SearchBox
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e);
-              }}
-            />
-            <div className="flex flex-wrap">
-              {filteredPatients.map((patient) => (
-                <div
-                  className=" w-fit cursor-pointer  items-center justify-between pl-2  hover:bg-[#e6e2d613]"
-                  key={patient._id}
-                  onClick={() => {
-                    setSelectedPatient(patient);
-                    setFilteredPatients([]);
-                    setSearchQuery("");
-                  }}
-                >
-                  <p className=" mb-1 rounded-md bg-slate-400 p-2 text-xs font-bold leading-4">
-                    {`${patient.nom} ${patient.prenom}`}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <SearchPatient
+          onPatientSelect={(patient) => {
+            setSelectedPatient(patient);
+          }}
+        />
       )}
       {Object.keys(selectedPatient).length !== 0 && (
         <>
-          <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
-            <p className="text-xs font-bold">{`Patient: ${selectedPatient.nom} ${selectedPatient.prenom}`}</p>
+          <div className="m-2  rounded-sm bg-[#4F6874] p-2">
+            <p className="text-center text-base font-bold text-white">{`${
+              selectedPatient.nom && selectedPatient.nom.toUpperCase()
+            } ${
+              selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
+            }`}</p>
           </div>
           <div className="m-2 flex flex-wrap  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
             <div className="mt-3">

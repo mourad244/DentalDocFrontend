@@ -131,6 +131,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onAddDevi === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onAddDevi}
         title="Ajouter un devis"
       />
@@ -139,6 +140,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onEdit}
         title="Modifier"
       />
@@ -146,6 +148,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onPostpone === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onPostpone}
         title="Reporter"
       />
@@ -154,6 +157,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onCancel === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#474a52"
         onClick={onCancel}
         title="Annuler"
       />
@@ -162,6 +166,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
           onDelete === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
+        color="#FF4D4D"
         onClick={() => {
           window.confirm("Confirmer la suppression") && onDelete(selectedItems);
         }}

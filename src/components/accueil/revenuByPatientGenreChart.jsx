@@ -145,7 +145,7 @@ function RevenuByPatientGenreChart({ data }) {
           .style("fill", "white");
       });
     }
-  }, [data]);
+  }, [data, total]);
 
   return (
     <div className="w-fit">

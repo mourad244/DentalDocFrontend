@@ -1,7 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import { getDents } from "../../services/dentService";
-import { getPatients, getPatient } from "../../services/patientService";
+import { getPatient } from "../../services/patientService";
 import { getMedecins } from "../../services/medecinService";
 import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
@@ -10,7 +10,6 @@ import { getRdv } from "../../services/rdvService";
 import Form from "../../common/form";
 import Input from "../../common/input";
 import Select from "../../common/select";
-import SearchBox from "../../common/searchBox";
 import ActesEffectuesTable from "./actesEffectuesTable";
 import { jsonToFormData } from "../../utils/jsonToFormData";
 
@@ -21,6 +20,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
+import SearchPatient from "../../common/searchPatient";
 
 class DeviForm extends Form {
   state = {
@@ -36,9 +36,6 @@ class DeviForm extends Form {
     },
     errors: {},
     medecins: [],
-    patients: [],
-    filteredPatients: [],
-    searchQuery: "",
     acteDentaires: [],
     natureActes: [],
     dents: [],
@@ -54,6 +51,7 @@ class DeviForm extends Form {
     filteredActeDentaires: [],
     nombreDentsPerActe: [],
     loading: false,
+    loadingPatient: false,
     form: "devis",
   };
   schema = {
@@ -131,13 +129,11 @@ class DeviForm extends Form {
           });
         }
       } else {
-        const { data: patients } = await getPatients();
         this.setState({
           dents,
           medecins,
           acteDentaires,
           natureActes,
-          patients,
         });
       }
     } else if (deviId) {
@@ -201,35 +197,43 @@ class DeviForm extends Form {
     this.setState({ loading: false });
   }
   onSelectPatient = async (patient) => {
+    this.setState({
+      loadingPatient: true,
+    });
     let data = { ...this.state.data };
+    const { data: fetchedPatient } = await getPatient(patient._id);
     if (
-      patient.deviIds !== undefined &&
-      patient.deviIds !== null &&
-      patient.deviIds.length !== 0
+      fetchedPatient.deviIds !== undefined &&
+      fetchedPatient.deviIds !== null &&
+      fetchedPatient.deviIds.length !== 0
     ) {
       let newSelecteDDevis = [];
-      const promises = patient.deviIds.map((item) => getDevi(item.deviId._id));
+      const promises = fetchedPatient.deviIds.map((item) =>
+        getDevi(item.deviId._id),
+      );
 
       const devisResults = await Promise.all(promises);
       newSelecteDDevis = devisResults.map(({ data: devi }) => devi);
       return this.setState({
         devis: [...newSelecteDDevis],
-        selecteDPatient: patient,
+        selecteDPatient: fetchedPatient,
         searchQuery: "",
         data: {
           ...data,
-          patientId: patient._id,
+          patientId: fetchedPatient._id,
         },
+        loadingPatient: false,
       });
     } else
       this.setState({
-        selecteDPatient: patient,
+        selecteDPatient: fetchedPatient,
         searchQuery: "",
         data: {
           ...data,
-          patientId: patient._id,
+          patientId: fetchedPatient._id,
         },
         devis: [],
+        loadingPatient: false,
       });
   };
 
@@ -239,21 +243,7 @@ class DeviForm extends Form {
 
   async componentDidUpdate(prevProps, prevState) {
     // if searchQuery change filteredPatients
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      const newFilteredPatients = this.state.patients.filter((patient) => {
-        return (
-          patient.nom
-            .toLowerCase()
-            .includes(this.state.searchQuery.toLowerCase()) ||
-          patient.prenom
-            .toLowerCase()
-            .includes(this.state.searchQuery.toLowerCase())
-        );
-      });
-      this.state.searchQuery === ""
-        ? this.setState({ filteredPatients: [] })
-        : this.setState({ filteredPatients: newFilteredPatients });
-    }
+
     if (prevState.devis !== this.state.devis) {
       let actes = [];
       this.state.devis.map((itemDevi) => {
@@ -588,10 +578,9 @@ class DeviForm extends Form {
       colors,
       selecteDActes,
       dents,
-      filteredPatients,
-      searchQuery,
       selecteDPatient,
       loading,
+      loadingPatient,
       actesEffectues,
       data,
       devis,
@@ -609,7 +598,7 @@ class DeviForm extends Form {
       return "";
     });
     return loading ? (
-      <div className="spinner">
+      <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
       </div>
     ) : (
@@ -629,361 +618,344 @@ class DeviForm extends Form {
           </button>
         </div>
         {deviId === "new" && !patientId && !rdvId && (
-          <div className="m-2 flex w-fit rounded-sm  bg-[#83BCCD] p-2 shadow-md ">
-            <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
-              Chercher un patient
-            </div>
-            <div className="flex w-fit items-start ">
-              <SearchBox
-                value={searchQuery}
-                onChange={(e) => {
-                  this.setState({
-                    searchQuery: e,
-                  });
-                }}
-              />
-              <div className="flex flex-wrap">
-                {filteredPatients.map((patient) => (
-                  <div
-                    className=" w-fit cursor-pointer  items-center justify-between pl-2  hover:bg-[#e6e2d613]"
-                    key={patient._id}
-                    onClick={() => {
-                      this.onSelectPatient(patient);
-                    }}
-                  >
-                    <p className=" mb-1 rounded-md bg-slate-400 p-2 text-xs font-bold leading-4">
-                      {`${patient.nom} ${patient.prenom}`}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <SearchPatient onPatientSelect={this.onSelectPatient} />
         )}
-        {Object.keys(selecteDPatient).length !== 0 && (
-          <>
-            <div className="m-2 w-fit rounded-sm bg-slate-400 p-2">
-              <p className="text-xs font-bold">{`Patient: ${selecteDPatient.nom} ${selecteDPatient.prenom}`}</p>
-            </div>
-            {(this.props.match.params.deviid === "new" ||
-              this.props.match.params.patientid) &&
-              devis.length !== 0 && (
-                <ActesEffectuesTable
-                  actesEffectuees={actesEffectues}
-                  onSort={this.handleSort}
-                  sortColumn={this.state.sortColumn}
-                />
-              )}
-            <div className="mt-2 bg-[#a2bdc5]">
-              <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
-                Actes à éffectuer
-              </p>
-              <form /* onSubmit={this.handleSubmit} */>
-                <div className="flex flex-wrap">
-                  <div className="mt-3">
-                    <Input
-                      type="number"
-                      name="nombreActe"
-                      value={nombreActes}
-                      label="Nombre des actes"
-                      onChange={this.defineActeLines}
-                      width={170}
-                      height={35}
-                      widthLabel={140}
-                    />
-                  </div>
-                  <div className="mt-3">
-                    {this.renderDate("dateDevi", "Date", 170, 35, 140)}
-                  </div>
-                  <div className="mt-3">
-                    <div className=" flex w-fit flex-wrap">
-                      <label
-                        className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
-                        style={{ width: 140 }}
-                      >
-                        Medecin
-                      </label>
-                      <div className="flex w-fit flex-wrap">
-                        <select
-                          name="medecinId"
-                          id="medecinId"
-                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                          onChange={this.handleChange}
-                          style={{
-                            height: 35,
-                            width: 170,
-                          }}
-                          value={this.state.data.medecinId}
+
+        {loadingPatient ? (
+          <div className="m-auto my-4">
+            <ClipLoader loading={loadingPatient} size={70} />
+          </div>
+        ) : (
+          Object.keys(selecteDPatient).length !== 0 && (
+            <>
+              <div className="m-2  rounded-sm bg-[#4F6874] p-2">
+                <p className="text-center text-base font-bold text-white">{`${
+                  selecteDPatient.nom && selecteDPatient.nom.toUpperCase()
+                } ${
+                  selecteDPatient.prenom && selecteDPatient.prenom.toUpperCase()
+                }`}</p>
+              </div>
+              {(this.props.match.params.deviid === "new" ||
+                this.props.match.params.patientid) &&
+                devis.length !== 0 && (
+                  <ActesEffectuesTable
+                    actesEffectuees={actesEffectues}
+                    onSort={this.handleSort}
+                    sortColumn={this.state.sortColumn}
+                  />
+                )}
+              <div className="mt-2 bg-[#a2bdc5]">
+                <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
+                  Actes à éffectuer
+                </p>
+                <form /* onSubmit={this.handleSubmit} */>
+                  <div className="flex flex-wrap">
+                    <div className="mt-3">
+                      <Input
+                        type="number"
+                        name="nombreActe"
+                        value={nombreActes}
+                        label="Nombre des actes"
+                        onChange={this.defineActeLines}
+                        width={170}
+                        height={35}
+                        widthLabel={140}
+                      />
+                    </div>
+                    <div className="mt-3">
+                      {this.renderDate("dateDevi", "Date", 170, 35, 140)}
+                    </div>
+                    <div className="mt-3">
+                      <div className=" flex w-fit flex-wrap">
+                        <label
+                          className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
+                          style={{ width: 140 }}
                         >
-                          <option value="" />
-                          {medecins.map((option) => {
-                            return (
-                              <option key={option._id} value={option._id}>
-                                {option.nom} {option.prenom}
-                              </option>
-                            );
-                          })}
-                        </select>
+                          Medecin
+                        </label>
+                        <div className="flex w-fit flex-wrap">
+                          <select
+                            name="medecinId"
+                            id="medecinId"
+                            className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                            onChange={this.handleChange}
+                            style={{
+                              height: 35,
+                              width: 170,
+                            }}
+                            value={this.state.data.medecinId}
+                          >
+                            <option value="" />
+                            {medecins.map((option) => {
+                              return (
+                                <option key={option._id} value={option._id}>
+                                  {option.nom} {option.prenom}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
                       </div>
                     </div>
+                    <div className="mt-3 w-full  ">
+                      {this.renderUpload("image", "Photo radio", "file", 140)}
+                    </div>
+
+                    <div className="  mt-3 flex w-full flex-wrap">
+                      {data.images.length !== 0 &&
+                        this.renderImage("images", "Images", 200)}
+                    </div>
                   </div>
-                  <div className="mt-3 w-full  ">
-                    {this.renderUpload("image", "Photo")}
-                  </div>
+                  <div className="m-2 flex justify-between">
+                    <table className="my-0 mr-2 h-fit w-fit">
+                      <thead className="h-12  text-[#4f5361]">
+                        <tr className="h-8 w-[100%] bg-[#D6E1E3] text-center">
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Nature Acte
+                          </th>
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Code Acte
+                          </th>
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Description
+                          </th>
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Prix
+                          </th>
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Nombre Dent
+                          </th>
+                          <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                            Dent
+                          </th>
+                        </tr>
+                      </thead>
 
-                  <div className="  mt-3 flex w-full flex-wrap">
-                    {data.images.length !== 0 &&
-                      this.renderImage("images", "Images", 200)}
-                  </div>
-                </div>
-                <div className="m-2 flex justify-between">
-                  <table className="my-0 mr-2 h-fit w-fit">
-                    <thead className="h-12  text-[#4f5361]">
-                      <tr className="h-8 w-[100%] bg-[#D6E1E3] text-center">
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Nature Acte
-                        </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Code Acte
-                        </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Description
-                        </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Prix
-                        </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Nombre Dent
-                        </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                          Dent
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {_.times(nombreActes, (indexActe) => {
-                        return (
-                          <tr
-                            key={"acte" + indexActe}
-                            className="h-12 bg-[#D6E1E3] text-center"
-                            style={
-                              selecteDNatureActes[indexActe]
-                                ? {
-                                    background:
-                                      colors[
-                                        selecteDNatureActes[indexActe].nom
-                                      ],
-                                  }
-                                : {}
-                            }
-                          >
-                            <td>
-                              <div className="m-2 flex justify-center">
-                                <Select
-                                  name="natureActe"
-                                  options={natureActes}
-                                  onChange={(e) =>
-                                    this.handleSelecteDNature(e, indexActe)
-                                  }
-                                  width={170}
-                                  height={35}
-                                  value={
-                                    selecteDNatureActes[indexActe]
-                                      ? selecteDNatureActes[indexActe]._id
-                                      : ""
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td>
-                              {filteredActeDentaires[indexActe] &&
-                              filteredActeDentaires[indexActe].length !== 0 ? (
-                                <div className="m-2 flex justify-center">
-                                  <div className="flex w-fit flex-wrap ">
-                                    <select
-                                      name="codeActe"
-                                      id="codeActe"
-                                      className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                                      onChange={(e) =>
-                                        this.handleSelecteDActe(e, indexActe)
-                                      }
-                                      style={{
-                                        height: 35,
-                                      }}
-                                      value={
-                                        selecteDActes[indexActe]
-                                          ? selecteDActes[indexActe]._id
-                                          : ""
-                                      }
-                                    >
-                                      <option value="" />
-                                      {filteredActeDentaires[indexActe].map(
-                                        (option) => {
-                                          return (
-                                            <option
-                                              key={indexActe + option._id}
-                                              value={option._id}
-                                            >
-                                              {option.code}
-                                            </option>
-                                          );
-                                        },
-                                      )}
-                                    </select>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div></div>
-                              )}
-                            </td>
-                            <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                              {selecteDActes[indexActe]
-                                ? selecteDActes[indexActe].nom
-                                : ""}
-                            </td>
-
-                            <td>
-                              {selecteDActes[indexActe] ? (
-                                <div className="m-2 flex justify-center">
-                                  <Input
-                                    type="number"
-                                    name="prix"
-                                    value={
-                                      data.acteEffectues &&
-                                      data.acteEffectues[indexActe] &&
-                                      data.acteEffectues[indexActe].prix
-                                        ? data.acteEffectues[indexActe].prix
-                                        : (selecteDActes[indexActe] &&
-                                            selecteDActes[indexActe].prix) ||
-                                          0
+                      <tbody>
+                        {_.times(nombreActes, (indexActe) => {
+                          return (
+                            <tr
+                              key={"acte" + indexActe}
+                              className="h-12 bg-[#D6E1E3] text-center"
+                              style={
+                                selecteDNatureActes[indexActe]
+                                  ? {
+                                      background:
+                                        colors[
+                                          selecteDNatureActes[indexActe].nom
+                                        ],
                                     }
-                                    onChange={(e) =>
-                                      this.definePrixActe(e, indexActe)
-                                    }
-                                    width={80}
-                                    height={35}
-                                  />
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                            </td>
-                            <td>
-                              {selecteDActes[indexActe] ? (
-                                <div className="m-2 flex justify-center">
-                                  <Input
-                                    type="number"
-                                    name="nombreDent"
-                                    value={
-                                      nombreDentsPerActe[indexActe]
-                                        ? nombreDentsPerActe[indexActe]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      this.defineNombreDentsPerActe(
-                                        e,
-                                        indexActe,
-                                      )
-                                    }
-                                    width={60}
-                                    height={35}
-                                  />
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                            </td>
-
-                            {selecteDActes[indexActe] ? (
+                                  : {}
+                              }
+                            >
                               <td>
-                                {_.times(
-                                  nombreDentsPerActe[indexActe],
-                                  (indexDent) => {
-                                    return (
-                                      <div
-                                        className="m-2 flex w-fit flex-wrap"
-                                        key={indexActe + indexDent}
+                                <div className="m-2 flex justify-center">
+                                  <Select
+                                    name="natureActe"
+                                    options={natureActes}
+                                    onChange={(e) =>
+                                      this.handleSelecteDNature(e, indexActe)
+                                    }
+                                    width={170}
+                                    height={35}
+                                    value={
+                                      selecteDNatureActes[indexActe]
+                                        ? selecteDNatureActes[indexActe]._id
+                                        : ""
+                                    }
+                                  />
+                                </div>
+                              </td>
+                              <td>
+                                {filteredActeDentaires[indexActe] &&
+                                filteredActeDentaires[indexActe].length !==
+                                  0 ? (
+                                  <div className="m-2 flex justify-center">
+                                    <div className="flex w-fit flex-wrap ">
+                                      <select
+                                        name="codeActe"
+                                        id="codeActe"
+                                        className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                        onChange={(e) =>
+                                          this.handleSelecteDActe(e, indexActe)
+                                        }
+                                        style={{
+                                          height: 35,
+                                        }}
+                                        value={
+                                          selecteDActes[indexActe]
+                                            ? selecteDActes[indexActe]._id
+                                            : ""
+                                        }
                                       >
-                                        <select
-                                          name="dent"
-                                          key={
-                                            "acte" +
-                                            indexActe +
-                                            "dent" +
-                                            indexDent
-                                          }
-                                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                                          onChange={(e) =>
-                                            this.handleSelecteDDent(
-                                              e,
-                                              indexActe,
-                                              indexDent,
-                                            )
-                                          }
-                                          style={{ height: 35 }}
-                                          value={
-                                            selecteDDents[indexActe]
-                                              ? selecteDDents[indexActe][
-                                                  indexDent
-                                                ]
-                                                ? selecteDDents[indexActe][
-                                                    indexDent
-                                                  ]._id
-                                                : ""
-                                              : ""
-                                          }
-                                        >
-                                          <option value="" />
-                                          {dents.map((option) => {
+                                        <option value="" />
+                                        {filteredActeDentaires[indexActe].map(
+                                          (option) => {
                                             return (
                                               <option
-                                                key={
-                                                  "acte" +
-                                                  indexActe +
-                                                  "dent" +
-                                                  indexDent +
-                                                  option._id
-                                                }
+                                                key={indexActe + option._id}
                                                 value={option._id}
                                               >
-                                                {option.numeroFDI}
+                                                {option.code}
                                               </option>
                                             );
-                                          })}
-                                        </select>
-                                      </div>
-                                    );
-                                  },
+                                          },
+                                        )}
+                                      </select>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div></div>
                                 )}
                               </td>
-                            ) : (
-                              <td></td>
-                            )}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  <SchemaDent className="min-w-fit" dents={colorDents} />
-                </div>
-                {
-                  <div className="mr-6 mt-3 flex w-full justify-end">
-                    <button
-                      onClick={this.handleSubmit}
-                      className={
-                        !this.validate()
-                          ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
-                          : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
-                      }
-                    >
-                      Sauvegarder
-                    </button>
+                              <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                                {selecteDActes[indexActe]
+                                  ? selecteDActes[indexActe].nom
+                                  : ""}
+                              </td>
+
+                              <td>
+                                {selecteDActes[indexActe] ? (
+                                  <div className="m-2 flex justify-center">
+                                    <Input
+                                      type="number"
+                                      name="prix"
+                                      value={
+                                        data.acteEffectues &&
+                                        data.acteEffectues[indexActe] &&
+                                        data.acteEffectues[indexActe].prix
+                                          ? data.acteEffectues[indexActe].prix
+                                          : (selecteDActes[indexActe] &&
+                                              selecteDActes[indexActe].prix) ||
+                                            0
+                                      }
+                                      onChange={(e) =>
+                                        this.definePrixActe(e, indexActe)
+                                      }
+                                      width={80}
+                                      height={35}
+                                    />
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                              </td>
+                              <td>
+                                {selecteDActes[indexActe] ? (
+                                  <div className="m-2 flex justify-center">
+                                    <Input
+                                      type="number"
+                                      name="nombreDent"
+                                      value={
+                                        nombreDentsPerActe[indexActe]
+                                          ? nombreDentsPerActe[indexActe]
+                                          : 0
+                                      }
+                                      onChange={(e) =>
+                                        this.defineNombreDentsPerActe(
+                                          e,
+                                          indexActe,
+                                        )
+                                      }
+                                      width={60}
+                                      height={35}
+                                    />
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                              </td>
+
+                              {selecteDActes[indexActe] ? (
+                                <td>
+                                  {_.times(
+                                    nombreDentsPerActe[indexActe],
+                                    (indexDent) => {
+                                      return (
+                                        <div
+                                          className="m-2 flex w-fit flex-wrap"
+                                          key={indexActe + indexDent}
+                                        >
+                                          <select
+                                            name="dent"
+                                            key={
+                                              "acte" +
+                                              indexActe +
+                                              "dent" +
+                                              indexDent
+                                            }
+                                            className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                            onChange={(e) =>
+                                              this.handleSelecteDDent(
+                                                e,
+                                                indexActe,
+                                                indexDent,
+                                              )
+                                            }
+                                            style={{ height: 35 }}
+                                            value={
+                                              selecteDDents[indexActe]
+                                                ? selecteDDents[indexActe][
+                                                    indexDent
+                                                  ]
+                                                  ? selecteDDents[indexActe][
+                                                      indexDent
+                                                    ]._id
+                                                  : ""
+                                                : ""
+                                            }
+                                          >
+                                            <option value="" />
+                                            {dents.map((option) => {
+                                              return (
+                                                <option
+                                                  key={
+                                                    "acte" +
+                                                    indexActe +
+                                                    "dent" +
+                                                    indexDent +
+                                                    option._id
+                                                  }
+                                                  value={option._id}
+                                                >
+                                                  {option.numeroFDI}
+                                                </option>
+                                              );
+                                            })}
+                                          </select>
+                                        </div>
+                                      );
+                                    },
+                                  )}
+                                </td>
+                              ) : (
+                                <td></td>
+                              )}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    <SchemaDent className="min-w-fit" dents={colorDents} />
                   </div>
-                }
-              </form>
-            </div>
-          </>
+                  {
+                    <div className="mr-6 mt-3 flex w-full justify-end">
+                      <button
+                        onClick={this.handleSubmit}
+                        className={
+                          !this.validate()
+                            ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
+                            : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
+                        }
+                      >
+                        Sauvegarder
+                      </button>
+                    </div>
+                  }
+                </form>
+              </div>
+            </>
+          )
         )}
       </div>
     );

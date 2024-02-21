@@ -62,10 +62,10 @@ function PatientsTable({
   const tableRows = patients.map((patient) => {
     return (
       <tr
-        className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center"
+        className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
         key={uuidv4()}
       >
-        <td className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center">
+        <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
           <input
             type="checkbox"
             checked={
@@ -275,6 +275,7 @@ function PatientsTable({
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
         onClick={onEdit}
+        color="#474a52"
         title="Modifier"
       />
       {/*  <GrFormView
@@ -288,6 +289,7 @@ function PatientsTable({
         onClick={() => {
           window.confirm("Confirmer la suppression") && onDelete(selectedItems);
         }}
+        color="#FF4D4D"
         title="Supprimer"
       />
       <FaPrint
@@ -295,6 +297,7 @@ function PatientsTable({
           onPrint === undefined ? "pointer-events-none opacity-50" : ""
         }`}
         title="Imprimer"
+        color="#474a52"
         onClick={onPrint}
       />
     </div>

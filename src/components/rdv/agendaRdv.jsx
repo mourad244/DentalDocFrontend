@@ -1,12 +1,152 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 
-import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvService";
+import { getRdvs } from "../../services/rdvService";
 
 // import _ from "lodash";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+const createHourlySegments = (filteredRdvs, selectedRdv, selectedRdvDate) => {
+  const workHoursStart = 9;
+  const workHoursEnd = 19;
+  let mergedSegments = {};
+  // make all segments available
+  for (let i = workHoursStart; i < workHoursEnd; i++) {
+    mergedSegments[i] = [
+      { start: 0, end: 60, available: true, isSelected: false },
+    ];
+  }
 
+  if (!selectedRdvDate) filteredRdvs = [];
+  // Step 2: Mark the minutes covered by RDVs as not available
+  else
+    filteredRdvs
+      .filter((e) => {
+        return (
+          new Date(e.datePrevu).getDate() === selectedRdvDate.getDate() &&
+          new Date(e.datePrevu).getMonth() === selectedRdvDate.getMonth() &&
+          new Date(e.datePrevu).getFullYear() ===
+            selectedRdvDate.getFullYear() &&
+          !e.isAnnule &&
+          !e.isReporte
+        );
+      })
+      .forEach((rdv) => {
+        const startHour = rdv.heureDebut.heure;
+        const startMinute = rdv.heureDebut.minute;
+
+        const endHour = rdv.heureFin.heure;
+        const endMinute = rdv.heureFin.minute;
+        const isSelected = selectedRdv && selectedRdv._id === rdv._id;
+        // Handle single-hour RDVs
+        if (startHour === endHour) {
+          // Find the segment that needs to be updated
+          const segmentIndex = mergedSegments[startHour].findIndex(
+            (segment) =>
+              startMinute >= segment.start && endMinute <= segment.end,
+          );
+
+          if (segmentIndex !== -1) {
+            const segment = mergedSegments[startHour][segmentIndex];
+            // Check if RDV starts at the beginning of a segment
+            if (segment.start === startMinute) {
+              segment.available = false;
+              segment.isSelected = isSelected;
+              if (segment.end !== endMinute) {
+                // Split the segment if RDV does not end at the end of a segment
+                mergedSegments[startHour].splice(segmentIndex + 1, 0, {
+                  start: endMinute,
+                  end: segment.end,
+                  available: true,
+                  isSelected: false,
+                });
+                segment.end = endMinute;
+              }
+            } else {
+              // Split the segment into two if RDV starts after the beginning of a segment
+              mergedSegments[startHour].splice(segmentIndex, 0, {
+                start: segment.start,
+                end: startMinute,
+                available: true,
+                isSelected: false,
+              });
+              mergedSegments[startHour][segmentIndex + 1] = {
+                start: startMinute,
+                end: endMinute,
+                available: false,
+                isSelected: isSelected,
+              };
+              // Add a new segment for the remaining time if there's any
+              if (segment.end !== endMinute) {
+                mergedSegments[startHour].splice(segmentIndex + 2, 0, {
+                  start: endMinute,
+                  end: segment.end,
+                  available: true,
+                  isSelected: false,
+                });
+              }
+            }
+          }
+        }
+        // Handle multi-hour RDVs
+        else {
+          // Update segments for each hour covered by the RDV
+          for (let hour = startHour; hour <= endHour; hour++) {
+            // Find segments for the current hour
+            const segmentStart = hour === startHour ? startMinute : 0;
+            const segmentEnd = hour === endHour ? endMinute : 60;
+
+            //  replace the whole hour segment with the rdv details
+            mergedSegments[hour] = mergedSegments[hour]
+              .map((segment) => {
+                if (
+                  segment.start === segmentStart &&
+                  segment.end === segmentEnd
+                ) {
+                  // This segment is fully covered by the RDV
+                  return {
+                    ...segment,
+                    available: false,
+                    isSelected: isSelected,
+                  };
+                } else if (
+                  segmentStart > segment.start &&
+                  segmentStart < segment.end
+                ) {
+                  // The RDV starts in the middle of this segment
+                  const newSegment = {
+                    start: segmentStart,
+                    end: segment.end,
+                    available: false,
+                    isSelected: isSelected,
+                  };
+                  // Adjust the original segment to end where the RDV starts
+                  segment.end = segmentStart;
+                  return [segment, newSegment];
+                } else if (
+                  segmentEnd > segment.start &&
+                  segmentEnd < segment.end
+                ) {
+                  // The RDV ends in the middle of this segment
+                  const newSegment = {
+                    start: segment.start,
+                    end: segmentEnd,
+                    available: false,
+                    isSelected: isSelected,
+                  };
+                  // Adjust the original segment to start where the RDV ends
+                  segment.start = segmentEnd;
+                  return [newSegment, segment];
+                }
+
+                return segment;
+              })
+              .flat();
+          }
+        }
+      });
+  return mergedSegments;
+};
 const AgendaRdv = (props) => {
   const mois = [
     "Janvier",
@@ -33,10 +173,12 @@ const AgendaRdv = (props) => {
   ];
   const {
     selectedRdv,
-    selectedDuree,
     selectedMoments,
     selectedPatient,
     selectedRdvDate,
+    onAvailableTimesChange,
+    onSelectDate,
+    // selectedDuree,
   } = props;
   const [rdvs, setRdvs] = useState([]);
   const [filteredRdvsPatient, setFilteredRdvsPatient] = useState([]);
@@ -98,11 +240,21 @@ const AgendaRdv = (props) => {
     daysInMonth();
   }, [time]);
   useEffect(() => {
-    const segments = createHourlySegments(filteredRdvs);
+    const segments = createHourlySegments(
+      filteredRdvs,
+      selectedRdv,
+      selectedRdvDate,
+    );
     setHourlySegments(segments);
     const availableTimes = calculateAvailableTimes(segments, selectedMoments);
-    props.onAvailableTimesChange(availableTimes);
-  }, [filteredRdvs, selectedRdvDate, selectedMoments]);
+    onAvailableTimesChange(availableTimes);
+  }, [
+    selectedRdv,
+    filteredRdvs,
+    selectedRdvDate,
+    selectedMoments,
+    onAvailableTimesChange,
+  ]);
   const navigateDate = (operation) => {
     const periode = new Date(time.setMonth(time.getMonth() + operation));
     setTime(periode);
@@ -120,9 +272,8 @@ const AgendaRdv = (props) => {
     );
      if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
       props.onDeleteRdv(deletedDate._id);
-    } else */ {
-      props.onSelectDate(date);
-    }
+    } else */
+    onSelectDate(date);
   };
   const displayDates = () => {
     let countTotal = 0;
@@ -263,147 +414,7 @@ const AgendaRdv = (props) => {
     } while (countTotal < nombreDays);
     return totalDiv;
   };
-  const createHourlySegments = (filteredRdvs) => {
-    const workHoursStart = 9;
-    const workHoursEnd = 19;
-    let mergedSegments = {};
-    // make all segments available
-    for (let i = workHoursStart; i < workHoursEnd; i++) {
-      mergedSegments[i] = [
-        { start: 0, end: 60, available: true, isSelected: false },
-      ];
-    }
 
-    if (!selectedRdvDate) filteredRdvs = [];
-    // Step 2: Mark the minutes covered by RDVs as not available
-    else
-      filteredRdvs
-        .filter((e) => {
-          return (
-            new Date(e.datePrevu).getDate() === selectedRdvDate.getDate() &&
-            new Date(e.datePrevu).getMonth() === selectedRdvDate.getMonth() &&
-            new Date(e.datePrevu).getFullYear() ===
-              selectedRdvDate.getFullYear() &&
-            !e.isAnnule &&
-            !e.isReporte
-          );
-        })
-        .forEach((rdv) => {
-          const startHour = rdv.heureDebut.heure;
-          const startMinute = rdv.heureDebut.minute;
-
-          const endHour = rdv.heureFin.heure;
-          const endMinute = rdv.heureFin.minute;
-          const isSelected = selectedRdv && selectedRdv._id === rdv._id;
-          // Handle single-hour RDVs
-          if (startHour === endHour) {
-            // Find the segment that needs to be updated
-            const segmentIndex = mergedSegments[startHour].findIndex(
-              (segment) =>
-                startMinute >= segment.start && endMinute <= segment.end,
-            );
-
-            if (segmentIndex !== -1) {
-              const segment = mergedSegments[startHour][segmentIndex];
-              // Check if RDV starts at the beginning of a segment
-              if (segment.start === startMinute) {
-                segment.available = false;
-                segment.isSelected = isSelected;
-                if (segment.end !== endMinute) {
-                  // Split the segment if RDV does not end at the end of a segment
-                  mergedSegments[startHour].splice(segmentIndex + 1, 0, {
-                    start: endMinute,
-                    end: segment.end,
-                    available: true,
-                    isSelected: false,
-                  });
-                  segment.end = endMinute;
-                }
-              } else {
-                // Split the segment into two if RDV starts after the beginning of a segment
-                mergedSegments[startHour].splice(segmentIndex, 0, {
-                  start: segment.start,
-                  end: startMinute,
-                  available: true,
-                  isSelected: false,
-                });
-                mergedSegments[startHour][segmentIndex + 1] = {
-                  start: startMinute,
-                  end: endMinute,
-                  available: false,
-                  isSelected: isSelected,
-                };
-                // Add a new segment for the remaining time if there's any
-                if (segment.end !== endMinute) {
-                  mergedSegments[startHour].splice(segmentIndex + 2, 0, {
-                    start: endMinute,
-                    end: segment.end,
-                    available: true,
-                    isSelected: false,
-                  });
-                }
-              }
-            }
-          }
-          // Handle multi-hour RDVs
-          else {
-            // Update segments for each hour covered by the RDV
-            for (let hour = startHour; hour <= endHour; hour++) {
-              // Find segments for the current hour
-              const segmentStart = hour === startHour ? startMinute : 0;
-              const segmentEnd = hour === endHour ? endMinute : 60;
-
-              //  replace the whole hour segment with the rdv details
-              mergedSegments[hour] = mergedSegments[hour]
-                .map((segment) => {
-                  if (
-                    segment.start === segmentStart &&
-                    segment.end === segmentEnd
-                  ) {
-                    // This segment is fully covered by the RDV
-                    return {
-                      ...segment,
-                      available: false,
-                      isSelected: isSelected,
-                    };
-                  } else if (
-                    segmentStart > segment.start &&
-                    segmentStart < segment.end
-                  ) {
-                    // The RDV starts in the middle of this segment
-                    const newSegment = {
-                      start: segmentStart,
-                      end: segment.end,
-                      available: false,
-                      isSelected: isSelected,
-                    };
-                    // Adjust the original segment to end where the RDV starts
-                    segment.end = segmentStart;
-                    return [segment, newSegment];
-                  } else if (
-                    segmentEnd > segment.start &&
-                    segmentEnd < segment.end
-                  ) {
-                    // The RDV ends in the middle of this segment
-                    const newSegment = {
-                      start: segment.start,
-                      end: segmentEnd,
-                      available: false,
-                      isSelected: isSelected,
-                    };
-                    // Adjust the original segment to start where the RDV ends
-                    segment.start = segmentEnd;
-                    return [newSegment, segment];
-                  }
-
-                  return segment;
-                })
-                .flat();
-            }
-          }
-        });
-    return mergedSegments;
-  };
   const calculateAvailableTimes = (hourlySegments, selectedMomemts) => {
     let availableTimes = [];
     Object.keys(hourlySegments)
@@ -423,6 +434,7 @@ const AgendaRdv = (props) => {
             return hour;
           }
         }
+        return "";
       })
       .forEach((hour) => {
         let startMinute = null;
