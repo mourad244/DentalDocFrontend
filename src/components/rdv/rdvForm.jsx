@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from "react";
-
-import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
-import { getPatients } from "../../services/patientService";
-
 import { useHistory } from "react-router-dom";
 
-import AgendaRdv from "./agendaRdv";
-
-import SearchBox from "../../common/searchBox";
-import { IoChevronBackCircleSharp } from "react-icons/io5";
-import { getNatureActes } from "../../services/natureActeService";
 import {
   getActeDentaires,
   saveActeDentaire,
 } from "../../services/acteDentaireService";
-import Select from "../../common/select";
+import { getNatureActes } from "../../services/natureActeService";
+import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
+
+import AgendaRdv from "./agendaRdv";
+
 import Input from "../../common/input";
+import Select from "../../common/select";
 import Checkbox from "../../common/checkbox";
 import SearchPatient from "../../common/searchPatient";
+import { IoChevronBackCircleSharp } from "react-icons/io5";
 
 function RdvForm(props) {
   const [actes, setActes] = useState([]);
-  const [patients, setPatients] = useState([]);
   const [natureActes, setNatureActes] = useState([]);
 
   const [selectedRdv, setSelectedRdv] = useState({});
@@ -99,31 +95,14 @@ function RdvForm(props) {
             : "00",
         });
       } else {
-        const { data: patientsData } = await getPatients();
         setActes(actesData);
-        setPatients(patientsData);
         setNatureActes(natureActesData);
       }
     };
     fetchData();
   }, [props.match.params.id]);
 
-  // useEffect(() => {
-  //   const filterPatients = () => {
-  //     const newFilteredPatients = patients.filter((patient) => {
-  //       return (
-  //         patient.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //         patient.prenom.toLowerCase().includes(searchQuery.toLowerCase())
-  //       );
-  //     });
-  //     searchQuery === ""
-  //       ? setFilteredPatients([])
-  //       : setFilteredPatients(newFilteredPatients);
-  //   };
-  //   filterPatients();
-  // }, [searchQuery, patients]);
   useEffect(() => {
-    //  set filteredActes based on selectedNatureActe
     const filterActes = () => {
       const newFilteredActes = actes.filter((acte) => {
         if (
@@ -142,7 +121,6 @@ function RdvForm(props) {
   }, [selectedNatureActe, actes]);
 
   useEffect(() => {
-    // Generate the start time options based on the available times and selected duration
     const options = generateTimeOptions(availableTimes, selectedDuree);
     setStartTimeOptions(options);
   }, [availableTimes, selectedDuree]);
@@ -157,7 +135,6 @@ function RdvForm(props) {
   const arraysEqual = (arr1, arr2) => {
     if (arr1.length !== arr2.length) return false;
 
-    // Create copies of the arrays to avoid modifying the original arrays
     const sortedArr1 = [...arr1].sort();
     const sortedArr2 = [...arr2].sort();
 

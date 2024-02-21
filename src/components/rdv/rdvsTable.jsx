@@ -34,19 +34,6 @@ function RdvsTable(props) {
       path: "heureDebut",
       label: "Heure",
       content: (rdv) => {
-        /* 
-        rdv :{
-          heureDebut:{
-            heure: 10,
-            minute: 30
-          },
-          heureFin:{
-            heure: 11,
-            minute: 30
-          
-          }
-        }
-        */
         return (
           <div key={rdv._id}>
             <label>
@@ -74,7 +61,19 @@ function RdvsTable(props) {
         );
       },
     },
-
+    {
+      path: "patientId.acteId",
+      label: "Acte",
+      content: (rdv) => {
+        return (
+          <label key={rdv._id}>
+            {rdv.acteId && rdv.acteId.nom && rdv.acteId.nom.length > 50
+              ? rdv.acteId.nom.substring(0, 50) + "..."
+              : rdv.acteId.nom}
+          </label>
+        );
+      },
+    },
     {
       path: "patientId.telephone",
       label: "Télephone",
@@ -125,13 +124,14 @@ function RdvsTable(props) {
     // selectedItem,
     onDelete,
   } = props;
+  console.log("rdvs", rdvs);
   const itemActions = (
     <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbDental
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onAddDevi === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
-        color="#474a52"
+        color="#28A54B"
         onClick={onAddDevi}
         title="Ajouter un devis"
       />
@@ -140,7 +140,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
-        color="#474a52"
+        color="#34707D"
         onClick={onEdit}
         title="Modifier"
       />
@@ -148,7 +148,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onPostpone === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
-        color="#474a52"
+        color="#D78C47"
         onClick={onPostpone}
         title="Reporter"
       />
@@ -157,7 +157,7 @@ function RdvsTable(props) {
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onCancel === undefined ? "pointer-events-none opacity-50 " : ""
         }`}
-        color="#474a52"
+        color="#D76947"
         onClick={onCancel}
         title="Annuler"
       />

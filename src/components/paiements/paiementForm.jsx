@@ -2,7 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 
 import { getDevi } from "../../services/deviService";
-import { getPatients, getPatient } from "../../services/patientService";
+import { getPatient } from "../../services/patientService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getActeDentaires } from "../../services/acteDentaireService";
 import { savePaiement, getPaiement } from "../../services/paiementService";
