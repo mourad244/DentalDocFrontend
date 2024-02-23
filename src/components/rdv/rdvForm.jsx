@@ -23,9 +23,9 @@ function RdvForm(props) {
   const [actes, setActes] = useState([]);
   const [natureActes, setNatureActes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingPatient, setLoadingPatient] = useState(false);
   const [selectedRdv, setSelectedRdv] = useState({});
-  const [selectedPatient, setSelectedPatient] = useState({});
+  const [loadingPatient, setLoadingPatient] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(undefined);
   const [selectedNatureActe, setSelectedNatureActe] = useState({});
   const [selectedActe, setSelectedActe] = useState({});
   const [selectedDuree, setSelectedDuree] = useState(0);
@@ -38,19 +38,15 @@ function RdvForm(props) {
     heure: "00",
     minute: "00",
   });
-
-  const [availableTimes, setAvailableTimes] = useState([]);
-  const [startTimeOptions, setStartTimeOptions] = useState([]);
   const [filteredActes, setFilteredActes] = useState([]);
-  // const [filteredPatients, setFilteredPatients] = useState([]);
-
-  // const [searchQuery, setSearchQuery] = useState("");
-
+  const [availableTimes, setAvailableTimes] = useState([]);
   const [selectedRdvDate, setSelectedRdvDate] = useState("");
+  const [startTimeOptions, setStartTimeOptions] = useState([]);
+  const [patienDataIsValid, setPatientDataIsValid] = useState(false);
+
+  const history = useHistory();
   const isRdvModified = props.match.params.id !== "new";
   const isPostponed = props.match.path === "/rdvs/postpone/:id";
-  const [patienDataIsValid, setPatientDataIsValid] = useState(false);
-  const history = useHistory();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -296,16 +292,26 @@ function RdvForm(props) {
         />
       )}
       {!loadingPatient &&
+      selectedPatient &&
       Object.keys(selectedPatient).length !== 0 &&
       selectedPatient._id ? (
-        <div>
-          <div className="m-2  rounded-sm bg-[#4F6874] p-2">
+        <div className=" m-2 flex  flex-row rounded-sm bg-[#4F6874] p-2">
+          <div className="m-auto w-auto">
             <p className="text-center text-base font-bold text-white">{`${
               selectedPatient.nom && selectedPatient.nom.toUpperCase()
             } ${
               selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
             }`}</p>
           </div>
+          <button
+            className=" h-7 w-7 bg-red-400 p-1 font-bold text-white"
+            onClick={() => {
+              setSelectedPatient({});
+              setPatientDataIsValid(false);
+            }}
+          >
+            X
+          </button>
         </div>
       ) : (
         <div className="m-auto my-4">
@@ -319,6 +325,8 @@ function RdvForm(props) {
             setSelectedPatient(patient);
           }}
           dataIsValid={(isValid) => setPatientDataIsValid(isValid)}
+          // i want to use a variable to make a sign that this form is for rdv
+          isRdvForm={true}
         />
       ) : (
         <div className="m-auto my-4">
@@ -327,6 +335,7 @@ function RdvForm(props) {
       )}
       {!loadingPatient &&
       !loading &&
+      selectedPatient &&
       Object.keys(selectedPatient).length !== 0 &&
       patienDataIsValid ? (
         <>

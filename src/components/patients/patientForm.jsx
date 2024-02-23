@@ -43,7 +43,7 @@ class PatientForm extends Form {
     dateNaissance: Joi.date().allow("").allow(null).label("Date Naissance"),
     telephone: Joi.string()
       .required() /* .allow("") */
-      .label("profession"),
+      .label("telephone"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
     provinceId: Joi.string().allow("").allow(null).label("Province"),
     regionId: Joi.string().allow("").allow(null).label("Region"),
@@ -81,7 +81,9 @@ class PatientForm extends Form {
     await this.populateDatas();
     await this.populatePatients();
     this.setState({ loading: false });
-    this.props.dataIsValid(this.validate() ? false : true);
+    this.props &&
+      this.props.dataIsValid &&
+      this.props.dataIsValid(this.validate() ? false : true);
   }
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.formDisplay !== this.props.formDisplay) {
@@ -109,11 +111,13 @@ class PatientForm extends Form {
       this.props.dataIsValid(this.validate() ? false : true);
     }
     // if selectedPatient is updated
-    // if (prevProps.selectedPatient !== this.props.selectedPatient) {
-    //   console.log("done2");
-    //   console.log("props", this.props.selectedPatient);
-    //   this.setState({ data: this.mapToViewModel(this.props.selectedPatient) });
-    // }
+    if (
+      prevProps.selectedPatient &&
+      this.props.selectedPatient &&
+      prevProps.selectedPatient._id !== this.props.selectedPatient._id
+    ) {
+      this.setState({ data: this.mapToViewModel(this.props.selectedPatient) });
+    }
   }
 
   mapToViewModel(patient) {
@@ -144,15 +148,8 @@ class PatientForm extends Form {
   };
 
   render() {
-    // let patientId = "";
-    // if (
-    //   this.props.match &&
-    //   this.props.match.params &&
-    //   this.props.match.params.id
-    // )
-    //   patientId = this.props.match.params.id;
     const { regions, filteredProvinces, loading, data } = this.state;
-    const { selectedPatient } = this.props;
+    const { isRdvForm } = this.props;
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -162,7 +159,7 @@ class PatientForm extends Form {
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
           Formulaire du patient
         </p>
-        {!selectedPatient && (
+        {!isRdvForm && (
           <div className="ml-2  flex justify-start">
             <button
               className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
@@ -185,7 +182,7 @@ class PatientForm extends Form {
           <div className="mt-3">
             {this.renderBoolean("isMasculin", "Genre", "Masculin", "Féminin")}
           </div>
-          {!selectedPatient && (
+          {!isRdvForm && (
             <div className="mt-3">
               {this.renderDate("dateNaissance", "Date naissance")}
             </div>
@@ -193,10 +190,10 @@ class PatientForm extends Form {
           <div className="mt-3">
             {this.renderInput("telephone", "Telephone")}
           </div>
-          {!selectedPatient && (
+          {!isRdvForm && (
             <div className="mt-3">{this.renderInput("ville", "Ville")}</div>
           )}
-          {!selectedPatient && (
+          {!isRdvForm && (
             <div className="mt-3">
               {this.renderInput("profession", "Profession")}
             </div>
@@ -208,18 +205,18 @@ class PatientForm extends Form {
             {this.renderSelect("provinceId", "Province", filteredProvinces)}
           </div>
           {/* {this.renderInput("commentaire", "Commentaire", 360, 70)} */}
-          {!selectedPatient && (
+          {!isRdvForm && (
             <div className="mt-3 w-full  ">
               {this.renderUpload("image", "Photo")}
             </div>
           )}
-          {!selectedPatient && (
+          {!isRdvForm && (
             <div className="  mt-3 flex w-full flex-wrap">
               {data.images.length !== 0 &&
                 this.renderImage("images", "Images", 200)}
             </div>
           )}
-          {!selectedPatient && this.renderButton("Sauvegarder")}
+          {!isRdvForm && this.renderButton("Sauvegarder")}
         </form>
         {/* {patientId ? (
           <FichePatient
