@@ -124,7 +124,6 @@ function RdvsTable(props) {
     // selectedItem,
     onDelete,
   } = props;
-  console.log("rdvs", rdvs);
   const itemActions = (
     <div className="mt-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbDental

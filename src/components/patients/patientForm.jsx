@@ -3,7 +3,6 @@ import Joi from "joi-browser";
 import Form from "../../common/form";
 
 import { getRegions } from "../../services/regionService";
-import { getMedecins } from "../../services/medecinService";
 import { getProvinces } from "../../services/provinceService";
 import { getPatient, savePatient } from "../../services/patientService";
 // import FichePatient from "../../documents/fichePatient";
@@ -15,7 +14,6 @@ class PatientForm extends Form {
   state = {
     data: {
       cin: "",
-      // medecinId: "",
       historiqueMedecins: [],
       nom: "",
       prenom: "",
@@ -31,7 +29,6 @@ class PatientForm extends Form {
     filteredProvinces: [],
     provinces: [],
     errors: {},
-    medecins: [],
     form: "patients",
     loading: false,
   };
@@ -40,24 +37,22 @@ class PatientForm extends Form {
     cin: Joi.string().allow("").allow(null).label("CIN"),
     nom: Joi.string().required().label("Nom"),
     prenom: Joi.string().required().label("Prenom"),
-    isMasculin: Joi.boolean().allow(null).label("Genre"),
+    isMasculin: Joi.boolean()
+      .required() /* .allow(null) */
+      .label("Genre"),
     dateNaissance: Joi.date().allow("").allow(null).label("Date Naissance"),
-    telephone: Joi.string().allow("").label("profession"),
+    telephone: Joi.string()
+      .required() /* .allow("") */
+      .label("profession"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
     provinceId: Joi.string().allow("").allow(null).label("Province"),
     regionId: Joi.string().allow("").allow(null).label("Region"),
     // dateDerniereVisite: Joi.date().allow("").label("Date dernière visite"),
-    // medecinId: Joi.string().allow("").label("Medecin"),
     historiqueMedecins: Joi.array().allow([]).label("Medecins"),
     images: Joi.label("Images").optional(),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
     profession: Joi.string().allow("").label("profession"),
   };
-
-  async populateMedecins() {
-    const { data: medecins } = await getMedecins();
-    this.setState({ medecins });
-  }
 
   async populateDatas() {
     const { data: provinces } = await getProvinces();
@@ -66,7 +61,11 @@ class PatientForm extends Form {
   }
   async populatePatients() {
     try {
-      const patientId = this.props.match.params.id;
+      const patientId = this.props.match && this.props.params.id;
+      const selectedPatient = this.props.selectedPatient;
+      if (selectedPatient) {
+        return this.setState({ data: this.mapToViewModel(selectedPatient) });
+      }
       if (patientId === "new" || patientId === undefined) return;
       const { data: patient } = await getPatient(patientId);
 
@@ -79,10 +78,10 @@ class PatientForm extends Form {
 
   async componentDidMount() {
     this.setState({ loading: true });
-    await this.populateMedecins();
     await this.populateDatas();
     await this.populatePatients();
     this.setState({ loading: false });
+    this.props.dataIsValid(this.validate() ? false : true);
   }
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.formDisplay !== this.props.formDisplay) {
@@ -95,13 +94,32 @@ class PatientForm extends Form {
         ),
       });
     }
+    // when updating the patient
+    if (
+      prevState.data !== this.state.data
+      /*
+      &&
+      this.state.data._id 
+       &&
+      prevState.data._id */
+    ) {
+      const { data } = this.state;
+
+      this.props.onPatientChange(data);
+      this.props.dataIsValid(this.validate() ? false : true);
+    }
+    // if selectedPatient is updated
+    // if (prevProps.selectedPatient !== this.props.selectedPatient) {
+    //   console.log("done2");
+    //   console.log("props", this.props.selectedPatient);
+    //   this.setState({ data: this.mapToViewModel(this.props.selectedPatient) });
+    // }
   }
 
   mapToViewModel(patient) {
     return {
       _id: patient._id,
       cin: patient.cin,
-      // medecinId: patient.medecinId ? patient.medecinId._id : undefined,
       historiqueMedecins: patient.historiqueMedecins,
       nom: patient.nom,
       prenom: patient.prenom,
@@ -134,6 +152,7 @@ class PatientForm extends Form {
     // )
     //   patientId = this.props.match.params.id;
     const { regions, filteredProvinces, loading, data } = this.state;
+    const { selectedPatient } = this.props;
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -143,17 +162,19 @@ class PatientForm extends Form {
         <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
           Formulaire du patient
         </p>
-        <div className="ml-2  flex justify-start">
-          <button
-            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
-            onClick={() => {
-              this.props.history.push("/patients");
-            }}
-          >
-            <IoChevronBackCircleSharp className="mr-1 " />
-            Retour à la Liste
-          </button>
-        </div>
+        {!selectedPatient && (
+          <div className="ml-2  flex justify-start">
+            <button
+              className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+              onClick={() => {
+                this.props.history.push("/patients");
+              }}
+            >
+              <IoChevronBackCircleSharp className="mr-1 " />
+              Retour à la Liste
+            </button>
+          </div>
+        )}
         <form
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
           onSubmit={this.handleSubmit}
@@ -164,16 +185,22 @@ class PatientForm extends Form {
           <div className="mt-3">
             {this.renderBoolean("isMasculin", "Genre", "Masculin", "Féminin")}
           </div>
-          <div className="mt-3">
-            {this.renderDate("dateNaissance", "Date naissance")}
-          </div>
+          {!selectedPatient && (
+            <div className="mt-3">
+              {this.renderDate("dateNaissance", "Date naissance")}
+            </div>
+          )}
           <div className="mt-3">
             {this.renderInput("telephone", "Telephone")}
           </div>
-          <div className="mt-3">{this.renderInput("ville", "Ville")}</div>
-          <div className="mt-3">
-            {this.renderInput("profession", "Profession")}
-          </div>
+          {!selectedPatient && (
+            <div className="mt-3">{this.renderInput("ville", "Ville")}</div>
+          )}
+          {!selectedPatient && (
+            <div className="mt-3">
+              {this.renderInput("profession", "Profession")}
+            </div>
+          )}
           <div className="mt-3">
             {this.renderSelect("regionId", "Region", regions)}
           </div>
@@ -181,15 +208,18 @@ class PatientForm extends Form {
             {this.renderSelect("provinceId", "Province", filteredProvinces)}
           </div>
           {/* {this.renderInput("commentaire", "Commentaire", 360, 70)} */}
-          <div className="mt-3 w-full  ">
-            {this.renderUpload("image", "Photo")}
-          </div>
-
-          <div className="  mt-3 flex w-full flex-wrap">
-            {data.images.length !== 0 &&
-              this.renderImage("images", "Images", 200)}
-          </div>
-          {this.renderButton("Sauvegarder")}
+          {!selectedPatient && (
+            <div className="mt-3 w-full  ">
+              {this.renderUpload("image", "Photo")}
+            </div>
+          )}
+          {!selectedPatient && (
+            <div className="  mt-3 flex w-full flex-wrap">
+              {data.images.length !== 0 &&
+                this.renderImage("images", "Images", 200)}
+            </div>
+          )}
+          {!selectedPatient && this.renderButton("Sauvegarder")}
         </form>
         {/* {patientId ? (
           <FichePatient

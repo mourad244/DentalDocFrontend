@@ -5,21 +5,25 @@ import {
   getActeDentaires,
   saveActeDentaire,
 } from "../../services/acteDentaireService";
+import { getPatient } from "../../services/patientService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
 
 import AgendaRdv from "./agendaRdv";
+import PatientForm from "../patients/patientForm";
+import SearchPatient from "../../common/searchPatient";
 
 import Input from "../../common/input";
 import Select from "../../common/select";
 import Checkbox from "../../common/checkbox";
-import SearchPatient from "../../common/searchPatient";
+import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 
 function RdvForm(props) {
   const [actes, setActes] = useState([]);
   const [natureActes, setNatureActes] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  const [loadingPatient, setLoadingPatient] = useState(false);
   const [selectedRdv, setSelectedRdv] = useState({});
   const [selectedPatient, setSelectedPatient] = useState({});
   const [selectedNatureActe, setSelectedNatureActe] = useState({});
@@ -45,10 +49,12 @@ function RdvForm(props) {
   const [selectedRdvDate, setSelectedRdvDate] = useState("");
   const isRdvModified = props.match.params.id !== "new";
   const isPostponed = props.match.path === "/rdvs/postpone/:id";
+  const [patienDataIsValid, setPatientDataIsValid] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const { data: actesData } = await getActeDentaires();
       const { data: natureActesData } = await getNatureActes();
       if (props.match.params.id !== "new") {
@@ -98,6 +104,7 @@ function RdvForm(props) {
         setActes(actesData);
         setNatureActes(natureActesData);
       }
+      setLoading(false);
     };
     fetchData();
   }, [props.match.params.id]);
@@ -124,6 +131,8 @@ function RdvForm(props) {
     const options = generateTimeOptions(availableTimes, selectedDuree);
     setStartTimeOptions(options);
   }, [availableTimes, selectedDuree]);
+
+  // re-render when the data of selectedPatient is updated
 
   const onDateSelect = async (date) => {
     setSelectedRdvDate(date);
@@ -276,17 +285,20 @@ function RdvForm(props) {
           Retour à la Liste
         </button>
       </div>
-      {/* get the params.id */}
-
       {props.match.params.id === "new" && (
         <SearchPatient
-          onPatientSelect={(patient) => {
-            setSelectedPatient(patient);
+          onPatientSelect={async (patient) => {
+            setLoadingPatient(true);
+            const { data: newPatient } = await getPatient(patient._id);
+            setSelectedPatient(newPatient);
+            setLoadingPatient(false);
           }}
         />
       )}
-      {Object.keys(selectedPatient).length !== 0 && (
-        <>
+      {!loadingPatient &&
+      Object.keys(selectedPatient).length !== 0 &&
+      selectedPatient._id ? (
+        <div>
           <div className="m-2  rounded-sm bg-[#4F6874] p-2">
             <p className="text-center text-base font-bold text-white">{`${
               selectedPatient.nom && selectedPatient.nom.toUpperCase()
@@ -294,8 +306,32 @@ function RdvForm(props) {
               selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
             }`}</p>
           </div>
+        </div>
+      ) : (
+        <div className="m-auto my-4">
+          <ClipLoader loading={loadingPatient} size={50} />
+        </div>
+      )}
+      {!loadingPatient ? (
+        <PatientForm
+          selectedPatient={selectedPatient}
+          onPatientChange={(patient) => {
+            setSelectedPatient(patient);
+          }}
+          dataIsValid={(isValid) => setPatientDataIsValid(isValid)}
+        />
+      ) : (
+        <div className="m-auto my-4">
+          <ClipLoader loading={loadingPatient} size={50} />
+        </div>
+      )}
+      {!loadingPatient &&
+      !loading &&
+      Object.keys(selectedPatient).length !== 0 &&
+      patienDataIsValid ? (
+        <>
           <div className="m-2 flex flex-wrap  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
-            <div className="mt-3">
+            <div className="mt-3 w-max">
               <Select
                 name="natureActe"
                 label="Nature Acte"
@@ -323,7 +359,7 @@ function RdvForm(props) {
               />
             </div>
             {selectedNatureActe && (
-              <div className="mt-3">
+              <div className="mt-3 w-max">
                 <Select
                   name="acte"
                   label="Acte"
@@ -346,7 +382,7 @@ function RdvForm(props) {
               </div>
             )}
             {selectedActe && (
-              <div className="mt-3">
+              <div className="mt-3 w-max">
                 <Input
                   name="duree"
                   label="Durée"
@@ -367,7 +403,7 @@ function RdvForm(props) {
               </div>
             )}
             {selectedActe && (
-              <div className="mt-3">
+              <div className="mt-3 w-max">
                 <Checkbox
                   name={"moments"}
                   label={"Moments"}
@@ -445,16 +481,21 @@ function RdvForm(props) {
           <button
             disabled={
               !selectedDuree ||
-              selectedDuree <= 0 ||
+              !patienDataIsValid ||
               !selectedRdvDate ||
-              !selectedHeureDebut.heure ||
-              !selectedHeureDebut.minute
+              selectedDuree <= 0 ||
+              selectedHeureDebut.heure === "00" ||
+              !selectedHeureDebut.heure
+              /* ||
+              !selectedHeureDebut.minute */
             }
             className={`m-2 ml-auto mt-3 flex w-fit cursor-pointer list-none rounded-lg p-3 text-center text-xs font-bold text-white no-underline ${
-              selectedDuree <= 0 ||
               !selectedDuree ||
+              !patienDataIsValid ||
               !selectedRdvDate ||
-              !selectedHeureDebut.heure
+              selectedDuree <= 0 ||
+              !selectedHeureDebut.heure ||
+              selectedHeureDebut.heure === "00"
                 ? "cursor-default bg-gray-400"
                 : "bg-[#4F6874]"
             } `}
@@ -531,6 +572,10 @@ function RdvForm(props) {
             Sauvegarder
           </button>
         </>
+      ) : (
+        <div className="m-auto my-4">
+          <ClipLoader loading={loading} size={70} />
+        </div>
       )}
     </div>
   );
