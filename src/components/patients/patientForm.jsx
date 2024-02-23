@@ -98,7 +98,8 @@ class PatientForm extends Form {
     }
     // when updating the patient
     if (
-      prevState.data !== this.state.data
+      prevState.data !== this.state.data &&
+      this.props.onPatientChange
       /*
       &&
       this.state.data._id 
@@ -106,7 +107,6 @@ class PatientForm extends Form {
       prevState.data._id */
     ) {
       const { data } = this.state;
-
       this.props.onPatientChange(data);
       this.props.dataIsValid(this.validate() ? false : true);
     }

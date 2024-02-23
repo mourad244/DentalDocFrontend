@@ -12,7 +12,6 @@ import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
 import AgendaRdv from "./agendaRdv";
 import PatientForm from "../patients/patientForm";
 import SearchPatient from "../../common/searchPatient";
-
 import Input from "../../common/input";
 import Select from "../../common/select";
 import Checkbox from "../../common/checkbox";
@@ -25,7 +24,7 @@ function RdvForm(props) {
   const [loading, setLoading] = useState(false);
   const [selectedRdv, setSelectedRdv] = useState({});
   const [loadingPatient, setLoadingPatient] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState(undefined);
+  const [selectedPatient, setSelectedPatient] = useState({});
   const [selectedNatureActe, setSelectedNatureActe] = useState({});
   const [selectedActe, setSelectedActe] = useState({});
   const [selectedDuree, setSelectedDuree] = useState(0);
@@ -281,7 +280,7 @@ function RdvForm(props) {
           Retour à la Liste
         </button>
       </div>
-      {props.match.params.id === "new" && (
+      {props.match.params.id === "new" && !selectedPatient._id && (
         <SearchPatient
           onPatientSelect={async (patient) => {
             setLoadingPatient(true);
@@ -303,15 +302,17 @@ function RdvForm(props) {
               selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
             }`}</p>
           </div>
-          <button
-            className=" h-7 w-7 bg-red-400 p-1 font-bold text-white"
-            onClick={() => {
-              setSelectedPatient({});
-              setPatientDataIsValid(false);
-            }}
-          >
-            X
-          </button>
+          {props.match.params.id === "new" && (
+            <button
+              className=" h-7 w-7 bg-red-400 p-1 font-bold text-white"
+              onClick={() => {
+                setSelectedPatient({});
+                setPatientDataIsValid(false);
+              }}
+            >
+              X
+            </button>
+          )}
         </div>
       ) : (
         <div className="m-auto my-4">
@@ -514,6 +515,7 @@ function RdvForm(props) {
                   let oldData = {
                     _id: selectedRdv._id,
                     patientId: selectedPatient._id,
+                    newPatient: selectedPatient,
                     datePrevu: selectedRdv.datePrevu,
                     natureId: selectedNatureActe
                       ? selectedNatureActe._id
@@ -524,7 +526,9 @@ function RdvForm(props) {
                   };
                   let newData = {
                     patientId: selectedPatient._id,
+                    newPatient: selectedPatient,
                     datePrevu: selectedRdvDate,
+
                     lastRdvId: selectedRdv._id,
                     natureId: selectedNatureActe
                       ? selectedNatureActe._id
@@ -539,10 +543,12 @@ function RdvForm(props) {
                   await saveRdv({
                     _id: selectedRdv._id,
                     patientId: selectedPatient._id,
+                    newPatient: selectedPatient,
                     datePrevu: selectedRdvDate,
                     natureId: selectedNatureActe
                       ? selectedNatureActe._id
                       : null,
+
                     acteId: selectedActe ? selectedActe._id : null,
                     heureDebut: selectedHeureDebut,
                     heureFin: selectedHeureFin,
@@ -569,6 +575,8 @@ function RdvForm(props) {
                 await saveRdv({
                   patientId: selectedPatient._id,
                   datePrevu: selectedRdvDate,
+                  newPatient: selectedPatient,
+
                   natureId: selectedNatureActe ? selectedNatureActe._id : null,
                   acteId: selectedActe ? selectedActe._id : null,
                   heureDebut: selectedHeureDebut,

@@ -92,6 +92,7 @@ function PatientsTable({
                 ) {
                   age_now--;
                 }
+
                 return (
                   <td
                     key={uuidv4()}
@@ -101,7 +102,7 @@ function PatientsTable({
                   </td>
                 );
               }
-              return "";
+              return <td key={uuidv4()} />;
             case "dateNaissance":
               if (patient.dateNaissance === undefined)
                 return <td key={uuidv4()} />;

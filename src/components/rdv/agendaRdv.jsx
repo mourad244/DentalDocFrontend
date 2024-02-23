@@ -527,11 +527,11 @@ const AgendaRdv = (props) => {
             return (
               <div
                 key={index}
-                className={`min-w-fit  border-2  p-1 text-center text-xs font-bold text-zinc-700 ${
+                className={`min-w-fit  border-2  p-1 text-center text-xs font-bold  ${
                   segment.available
-                    ? "bg-green-500"
+                    ? "bg-[#caecff] text-zinc-700"
                     : segment.isSelected
-                    ? "bg-blue-500"
+                    ? "bg-[#152961] text-white"
                     : "bg-gray-300"
                 }`}
                 style={{
