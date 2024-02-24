@@ -290,57 +290,62 @@ function RdvForm(props) {
           }}
         />
       )}
-      {!loadingPatient &&
-      selectedPatient &&
-      Object.keys(selectedPatient).length !== 0 &&
-      selectedPatient._id ? (
-        <div className=" m-2 flex  flex-row rounded-sm bg-[#4F6874] p-2">
-          <div className="m-auto w-auto">
-            <p className="text-center text-base font-bold text-white">{`${
-              selectedPatient.nom && selectedPatient.nom.toUpperCase()
-            } ${
-              selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
-            }`}</p>
+      <div className="m-2 flex flex-col  bg-[#adced8] ">
+        {selectedPatient &&
+        Object.keys(selectedPatient).length !== 0 &&
+        selectedPatient._id ? (
+          <div className=" flex w-full flex-row rounded-sm bg-[#4F6874]  p-2">
+            <div className="m-auto w-auto">
+              <p className="text-center text-base font-bold text-white">{`${
+                selectedPatient.nom && selectedPatient.nom.toUpperCase()
+              } ${
+                selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
+              }`}</p>
+            </div>
+            {props.match.params.id === "new" && (
+              <button
+                className=" h-6 w-6 rounded-md bg-red-400 p-1 font-bold leading-4 text-white"
+                onClick={() => {
+                  setSelectedPatient({});
+                  setPatientDataIsValid(false);
+                }}
+              >
+                x
+              </button>
+            )}
           </div>
-          {props.match.params.id === "new" && (
-            <button
-              className=" h-7 w-7 bg-red-400 p-1 font-bold text-white"
-              onClick={() => {
-                setSelectedPatient({});
-                setPatientDataIsValid(false);
+        ) : (
+          loadingPatient && (
+            <div className="m-auto my-4">
+              <ClipLoader loading={loadingPatient} size={50} />
+            </div>
+          )
+        )}
+        {!loadingPatient ? (
+          <div className=" w-[95%]">
+            <PatientForm
+              selectedPatient={selectedPatient}
+              onPatientChange={(patient) => {
+                setSelectedPatient(patient);
               }}
-            >
-              X
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="m-auto my-4">
-          <ClipLoader loading={loadingPatient} size={50} />
-        </div>
-      )}
-      {!loadingPatient ? (
-        <PatientForm
-          selectedPatient={selectedPatient}
-          onPatientChange={(patient) => {
-            setSelectedPatient(patient);
-          }}
-          dataIsValid={(isValid) => setPatientDataIsValid(isValid)}
-          // i want to use a variable to make a sign that this form is for rdv
-          isRdvForm={true}
-        />
-      ) : (
-        <div className="m-auto my-4">
-          <ClipLoader loading={loadingPatient} size={50} />
-        </div>
-      )}
+              dataIsValid={(isValid) => setPatientDataIsValid(isValid)}
+              // i want to use a variable to make a sign that this form is for rdv
+              isRdvForm={true}
+            />
+          </div>
+        ) : (
+          <div className="m-auto my-4">
+            <ClipLoader loading={loadingPatient} size={50} />
+          </div>
+        )}
+      </div>
       {!loadingPatient &&
       !loading &&
       selectedPatient &&
       Object.keys(selectedPatient).length !== 0 &&
       patienDataIsValid ? (
         <>
-          <div className="m-2 flex flex-wrap  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
+          <div className="m-2 flex flex-wrap  rounded-sm bg-[#adced8] pb-2  pt-2 shadow-md ">
             <div className="mt-3 w-max">
               <Select
                 name="natureActe"
@@ -437,57 +442,63 @@ function RdvForm(props) {
               </div>
             )}
           </div>
-          {selectedDuree > 0 && (
-            <AgendaRdv
-              selectedRdv={selectedRdv}
-              onDeleteRdv={onRdvDelete}
-              onSelectDate={onDateSelect}
-              selectedDuree={selectedDuree}
-              selectedPatient={selectedPatient}
-              selectedRdvDate={selectedRdvDate}
-              selectedMoments={selectedMomemts}
-              onAvailableTimesChange={setAvailableTimes}
-            />
-          )}
-          {selectedRdvDate && selectedDuree > 0 && (
-            <div>
-              <div className=" flex flex-col">
-                <div className="flex w-fit flex-wrap">
-                  <label
-                    style={{
-                      width: 96,
-                    }}
-                    className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
-                  >
-                    Début
-                  </label>
-                  <select
-                    className=" rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
-                    name="heuredebut"
-                    onChange={(e) => {
-                      const [hour, minute] = e.target.value.split("-");
-                      handleStartTimeChange(hour, minute);
-                    }}
-                    style={{ height: 35 }}
-                    value={
-                      selectedHeureDebut && selectedHeureDebut.heure
-                        ? selectedHeureDebut.heure.toString().padStart(2, "0") +
-                          "-" +
-                          selectedHeureDebut.minute.toString().padStart(2, "0")
-                        : ""
-                    }
-                  >
-                    <option value="" />
-                    {startTimeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+          <div className=" flex flex-col">
+            {selectedDuree > 0 && (
+              <AgendaRdv
+                selectedRdv={selectedRdv}
+                onDeleteRdv={onRdvDelete}
+                onSelectDate={onDateSelect}
+                selectedDuree={selectedDuree}
+                selectedPatient={selectedPatient}
+                selectedRdvDate={selectedRdvDate}
+                selectedMoments={selectedMomemts}
+                onAvailableTimesChange={setAvailableTimes}
+              />
+            )}
+            {selectedRdvDate && selectedDuree > 0 && (
+              <div className="m-2 flex h-fit  flex-wrap rounded-sm bg-[#adced8] pb-2 pt-2 shadow-md ">
+                <div className=" mx-2 flex min-w-max flex-col">
+                  <div className="flex w-fit flex-wrap">
+                    <label
+                      style={{
+                        width: 96,
+                      }}
+                      className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
+                    >
+                      Début
+                    </label>
+                    <select
+                      className=" rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                      name="heuredebut"
+                      onChange={(e) => {
+                        const [hour, minute] = e.target.value.split("-");
+                        handleStartTimeChange(hour, minute);
+                      }}
+                      style={{ height: 35 }}
+                      value={
+                        selectedHeureDebut && selectedHeureDebut.heure
+                          ? selectedHeureDebut.heure
+                              .toString()
+                              .padStart(2, "0") +
+                            "-" +
+                            selectedHeureDebut.minute
+                              .toString()
+                              .padStart(2, "0")
+                          : ""
+                      }
+                    >
+                      <option value="" />
+                      {startTimeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           <button
             disabled={
               !selectedDuree ||

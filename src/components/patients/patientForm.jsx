@@ -155,10 +155,18 @@ class PatientForm extends Form {
         <ClipLoader loading={loading} size={70} />
       </div>
     ) : (
-      <div className="mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md border border-white bg-white">
-        <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-          Formulaire du patient
-        </p>
+      <div
+        className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
+          !isRdvForm && "border border-white bg-white"
+        }`}
+      >
+        {this.props &&
+          this.props.selectedPatient &&
+          !this.props.selectedPatient._id && (
+            <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+              Formulaire du patient
+            </p>
+          )}
         {!isRdvForm && (
           <div className="ml-2  flex justify-start">
             <button
