@@ -12,6 +12,7 @@ import { getRdv, deleteRdv, saveRdv } from "../../services/rdvService";
 import AgendaRdv from "./agendaRdv";
 import PatientForm from "../patients/patientForm";
 import SearchPatient from "../../common/searchPatient";
+
 import Input from "../../common/input";
 import Select from "../../common/select";
 import Checkbox from "../../common/checkbox";
@@ -44,7 +45,8 @@ function RdvForm(props) {
   const [patienDataIsValid, setPatientDataIsValid] = useState(false);
 
   const history = useHistory();
-  const isRdvModified = props.match.params.id !== "new";
+  const rdvId = props.match.params.id;
+  const isRdvModified = rdvId !== "new";
   const isPostponed = props.match.path === "/rdvs/postpone/:id";
 
   useEffect(() => {
@@ -52,8 +54,8 @@ function RdvForm(props) {
       setLoading(true);
       const { data: actesData } = await getActeDentaires();
       const { data: natureActesData } = await getNatureActes();
-      if (props.match.params.id !== "new") {
-        const { data: rdvData } = await getRdv(props.match.params.id);
+      if (rdvId !== "new") {
+        const { data: rdvData } = await getRdv(rdvId);
         let newSelectedActe = rdvData.acteId
           ? actesData.find((a) => a._id === rdvData.acteId)
           : {};
@@ -102,7 +104,7 @@ function RdvForm(props) {
       setLoading(false);
     };
     fetchData();
-  }, [props.match.params.id]);
+  }, [rdvId]);
 
   useEffect(() => {
     const filterActes = () => {
@@ -127,65 +129,55 @@ function RdvForm(props) {
     setStartTimeOptions(options);
   }, [availableTimes, selectedDuree]);
 
-  // re-render when the data of selectedPatient is updated
-
   const onDateSelect = async (date) => {
     setSelectedRdvDate(date);
   };
+
   const onRdvDelete = async (rdvId) => {
     await deleteRdv(rdvId);
     history.push("/rdvs");
   };
+
   const arraysEqual = (arr1, arr2) => {
     if (arr1.length !== arr2.length) return false;
-
     const sortedArr1 = [...arr1].sort();
     const sortedArr2 = [...arr2].sort();
-
     for (let i = 0; i < sortedArr1.length; i++) {
       if (sortedArr1[i] !== sortedArr2[i]) return false;
     }
-
     return true;
   };
+
   const calculateEndTime = (startHour, startMinute) => {
     // Convert parameters to integers to ensure proper calculations
     startHour = parseInt(startHour, 10);
     startMinute = parseInt(startMinute, 10);
-    const duration = parseInt(selectedDuree, 10); // Ensure this is the duration in minutes
-
+    const duration = parseInt(selectedDuree, 10);
     let endTimeInMinutes = startHour * 60 + startMinute + duration;
     let endHour = Math.floor(endTimeInMinutes / 60);
     const endMinute = endTimeInMinutes % 60;
-
     // If endHour reaches 24, wrap it to 0 (midnight), and so forth
     endHour = endHour % 24;
-
     // Convert endHour back to a string, adding leading zero if necessary
     const endHourStr = endHour.toString().padStart(2, "0");
     const endMinuteStr = endMinute.toString().padStart(2, "0");
-
     setSelectedHeureFin({
       heure: endHourStr,
       minute: endMinuteStr,
     });
   };
-  // Function to filter available start times based on selected duration
 
-  // Example of handling start time selection
   const handleStartTimeChange = (hour, minute) => {
     setSelectedHeureDebut({
       heure: hour,
       minute: minute,
     });
-    // Additional logic to set end time based on start time and duration
     calculateEndTime(hour, minute);
   };
 
   const generateTimeOptions = (availableTimes, selectedDuree) => {
     let options = [];
     const durationInMinutes = parseInt(selectedDuree);
-    // Function to check if a time range is available
     const isRangeAvailable = (
       startHour,
       startMinute,
@@ -194,41 +186,27 @@ function RdvForm(props) {
     ) => {
       const startTime = startHour * 60 + startMinute;
       const endTime = startTime + duration;
-
-      // Check if start time is within any slot
       const startSlotIndex = availableTimes.findIndex((slot) => {
         const slotStart = slot.startHour * 60 + slot.startMinute;
         const slotEnd = slot.endHour * 60 + slot.endMinute;
         return startTime >= slotStart && startTime < slotEnd;
       });
-
-      // If start time is not within any slot, it's not available
       if (startSlotIndex === -1) return false;
-
-      // Check if the end time is within the same slot or extends to the next slot
       const startSlot = availableTimes[startSlotIndex];
       const startSlotEnd = startSlot.endHour * 60 + startSlot.endMinute;
-
-      // If the end time is within the same slot, it's available
       if (endTime <= startSlotEnd) return true;
-
-      // If the end time extends to the next slot, check if the next slot is available
       if (startSlotIndex + 1 < availableTimes.length) {
         const nextSlot = availableTimes[startSlotIndex + 1];
         const nextSlotStart = nextSlot.startHour * 60 + nextSlot.startMinute;
         const nextSlotEnd = nextSlot.endHour * 60 + nextSlot.endMinute;
-
-        // Check if the next slot directly follows the current slot and accommodates the end time
         return nextSlotStart === startSlotEnd && endTime <= nextSlotEnd;
       }
-
-      // If there is no next slot or the end time does not fit within it, it's not available
       return false;
     };
+
     availableTimes.forEach((timeSlot, i) => {
       let currentHour = timeSlot.startHour;
       let currentMinute = timeSlot.startMinute;
-      // Ensure the first option starts at a quarter-hour if not already
       if (currentMinute % 15 !== 0) {
         currentMinute += 15 - (currentMinute % 15);
       }
@@ -252,8 +230,6 @@ function RdvForm(props) {
             value: `${hour}-${minute}`,
           });
         }
-
-        // Increment by 15 minutes
         currentMinute += 15;
         if (currentMinute >= 60) {
           currentMinute -= 60;
@@ -280,7 +256,7 @@ function RdvForm(props) {
           Retour à la Liste
         </button>
       </div>
-      {props.match.params.id === "new" && !selectedPatient._id && (
+      {rdvId === "new" && !selectedPatient._id && (
         <SearchPatient
           onPatientSelect={async (patient) => {
             setLoadingPatient(true);
@@ -302,7 +278,7 @@ function RdvForm(props) {
                 selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
               }`}</p>
             </div>
-            {props.match.params.id === "new" && (
+            {rdvId === "new" && (
               <button
                 className=" h-6 w-6 rounded-md bg-red-400 p-1 font-bold leading-4 text-white"
                 onClick={() => {
@@ -329,7 +305,6 @@ function RdvForm(props) {
                 setSelectedPatient(patient);
               }}
               dataIsValid={(isValid) => setPatientDataIsValid(isValid)}
-              // i want to use a variable to make a sign that this form is for rdv
               isRdvForm={true}
             />
           </div>
@@ -507,8 +482,6 @@ function RdvForm(props) {
               selectedDuree <= 0 ||
               selectedHeureDebut.heure === "00" ||
               !selectedHeureDebut.heure
-              /* ||
-              !selectedHeureDebut.minute */
             }
             className={`m-2 ml-auto mt-3 flex w-fit cursor-pointer list-none rounded-lg p-3 text-center text-xs font-bold text-white no-underline ${
               !selectedDuree ||
@@ -567,7 +540,6 @@ function RdvForm(props) {
                   });
                 }
               } else {
-                // save duree to acteDentaire if it have not an save moments to acteDentaire it is different from acte
                 if (selectedActe && selectedActe._id) {
                   let acteDentaire = { ...selectedActe };
                   acteDentaire.natureId = acteDentaire.natureId._id;
@@ -582,12 +554,10 @@ function RdvForm(props) {
                     await saveActeDentaire(acteDentaire);
                   }
                 }
-
                 await saveRdv({
                   patientId: selectedPatient._id,
                   datePrevu: selectedRdvDate,
                   newPatient: selectedPatient,
-
                   natureId: selectedNatureActe ? selectedNatureActe._id : null,
                   acteId: selectedActe ? selectedActe._id : null,
                   heureDebut: selectedHeureDebut,

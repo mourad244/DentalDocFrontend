@@ -61,7 +61,10 @@ class PatientForm extends Form {
   }
   async populatePatients() {
     try {
-      const patientId = this.props.match && this.props.params.id;
+      const patientId =
+        this.props.match &&
+        this.props.match.params &&
+        this.props.match.params.id;
       const selectedPatient = this.props.selectedPatient;
       if (selectedPatient) {
         return this.setState({ data: this.mapToViewModel(selectedPatient) });
@@ -160,13 +163,13 @@ class PatientForm extends Form {
           !isRdvForm && "border border-white bg-white"
         }`}
       >
-        {this.props &&
-          this.props.selectedPatient &&
-          !this.props.selectedPatient._id && (
-            <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-              Formulaire du patient
-            </p>
-          )}
+        {(!this.props ||
+          (this.props && !this.props.selectedPatient) ||
+          (this.props.selectedPatient && !this.props.selectedPatient._id)) && (
+          <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+            Formulaire du patient
+          </p>
+        )}
         {!isRdvForm && (
           <div className="ml-2  flex justify-start">
             <button
