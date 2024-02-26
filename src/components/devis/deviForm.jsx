@@ -43,7 +43,10 @@ class DeviForm extends Form {
     errors: {},
     medecins: [],
     form: "devis",
+
     loading: false,
+    loadingPatient: false,
+
     nombreActes: 1,
     natureActes: [],
     acteDentaires: [],
@@ -52,7 +55,6 @@ class DeviForm extends Form {
     selecteDActes: [],
     actesEffectues: [],
     selecteDPatient: {},
-    loadingPatient: false,
     nombreDentsPerActe: [],
     selecteDNatureActes: [],
     colors: colorsNatureActe,
@@ -71,7 +73,8 @@ class DeviForm extends Form {
     numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
   };
   async populateDatas() {
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadingPatient: true });
+
     const patientId = this.props.match.params.patientid;
     const deviId = this.props.match.params.deviid;
     const rdvId = this.props.match.params.rdvid;
@@ -199,7 +202,7 @@ class DeviForm extends Form {
         selecteDDents,
       });
     }
-    this.setState({ loading: false });
+    this.setState({ loading: false, loadingPatient: false });
   }
   onSelectPatient = async (patient) => {
     this.setState({
@@ -358,6 +361,7 @@ class DeviForm extends Form {
     const form = this.state.form;
     let data = { ...this.state.data };
     let selecteDActes = [...this.state.selecteDActes];
+    const newPatient = { ...this.state.selecteDPatient };
 
     let montant = 0;
     data.acteEffectues.map((acteItem, index) => {
@@ -369,6 +373,15 @@ class DeviForm extends Form {
     });
     delete data._id;
     delete data.images;
+    data.newPatient = {
+      nom: newPatient.nom,
+      prenom: newPatient.prenom,
+      cin: newPatient.cin,
+      isMasculin: newPatient.isMasculin,
+      telephone: newPatient.telephone,
+      regionId: newPatient.regionId ? newPatient.regionId : undefined,
+      provinceId: newPatient.provinceId ? newPatient.provinceId : undefined,
+    };
     fd = jsonToFormData(data);
     for (const item in this.state) {
       if (item.includes("selected")) {
@@ -383,6 +396,8 @@ class DeviForm extends Form {
       }
     }
     fd.append("montant", montant);
+    // fd.append("newPatient", JSON.stringify(newPatient));
+
     this.props.match !== undefined &&
     this.props.match.params.deviid &&
     this.props.match.params.deviid !== "new"
@@ -399,6 +414,8 @@ class DeviForm extends Form {
   doSubmit = async () => {
     let data = { ...this.state.data };
     let selecteDActes = [...this.state.selecteDActes];
+    const newPatient = { ...this.state.selecteDPatient };
+
     let montant = 0;
     data.acteEffectues.map((acteItem, index) => {
       if (acteItem.prix) {
@@ -408,8 +425,9 @@ class DeviForm extends Form {
       } else return (montant += 0);
     });
     data.montant = montant;
-    await saveDevi(data);
+    data.newPatient = newPatient;
     this.props.history.push("/devis");
+    await saveDevi(data);
   };
   defineActeLines = (e) => {
     e.preventDefault();
@@ -627,11 +645,6 @@ class DeviForm extends Form {
             </div>
           )}
         </div>
-        {console.log("loadingPatient", loadingPatient)}
-        {console.log("loading", loading)}
-        {console.log("selecteDPatient", selecteDPatient)}
-        {console.log("patientDataIsValid", patientDataIsValid)}
-
         {!loadingPatient &&
         !loading &&
         selecteDPatient &&
@@ -927,7 +940,7 @@ class DeviForm extends Form {
                                 )}
                               </td>
                             ) : (
-                              <td></td>
+                              <td />
                             )}
                           </tr>
                         );
@@ -940,9 +953,12 @@ class DeviForm extends Form {
                   <button
                     onClick={this.handleSubmit}
                     className={
-                      !this.validate()
-                        ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
+                      patientDataIsValid && !this.validate()
+                        ? "cursor-pointer rounded-5px border-0 bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
                         : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
+                    }
+                    disabled={
+                      this.validate() || !patientDataIsValid ? true : false
                     }
                   >
                     Sauvegarder

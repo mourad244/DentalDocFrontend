@@ -7,10 +7,12 @@ function rdvUrl(id) {
   return `${apiEndpoint}/${id}`;
 }
 
-export function getRdvs() {
+export function getRdvs(date) {
+  if (date) return http.get(apiEndpoint + "?date=" + date);
   return http.get(apiEndpoint);
 }
-
+// export function getRdvs() {
+// }
 export function getRdv(rdvId) {
   return http.get(rdvUrl(rdvId));
 }

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-
-import ReactPaginate from "react-paginate";
 import { withRouter, useHistory } from "react-router-dom";
 
 import { getRdvs, saveRdv, deleteRdv } from "../../services/rdvService";
@@ -9,22 +7,23 @@ import RdvsTable from "./rdvsTable";
 
 import _ from "lodash";
 import { toast } from "react-toastify";
+import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 
 function Rdvs() {
-  // const date = new Date();
   const [rdvs, setRdvs] = useState([]);
-  const [filteredRdvs, setFilteredRdvs] = useState([]);
   const [selectedRdv, setSelectedRdv] = useState(null);
   const [selectedRdvs, setSelectedRdvs] = useState([]);
+  const [filteredRdvs, setFilteredRdvs] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [sortColumn, setSortColumn] = useState({
     order: "asc",
     path: "heureDebut",
   });
+  const [time, setTime] = useState(new Date());
   const [totalCount, setTotalCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,35 +31,25 @@ function Rdvs() {
   const pageSize = 15;
   const history = useHistory();
 
-  const [time, setTime] = useState(new Date());
-  // const [showDetails, setShowDetails] = useState(false);
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: rdvs } = await getRdvs();
-      setRdvs(rdvs);
+      const { data: filtered } = await getRdvs(time);
+
+      setRdvs(filtered);
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [time]);
 
   useEffect(() => {
     let filtered = rdvs;
     const filterRdvs = async () => {
-      filtered = filtered.filter(
-        (e) =>
-          new Date(e.datePrevu).getFullYear() === time.getFullYear() &&
-          new Date(e.datePrevu).getMonth() === time.getMonth() &&
-          new Date(e.datePrevu).getDate() === time.getDate(),
-      );
       const sortBy =
         sortColumn.path === "heureDebut"
           ? (rdv) => rdv.heureDebut.heure * 60 + rdv.heureDebut.minute
           : sortColumn.path;
-
       const sorted = _.orderBy(filtered, [sortBy], [sortColumn.order]);
-
       const endOffset = itemOffset + pageSize;
       setFilteredRdvs(sorted.slice(itemOffset, endOffset));
       setCurrentPage(Math.ceil(sorted.length / pageSize));

@@ -477,16 +477,16 @@ function RdvForm(props) {
           <button
             disabled={
               !selectedDuree ||
-              !patienDataIsValid ||
               !selectedRdvDate ||
+              !patienDataIsValid ||
               selectedDuree <= 0 ||
-              selectedHeureDebut.heure === "00" ||
-              !selectedHeureDebut.heure
+              !selectedHeureDebut.heure ||
+              selectedHeureDebut.heure === "00"
             }
             className={`m-2 ml-auto mt-3 flex w-fit cursor-pointer list-none rounded-lg p-3 text-center text-xs font-bold text-white no-underline ${
               !selectedDuree ||
-              !patienDataIsValid ||
               !selectedRdvDate ||
+              !patienDataIsValid ||
               selectedDuree <= 0 ||
               !selectedHeureDebut.heure ||
               selectedHeureDebut.heure === "00"

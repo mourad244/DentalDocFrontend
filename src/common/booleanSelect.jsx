@@ -19,7 +19,7 @@ const BooleanSelect = ({
   };
   if (value === "" || value === undefined || value === null)
     return (
-      <div className=" flex w-fit flex-wrap">
+      <div className="flex w-max flex-wrap">
         <label
           className="mr-3  text-right text-xs font-bold leading-[36px] text-[#72757c]"
           htmlFor={name}
@@ -47,7 +47,7 @@ const BooleanSelect = ({
     );
   else
     return (
-      <div className="flex w-fit flex-wrap">
+      <div className="flex w-max flex-wrap">
         <label
           className="mr-3 text-right text-xs font-bold leading-[36px] text-[#72757c]"
           htmlFor={name}
