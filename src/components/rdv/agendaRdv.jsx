@@ -264,15 +264,6 @@ const AgendaRdv = (props) => {
   };
   const handleSelectedDate = async (index) => {
     const date = new Date(time.getFullYear(), time.getMonth(), index + 1);
-    /*let deletedDate = filteredRdvsPatient.find(
-      (e) =>
-        new Date(e.datePrevu).getFullYear() === date.getFullYear() &&
-        new Date(e.datePrevu).getMonth() === date.getMonth() &&
-        new Date(e.datePrevu).getDate() === date.getDate(),
-    );
-     if (deletedDate && window.confirm("Confirmer le suppression du rdv")) {
-      props.onDeleteRdv(deletedDate._id);
-    } else */
     onSelectDate(date);
   };
   const displayDates = () => {
@@ -283,6 +274,9 @@ const AgendaRdv = (props) => {
       for (let j = 0; j < days.length; j++) {
         const t = countTotal;
         let d = new Date(time.getFullYear(), time.getMonth(), t + 1);
+        console.log("j", j);
+        console.log("d", d.getDay());
+        console.log("countTotal", countTotal);
         if (
           days[j] === days[d.getDay()] &&
           t < nombreDays &&
@@ -298,11 +292,12 @@ const AgendaRdv = (props) => {
             selectedRdvDate.getFullYear() === d.getFullYear()
           ) {
             arrayDiv.push(
-              <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+              <div
+                className=" m-1 rounded-md bg-[#778e96] shadow-lg"
+                key={"date-active" + countTotal}
+              >
                 <div
-                  key={"date-active" + countTotal}
-                  className={`m-2 flex h-10 w-10 rounded-3xl bg-[#152961] text-white shadow-daySelected`}
-                  // onClick={() => handleSelectedDate(t)}
+                  className={`m-2 flex h-10 w-10 rounded-3xl bg-[#caecff] shadow-inner`}
                 >
                   <label className="m-auto align-middle text-sm font-bold">
                     {countTotal + 1}
@@ -320,10 +315,12 @@ const AgendaRdv = (props) => {
                 d.getDate() >= date.getDate())
             ) {
               arrayDiv.push(
-                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                <div
+                  className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg"
+                  key={"date-active" + countTotal}
+                >
                   <div
-                    key={"date-active" + countTotal}
-                    className={`m-2 flex h-10 w-10 cursor-pointer rounded-3xl ${
+                    className={`m-2 flex h-10 w-10 cursor-pointer rounded-3xl shadow-inner ${
                       found.isReporte
                         ? "bg-[#e49012]"
                         : found.isAnnule
@@ -340,12 +337,11 @@ const AgendaRdv = (props) => {
               );
             } else {
               arrayDiv.push(
-                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
-                  <div
-                    key={"date-active" + countTotal}
-                    className=" m-2 flex h-10 w-10 rounded-3xl bg-[#d6d7ed]"
-                    // onClick={() => handleSelectedDate(t)}
-                  >
+                <div
+                  className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg"
+                  key={"date-active" + countTotal}
+                >
+                  <div className=" m-2 flex h-10 w-10 rounded-3xl bg-[#b1b2c4] shadow-inner">
                     <label className="m-auto cursor-auto align-middle text-sm font-bold">
                       {countTotal + 1}
                     </label>
@@ -363,10 +359,12 @@ const AgendaRdv = (props) => {
                 d.getDate() >= date.getDate())
             )
               arrayDiv.push(
-                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                <div
+                  className=" m-1 rounded-md bg-[#adced8] shadow-lg"
+                  key={"date-active" + countTotal}
+                >
                   <div
-                    key={"date-active" + countTotal}
-                    className="m-2 flex h-10 w-10 cursor-pointer rounded-3xl bg-[#caecff]"
+                    className="m-2 flex h-10 w-10 cursor-pointer rounded-3xl bg-[#caecff] shadow-md"
                     onClick={() => handleSelectedDate(t)}
                   >
                     <label className="m-auto cursor-pointer align-middle text-sm font-bold">
@@ -377,12 +375,11 @@ const AgendaRdv = (props) => {
               );
             else
               arrayDiv.push(
-                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
-                  <div
-                    key={"date-active" + countTotal}
-                    className=" m-2 flex h-10 w-10 rounded-3xl bg-[#f0faff]"
-                    // onClick={() => handleSelectedDate(t)}
-                  >
+                <div
+                  className=" m-1 rounded-md bg-[#D6E1E3] shadow-md"
+                  key={"date-active" + countTotal}
+                >
+                  <div className=" m-2 flex h-10 w-10 rounded-3xl bg-[#D6E1E3]">
                     <label className="m-auto cursor-auto align-middle text-sm font-bold">
                       {countTotal + 1}
                     </label>
@@ -391,9 +388,8 @@ const AgendaRdv = (props) => {
               );
           } else if (found.nombre >= 10) {
             arrayDiv.push(
-              <div className=" m-1 bg-white">
+              <div key={"date-active" + countTotal} className=" m-1 bg-white">
                 <div
-                  key={"date-active" + countTotal}
                   className="pointer-events-none m-2  flex h-10 w-10 rounded-3xl bg-[#eaeaea] shadow-dayFull"
                   onClick={() => handleSelectedDate(t)}
                 >
@@ -405,23 +401,21 @@ const AgendaRdv = (props) => {
             );
           }
           countTotal++;
-        } else if (d.getDay() === 0) {
+        } else if (
+          d.getDay() === 0 ||
+          t >= nombreDays /*  ||
+          (j === 0 && countTotal === 0) */
+        ) {
           arrayDiv.push(
-            <div className=" bg-white  p-1">
-              <div
-                key={"date-inactif" + j}
-                className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-              />
+            <div className=" bg-white  p-1" key={"date-inactif" + j}>
+              <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
             </div>,
           );
           countTotal++;
         } else {
           arrayDiv.push(
-            <div className=" bg-white p-1">
-              <div
-                key={"date-inactif" + j}
-                className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-              />
+            <div className="p-1" key={"date-inactif" + j}>
+              <div className=" m-2  flex h-10 w-10 rounded-3xl " />
             </div>,
           );
         }
@@ -579,7 +573,7 @@ const AgendaRdv = (props) => {
   };
   return (
     <div className="flex flex-wrap">
-      <div className="m-auto my-2 flex h-fit w-fit min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+      <div className="m-auto my-2  flex h-fit w-fit min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
         <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
           <PrecedentButton
             className="cursor-pointer"
@@ -598,11 +592,11 @@ const AgendaRdv = (props) => {
           />
         </div>
 
-        <div className="mb-1 ml-16 mt-6 flex">
+        <div className="ml-16 mr-16 mt-2 flex bg-[#eeeeee] ">
           {days.map((e) =>
             e !== "Dimanche" ? (
               <label
-                className="border-x-1 m-1 w-14 rounded-md border-white bg-[#4F6874] py-2 text-center text-xs font-bold  text-white"
+                className="border-x-1 m-1 w-14 rounded-md border-white bg-[#6a8997] py-2 text-center text-xs font-bold  text-white"
                 key={e}
                 htmlFor={e}
               >
@@ -613,7 +607,7 @@ const AgendaRdv = (props) => {
             ),
           )}
         </div>
-        <div className="flex w-[450px] flex-wrap bg-[#eeeeee]">
+        <div className=" flex w-[448px] flex-wrap bg-[#eeeeee]">
           {displayDates()}
         </div>
       </div>
