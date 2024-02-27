@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.15e25442.css",
-    "main.js": "/static/js/main.abb8c28a.js",
+    "main.js": "/static/js/main.26a1a4b0.js",
     "static/media/icon-dental.png": "/static/media/icon-dental.bc4ba4dce2d20450ea73.png",
     "static/media/roboto-latin-900italic.woff": "/static/media/roboto-latin-900italic.c20d916c1a1b094c1cec.woff",
     "static/media/roboto-latin-300italic.woff": "/static/media/roboto-latin-300italic.bd5b7a13f2c52b531a2a.woff",
@@ -43,10 +43,10 @@
     "static/media/precedent-btn.svg": "/static/media/precedent-btn.0af0347189689b646dac7e52f0e33343.svg",
     "static/media/suivant-btn.svg": "/static/media/suivant-btn.0f1c22a734a32e254adc1ae30ddfab9a.svg",
     "main.15e25442.css.map": "/static/css/main.15e25442.css.map",
-    "main.abb8c28a.js.map": "/static/js/main.abb8c28a.js.map"
+    "main.26a1a4b0.js.map": "/static/js/main.26a1a4b0.js.map"
   },
   "entrypoints": [
     "static/css/main.15e25442.css",
-    "static/js/main.abb8c28a.js"
+    "static/js/main.26a1a4b0.js"
   ]
 }
