@@ -274,9 +274,7 @@ const AgendaRdv = (props) => {
       for (let j = 0; j < days.length; j++) {
         const t = countTotal;
         let d = new Date(time.getFullYear(), time.getMonth(), t + 1);
-        console.log("j", j);
-        console.log("d", d.getDay());
-        console.log("countTotal", countTotal);
+        // if (t === 0) console.log("day", days[j]);
         if (
           days[j] === days[d.getDay()] &&
           t < nombreDays &&
@@ -401,11 +399,13 @@ const AgendaRdv = (props) => {
             );
           }
           countTotal++;
-        } else if (
-          d.getDay() === 0 ||
-          t >= nombreDays /*  ||
-          (j === 0 && countTotal === 0) */
-        ) {
+        } else if (j === 0 && countTotal === 0) {
+          arrayDiv.push(
+            <div className=" bg-white  p-1" key={"date-inactif" + j}>
+              <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
+            </div>,
+          );
+        } else if (d.getDay() === 0 || t >= nombreDays) {
           arrayDiv.push(
             <div className=" bg-white  p-1" key={"date-inactif" + j}>
               <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
@@ -537,12 +537,12 @@ const AgendaRdv = (props) => {
             return (
               <div
                 key={index}
-                className={`min-w-fit  border-2  p-1 text-center text-xs font-bold  ${
+                className={`min-w-fit border-2 border-[#ffffff]  p-1  text-center text-xs font-bold   ${
                   segment.available
-                    ? "bg-[#caecff] text-zinc-700"
+                    ? "bg-[#caecff] text-zinc-700 shadow-md"
                     : segment.isSelected
-                    ? "bg-[#152961] text-white"
-                    : "bg-gray-300"
+                    ? "bg-[#152961] text-white shadow-inner"
+                    : "bg-gray-300 text-[#363636]"
                 }`}
                 style={{
                   width: segmentWidth,
