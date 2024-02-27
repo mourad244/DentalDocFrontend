@@ -63,28 +63,29 @@ function App() {
   return (
     <React.Fragment>
       <ToastContainer />
-      <div className="m-0 flex h-24  bg-gradient-radial p-1 shadow-xl ">
-        <p className=" ml-5 flex w-48 items-center text-center text-xl font-bold text-[#424746]">
-          Cabinet dentaire
-        </p>
-        <img
-          // i want that the image be at the center of the header even if the screen is small
-          className="z-10 m-auto h-24 "
-          src={logo}
-          alt=""
-        />
-        <div className="flex w-48 flex-row">
-          <p className="user-name m-auto ml-5 mr-9 flex  items-center text-center text-xl font-bold text-[#424746]">
-            {user.role}
+      <div className="w-auto min-w-fit">
+        <div className="m-0 flex h-24  bg-gradient-radial p-1 shadow-xl ">
+          <p className=" ml-5 flex w-48 items-center text-center text-xl font-bold text-[#424746]">
+            Cabinet dentaire
           </p>
-          <RiLogoutCircleRLine
-            className="mr-5 cursor-pointer self-center"
-            size="35"
-            onClick={logOut}
-            color="#FF4D4D"
+          <img
+            // i want that the image be at the center of the header even if the screen is small
+            className="z-10 m-auto h-24 "
+            src={logo}
+            alt=""
           />
-        </div>
-        {/* <svg
+          <div className="flex w-48 flex-row">
+            <p className="user-name m-auto ml-5 mr-9 flex  items-center text-center text-xl font-bold text-[#424746]">
+              {user.role}
+            </p>
+            <RiLogoutCircleRLine
+              className="mr-5 cursor-pointer self-center"
+              size="35"
+              onClick={logOut}
+              color="#FF4D4D"
+            />
+          </div>
+          {/* <svg
           className="cursor-pointer self-center"
           width="30"
           height="30"
@@ -99,100 +100,101 @@ function App() {
             fill="#FFAFAF"
           />
         </svg> */}
-      </div>
-      <div className=" flex flex-row">
-        <NavBar user={user} />
+        </div>
+        <div className=" flex flex-row">
+          <NavBar user={user} />
 
-        <main className=" w-min[1300px] flex w-[100%] flex-col px-2">
-          <Switch>
-            {/* login */}
-            <Route path="/login" exact component={LoginForm} />
-            {/* Accueil */}
-            {user.role === "autorite" || user.role === "admin" ? (
-              <Route path="/accueil" exact component={Accueil} />
-            ) : (
-              ""
-            )}
-            {/* Devis */}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route
-                path="/devis/:deviid/:patientid/:rdvid"
-                exact
-                component={DeviForm}
-              />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/devis/:deviid" exact component={DeviForm} />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/devis" exact component={Devis} />
-            ) : (
-              ""
-            )}
-            {/* paiements */}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route
-                path="/paiements/new/:patientid"
-                exact
-                component={PaiementForm}
-              />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route
-                path="/paiements/:paiementid"
-                exact
-                component={PaiementForm}
-              />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "comptable" ? (
-              <Route path="/paiements" exact component={Paiements} />
-            ) : (
-              ""
-            )}
-            {/* patients */}
-            {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/patients/:id" exact component={PatientForm} />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/patients" component={Patients} />
-            ) : (
-              ""
-            )}
-            {/* rdvs */}
-            {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/rdvs/postpone/:id" exact component={RdvForm} />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/rdvs/:id" exact component={RdvForm} />
-            ) : (
-              ""
-            )}
-            {user.role === "admin" || user.role === "assistante" ? (
-              <Route path="/rdvs" exact component={Rdvs} />
-            ) : (
-              ""
-            )}
+          <main className=" w-min[1300px] flex w-[100%] flex-col px-2">
+            <Switch>
+              {/* login */}
+              <Route path="/login" exact component={LoginForm} />
+              {/* Accueil */}
+              {user.role === "autorite" || user.role === "admin" ? (
+                <Route path="/accueil" exact component={Accueil} />
+              ) : (
+                ""
+              )}
+              {/* Devis */}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route
+                  path="/devis/:deviid/:patientid/:rdvid"
+                  exact
+                  component={DeviForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route path="/devis/:deviid" exact component={DeviForm} />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route path="/devis" exact component={Devis} />
+              ) : (
+                ""
+              )}
+              {/* paiements */}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route
+                  path="/paiements/new/:patientid"
+                  exact
+                  component={PaiementForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route
+                  path="/paiements/:paiementid"
+                  exact
+                  component={PaiementForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route path="/paiements" exact component={Paiements} />
+              ) : (
+                ""
+              )}
+              {/* patients */}
+              {user.role === "admin" || user.role === "assistante" ? (
+                <Route path="/patients/:id" exact component={PatientForm} />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "assistante" ? (
+                <Route path="/patients" component={Patients} />
+              ) : (
+                ""
+              )}
+              {/* rdvs */}
+              {user.role === "admin" || user.role === "assistante" ? (
+                <Route path="/rdvs/postpone/:id" exact component={RdvForm} />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "assistante" ? (
+                <Route path="/rdvs/:id" exact component={RdvForm} />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "assistante" ? (
+                <Route path="/rdvs" exact component={Rdvs} />
+              ) : (
+                ""
+              )}
 
-            {user.role === "admin" && (
-              <Route path="/settings" exact component={Settings} />
-            )}
-            {/* not found */}
-            <Route path="/not-found" exact component={NotFound} />
-            {/* <Redirect from="/" exact to="/patients"></Redirect> */}
-          </Switch>
-        </main>
+              {user.role === "admin" && (
+                <Route path="/settings" exact component={Settings} />
+              )}
+              {/* not found */}
+              <Route path="/not-found" exact component={NotFound} />
+              {/* <Redirect from="/" exact to="/patients"></Redirect> */}
+            </Switch>
+          </main>
+        </div>
       </div>
     </React.Fragment>
   );
