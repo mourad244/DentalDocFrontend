@@ -135,13 +135,13 @@ function Rdvs() {
   const handleAddDevi = () => {
     history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
   };
-
   const handleCancel = () => {
     let newRdvs = [...rdvs];
     let data = { ...selectedRdv };
     data.isHonnore = false;
     data.isAnnule = true;
     data.patientId = data.patientId._id;
+    data.acteId = data.acteId && data.acteId._id ? data.acteId._id : null;
 
     newRdvs.some((e, index) => {
       if (e._id === selectedRdv._id) {

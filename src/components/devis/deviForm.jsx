@@ -658,8 +658,8 @@ class DeviForm extends Form {
                 sortColumn={this.state.sortColumn}
               />
             )}
-            <div className="mt-2 bg-[#a2bdc5]">
-              <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
+            <div className="m-2 bg-[#a2bdc5]">
+              <p className="w-full bg-[#4F6874] p-2 text-xl font-bold text-white">
                 Actes à éffectuer
               </p>
               <form>
@@ -720,26 +720,26 @@ class DeviForm extends Form {
                       this.renderImage("images", "Images", 200)}
                   </div>
                 </div>
-                <div className="m-2 flex justify-between">
-                  <table className="my-0 mr-2 h-fit w-fit">
+                <div className="m-2 flex justify-between ">
+                  <table className="my-0 mr-2 h-fit w-fit rounded-md border-2 border-white">
                     <thead className="h-12  text-[#4f5361]">
-                      <tr className="h-8 w-[100%] bg-[#D6E1E3] text-center">
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                      <tr className="h-8 w-[100%] bg-[#4F6874] text-center">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Nature Acte
                         </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Code Acte
                         </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Description
                         </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Prix
                         </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Nombre Dent
                         </th>
-                        <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                        <th className="px-3 text-xs font-semibold text-white">
                           Dent
                         </th>
                       </tr>
@@ -750,7 +750,7 @@ class DeviForm extends Form {
                         return (
                           <tr
                             key={"acte" + indexActe}
-                            className="h-12 bg-[#D6E1E3] text-center"
+                            className="h-12 border-2 border-white bg-[#D6E1E3] text-center"
                             style={
                               selecteDNatureActes[indexActe]
                                 ? {
