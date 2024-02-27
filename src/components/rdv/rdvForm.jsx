@@ -398,7 +398,7 @@ function RdvForm(props) {
                   name={"moments"}
                   label={"Moments"}
                   widthLabel={96}
-                  width={200}
+                  width={206}
                   listItems={["matin", "apres-midi", "soir"]}
                   labelItems={["Matin", "Après-midi", "Soir"]}
                   value={selectedMomemts}

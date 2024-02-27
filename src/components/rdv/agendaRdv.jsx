@@ -298,14 +298,16 @@ const AgendaRdv = (props) => {
             selectedRdvDate.getFullYear() === d.getFullYear()
           ) {
             arrayDiv.push(
-              <div
-                key={"date-active" + countTotal}
-                className={`m-2 flex h-10 w-10 rounded-3xl bg-[#152961] text-white shadow-daySelected`}
-                // onClick={() => handleSelectedDate(t)}
-              >
-                <label className="m-auto align-middle text-sm font-bold">
-                  {countTotal + 1}
-                </label>
+              <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                <div
+                  key={"date-active" + countTotal}
+                  className={`m-2 flex h-10 w-10 rounded-3xl bg-[#152961] text-white shadow-daySelected`}
+                  // onClick={() => handleSelectedDate(t)}
+                >
+                  <label className="m-auto align-middle text-sm font-bold">
+                    {countTotal + 1}
+                  </label>
+                </div>
               </div>,
             );
           } else if (found) {
@@ -318,32 +320,36 @@ const AgendaRdv = (props) => {
                 d.getDate() >= date.getDate())
             ) {
               arrayDiv.push(
-                <div
-                  key={"date-active" + countTotal}
-                  className={`m-2 flex h-10 w-10 cursor-pointer rounded-3xl ${
-                    found.isReporte
-                      ? "bg-[#e49012]"
-                      : found.isAnnule
-                      ? " bg-[#ff6868]"
-                      : "bg-[#506496]"
-                  }  text-white shadow-daySelected`}
-                  onClick={() => handleSelectedDate(t)}
-                >
-                  <label className="m-auto cursor-pointer align-middle text-sm font-bold">
-                    {countTotal + 1}
-                  </label>
+                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                  <div
+                    key={"date-active" + countTotal}
+                    className={`m-2 flex h-10 w-10 cursor-pointer rounded-3xl ${
+                      found.isReporte
+                        ? "bg-[#e49012]"
+                        : found.isAnnule
+                        ? " bg-[#ff6868]"
+                        : "bg-[#506496]"
+                    }  text-white shadow-daySelected`}
+                    onClick={() => handleSelectedDate(t)}
+                  >
+                    <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                      {countTotal + 1}
+                    </label>
+                  </div>
                 </div>,
               );
             } else {
               arrayDiv.push(
-                <div
-                  key={"date-active" + countTotal}
-                  className=" m-2 flex h-10 w-10 rounded-3xl bg-[#d6d7ed]"
-                  // onClick={() => handleSelectedDate(t)}
-                >
-                  <label className="m-auto cursor-auto align-middle text-sm font-bold">
-                    {countTotal + 1}
-                  </label>
+                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                  <div
+                    key={"date-active" + countTotal}
+                    className=" m-2 flex h-10 w-10 rounded-3xl bg-[#d6d7ed]"
+                    // onClick={() => handleSelectedDate(t)}
+                  >
+                    <label className="m-auto cursor-auto align-middle text-sm font-bold">
+                      {countTotal + 1}
+                    </label>
+                  </div>
                 </div>,
               );
             }
@@ -357,56 +363,66 @@ const AgendaRdv = (props) => {
                 d.getDate() >= date.getDate())
             )
               arrayDiv.push(
+                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                  <div
+                    key={"date-active" + countTotal}
+                    className="m-2 flex h-10 w-10 cursor-pointer rounded-3xl bg-[#caecff]"
+                    onClick={() => handleSelectedDate(t)}
+                  >
+                    <label className="m-auto cursor-pointer align-middle text-sm font-bold">
+                      {countTotal + 1}
+                    </label>
+                  </div>
+                </div>,
+              );
+            else
+              arrayDiv.push(
+                <div className=" m-1 rounded-md bg-[#D6E1E3] shadow-lg">
+                  <div
+                    key={"date-active" + countTotal}
+                    className=" m-2 flex h-10 w-10 rounded-3xl bg-[#f0faff]"
+                    // onClick={() => handleSelectedDate(t)}
+                  >
+                    <label className="m-auto cursor-auto align-middle text-sm font-bold">
+                      {countTotal + 1}
+                    </label>
+                  </div>
+                </div>,
+              );
+          } else if (found.nombre >= 10) {
+            arrayDiv.push(
+              <div className=" m-1 bg-white">
                 <div
                   key={"date-active" + countTotal}
-                  className="m-2 flex h-10 w-10 cursor-pointer rounded-3xl bg-[#caecff]"
+                  className="pointer-events-none m-2  flex h-10 w-10 rounded-3xl bg-[#eaeaea] shadow-dayFull"
                   onClick={() => handleSelectedDate(t)}
                 >
                   <label className="m-auto cursor-pointer align-middle text-sm font-bold">
                     {countTotal + 1}
                   </label>
-                </div>,
-              );
-            else
-              arrayDiv.push(
-                <div
-                  key={"date-active" + countTotal}
-                  className=" m-2 flex h-10 w-10 rounded-3xl bg-[#f0faff]"
-                  // onClick={() => handleSelectedDate(t)}
-                >
-                  <label className="m-auto cursor-auto align-middle text-sm font-bold">
-                    {countTotal + 1}
-                  </label>
-                </div>,
-              );
-          } else if (found.nombre >= 10) {
-            arrayDiv.push(
-              <div
-                key={"date-active" + countTotal}
-                className="pointer-events-none m-2  flex h-10 w-10 rounded-3xl bg-[#eaeaea] shadow-dayFull"
-                onClick={() => handleSelectedDate(t)}
-              >
-                <label className="m-auto cursor-pointer align-middle text-sm font-bold">
-                  {countTotal + 1}
-                </label>
+                </div>
               </div>,
             );
           }
           countTotal++;
         } else if (d.getDay() === 0) {
           arrayDiv.push(
-            <div
-              key={"date-inactif" + j}
-              className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-            />,
+            <div className=" bg-white  p-1">
+              <div
+                key={"date-inactif" + j}
+                className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
+              />
+            </div>,
           );
           countTotal++;
         } else {
           arrayDiv.push(
-            <div
-              key={"date-inactif" + j}
-              className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
-            />,
+            <div className=" bg-white p-1">
+              <div
+                key={"date-inactif" + j}
+                className=" m-2  flex h-10 w-10 rounded-3xl bg-white"
+              />
+            </div>,
           );
         }
       }
@@ -582,11 +598,11 @@ const AgendaRdv = (props) => {
           />
         </div>
 
-        <div className="mb-3 ml-14 mt-6 flex">
+        <div className="mb-1 ml-16 mt-6 flex">
           {days.map((e) =>
             e !== "Dimanche" ? (
               <label
-                className="w-14 text-center text-xs font-bold text-[#3d3d3d]"
+                className="border-x-1 m-1 w-14 rounded-md border-white bg-[#4F6874] py-2 text-center text-xs font-bold  text-white"
                 key={e}
                 htmlFor={e}
               >
@@ -597,7 +613,9 @@ const AgendaRdv = (props) => {
             ),
           )}
         </div>
-        <div className="flex w-[420px] flex-wrap">{displayDates()}</div>
+        <div className="flex w-[450px] flex-wrap bg-[#eeeeee]">
+          {displayDates()}
+        </div>
       </div>
       {selectedRdvDate && (
         <div className="m-auto my-2 flex h-fit w-[600px] flex-col rounded-5px border border-white bg-white shadow-component ">

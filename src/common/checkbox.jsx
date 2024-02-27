@@ -26,7 +26,7 @@ const Checkbox = ({
     */
   return (
     <div className="flex flex-col">
-      <div className="flex w-fit flex-wrap">
+      <div className="flex w-fit flex-wrap ">
         {label && (
           <label
             className={`mr-3 text-right text-xs font-bold leading-9 text-[#72757c]`}
@@ -35,17 +35,20 @@ const Checkbox = ({
             {label}
           </label>
         )}
-        <div className={`flex justify-between`} style={{ width }}>
+        <div
+          className={`flex justify-between rounded-md	border-0 bg-[#D6E1E3] `}
+          style={{ width }}
+        >
           {listItems.map((item, index) => (
-            <div key={item}>
+            <div className="px-1" key={item}>
               <label
                 htmlFor={item}
-                className="mr-2 inline-flex items-center text-xs font-bold leading-9 text-[#72757c]"
+                className="inline-flex items-center text-xs font-bold leading-9 text-[#1f2037]"
               >
                 <input
                   name={name}
                   id={item}
-                  className="mr-2"
+                  className="mx-1"
                   type="checkbox"
                   checked={value ? value.includes(item) : false}
                   onChange={(e) => onChange(name, item, e.target.checked)}
