@@ -494,6 +494,9 @@ function RdvForm(props) {
                 : "bg-[#4F6874]"
             } `}
             onClick={async () => {
+              setLoading(true);
+              setLoadingPatient(true);
+
               if (isRdvModified) {
                 if (isPostponed) {
                   let oldData = {
@@ -564,6 +567,8 @@ function RdvForm(props) {
                   heureFin: selectedHeureFin,
                 });
               }
+              setLoading(false);
+              setLoadingPatient(false);
               history.push("/rdvs");
             }}
           >

@@ -117,6 +117,15 @@ function App() {
               {/* Devis */}
               {user.role === "admin" || user.role === "comptable" ? (
                 <Route
+                  path="/devis/:deviid/:patientid/:rdvid/:acteid"
+                  exact
+                  component={DeviForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" || user.role === "comptable" ? (
+                <Route
                   path="/devis/:deviid/:patientid/:rdvid"
                   exact
                   component={DeviForm}

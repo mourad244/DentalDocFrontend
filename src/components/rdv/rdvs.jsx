@@ -133,7 +133,13 @@ function Rdvs() {
     history.push(`/rdvs/postpone/${selectedRdv._id}`);
   };
   const handleAddDevi = () => {
-    history.push(`/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}`);
+    history.push(
+      `/devis/new/${selectedRdv.patientId._id}/${selectedRdv._id}${
+        selectedRdv.acteId && selectedRdv.acteId._id
+          ? `/${selectedRdv.acteId._id}`
+          : ""
+      }`,
+    );
   };
   const handleCancel = () => {
     let newRdvs = [...rdvs];

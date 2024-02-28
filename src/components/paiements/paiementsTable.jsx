@@ -42,6 +42,15 @@ function PaiementsTable({
           switch (key) {
             case "select":
               return null;
+            case "montant":
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {paiement.montant ? `${paiement.montant} Dh` : `Non défini`}
+                </td>
+              );
             case "patientId":
               return (
                 <td

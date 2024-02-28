@@ -67,9 +67,11 @@ function RdvsTable(props) {
       content: (rdv) => {
         return (
           <label key={rdv._id}>
-            {rdv.acteId && rdv.acteId.nom && rdv.acteId.nom.length > 50
-              ? rdv.acteId.nom.substring(0, 50) + "..."
-              : rdv.acteId.nom}
+            {rdv.acteId && rdv.acteId.nom
+              ? rdv.acteId.nom.length > 50
+                ? rdv.acteId.nom.substring(0, 50) + "..."
+                : rdv.acteId.nom
+              : ""}
           </label>
         );
       },

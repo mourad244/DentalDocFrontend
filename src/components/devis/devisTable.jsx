@@ -68,6 +68,15 @@ function DevisTable({
         {headers.map((header, index) => {
           const key = header.name;
           switch (key) {
+            case "montant":
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {devi.montant ? `${devi.montant} Dh` : `Non défini`}
+                </td>
+              );
             case "select":
               return null;
             case "patientId":

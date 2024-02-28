@@ -50,23 +50,31 @@ function PaiementActesTable(props) {
         Paiement des actes effectués
       </div>
       <div className="m-2 flex justify-between">
-        <div className="mr-2">
-          <Table
-            columns={columns}
-            data={actesEffectuees}
-            sortColumn={sortColumn}
-            onSort={onSort}
-          />
-          <div className="flex justify-end border-t-2 border-black ">
-            <p
-              className={`${
-                balance > 0 ? "bg-[#df6666]" : "bg-[#2bbb07]"
-              } p-2 text-sm font-bold text-[#303233]`}
-            >
-              Balance: {totalDevis} - {totalPaiements} = {balance} Dh
+        {actesEffectuees.length !== 0 ? (
+          <div className="mr-2">
+            <Table
+              columns={columns}
+              data={actesEffectuees}
+              sortColumn={sortColumn}
+              onSort={onSort}
+            />
+            <div className="flex justify-end border-t-2 border-black ">
+              <p
+                className={`${
+                  balance > 0 ? "bg-[#df6666]" : "bg-[#2bbb07]"
+                } p-2 text-sm font-bold text-[#303233]`}
+              >
+                Balance: {totalDevis} - {totalPaiements} = {balance} Dh
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex h-fit items-center justify-center">
+            <p className="text-sm font-bold text-[#303233]">
+              Aucun acte effectué
             </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

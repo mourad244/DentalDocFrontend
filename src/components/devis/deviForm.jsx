@@ -75,23 +75,29 @@ class DeviForm extends Form {
   async populateDatas() {
     this.setState({ loading: true, loadingPatient: true });
 
-    const patientId = this.props.match.params.patientid;
-    const deviId = this.props.match.params.deviid;
+    const { data: dents } = await getDents();
+    const { data: medecins } = await getMedecins();
+    const { data: natureActes } = await getNatureActes();
+    const { data: acteDentaires } = await getActeDentaires();
+
     const rdvId = this.props.match.params.rdvid;
+    const acteId = this.props.match.params.acteid;
+    let selectedActeRdv = undefined;
+    if (acteId) {
+      selectedActeRdv = acteDentaires.find((item) => item._id === acteId);
+    }
+    const deviId = this.props.match.params.deviid;
+    const patientId = this.props.match.params.patientid;
     if (deviId === "new" || deviId === undefined) {
       let rdvDate = new Date();
       if (rdvId) {
         const { data: rdv } = await getRdv(rdvId);
         rdvDate = rdv.datePrevu;
       }
-      const { data: dents } = await getDents();
-      const { data: medecins } = await getMedecins();
-      const { data: natureActes } = await getNatureActes();
-      const { data: acteDentaires } = await getActeDentaires();
-
       if (patientId) {
         const { data: patient } = await getPatient(patientId);
         let newData = { ...this.state.data };
+
         if (
           patient.deviIds !== undefined &&
           patient.deviIds !== null &&
@@ -120,12 +126,35 @@ class DeviForm extends Form {
             natureActes,
           });
         } else {
+          let selecteDActes = [];
+          let selecteDNatureActes = [];
+          let filteredActeDentaires = [];
+
+          if (selectedActeRdv) {
+            selecteDActes = [selectedActeRdv];
+            selecteDNatureActes = [
+              natureActes.find(
+                (item) => item._id === selectedActeRdv.natureId._id,
+              ),
+            ];
+            filteredActeDentaires = [
+              acteDentaires.filter((e) => e._id === acteId),
+            ];
+          }
+
           this.setState({
             selecteDPatient: patient,
             searchQuery: "",
             data: {
               ...newData,
               patientId: patient._id,
+              acteEffectues: [
+                {
+                  acteId: selectedActeRdv,
+                  dentIds: [],
+                  prix: selectedActeRdv ? selectedActeRdv.prix : 0,
+                },
+              ],
               rdvIds: rdvId ? [rdvId] : [],
               dateDevi: rdvDate,
             },
@@ -134,6 +163,9 @@ class DeviForm extends Form {
             medecins,
             acteDentaires,
             natureActes,
+            selecteDActes,
+            selecteDNatureActes,
+            filteredActeDentaires,
           });
         }
       } else {
@@ -144,12 +176,9 @@ class DeviForm extends Form {
           natureActes,
         });
       }
-    } else if (deviId) {
+    } else {
       const { data: devi } = await getDevi(deviId);
-      const { data: dents } = await getDents();
-      const { data: medecins } = await getMedecins();
-      const { data: natureActes } = await getNatureActes();
-      const { data: acteDentaires } = await getActeDentaires();
+
       let selecteDDents = [];
       let selecteDActes = [];
       let nombreDentsPerActe = [];
@@ -195,6 +224,7 @@ class DeviForm extends Form {
         acteDentaires,
         natureActes,
         nombreActes: devi.acteEffectues.length,
+
         filteredActeDentaires,
         selecteDNatureActes,
         selecteDActes,
@@ -412,6 +442,7 @@ class DeviForm extends Form {
     }
   };
   doSubmit = async () => {
+    this.setState({ loading: true });
     let data = { ...this.state.data };
     let selecteDActes = [...this.state.selecteDActes];
     const newPatient = { ...this.state.selecteDPatient };
@@ -426,8 +457,9 @@ class DeviForm extends Form {
     });
     data.montant = montant;
     data.newPatient = newPatient;
-    this.props.history.push("/devis");
     await saveDevi(data);
+    this.setState({ loading: false });
+    this.props.history.push("/devis");
   };
   defineActeLines = (e) => {
     e.preventDefault();
@@ -720,7 +752,7 @@ class DeviForm extends Form {
                       this.renderImage("images", "Images", 200)}
                   </div>
                 </div>
-                <div className="m-2 flex justify-between ">
+                <div className="mx-2 flex justify-between ">
                   <table className="my-0 mr-2 h-fit w-fit rounded-md border-2 border-white">
                     <thead className="h-12  text-[#4f5361]">
                       <tr className="h-8 w-[100%] bg-[#4F6874] text-center">
@@ -728,10 +760,10 @@ class DeviForm extends Form {
                           Nature Acte
                         </th>
                         <th className="px-3 text-xs font-semibold text-white">
-                          Code Acte
+                          Acte
                         </th>
                         <th className="px-3 text-xs font-semibold text-white">
-                          Description
+                          Code
                         </th>
                         <th className="px-3 text-xs font-semibold text-white">
                           Prix
@@ -770,7 +802,7 @@ class DeviForm extends Form {
                                   onChange={(e) =>
                                     this.handleSelecteDNature(e, indexActe)
                                   }
-                                  width={170}
+                                  width={120}
                                   height={35}
                                   value={
                                     selecteDNatureActes[indexActe]
@@ -786,14 +818,16 @@ class DeviForm extends Form {
                                 <div className="m-2 flex justify-center">
                                   <div className="flex w-fit flex-wrap ">
                                     <select
-                                      name="codeActe"
-                                      id="codeActe"
-                                      className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                      name="acte"
+                                      id={"acte" + indexActe}
+                                      className="  rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                                       onChange={(e) =>
                                         this.handleSelecteDActe(e, indexActe)
                                       }
                                       style={{
                                         height: 35,
+                                        // width: 220,
+                                        maxWidth: 450,
                                       }}
                                       value={
                                         selecteDActes[indexActe]
@@ -809,7 +843,7 @@ class DeviForm extends Form {
                                               key={indexActe + option._id}
                                               value={option._id}
                                             >
-                                              {option.code}
+                                              {option.nom}
                                             </option>
                                           );
                                         },
@@ -823,7 +857,7 @@ class DeviForm extends Form {
                             </td>
                             <td className="px-1 text-xs font-medium text-[#2f2f2f]">
                               {selecteDActes[indexActe]
-                                ? selecteDActes[indexActe].nom
+                                ? selecteDActes[indexActe].code
                                 : ""}
                             </td>
                             <td>
@@ -844,7 +878,7 @@ class DeviForm extends Form {
                                     onChange={(e) =>
                                       this.definePrixActe(e, indexActe)
                                     }
-                                    width={80}
+                                    width={70}
                                     height={35}
                                   />
                                 </div>
@@ -895,7 +929,7 @@ class DeviForm extends Form {
                                             "dent" +
                                             indexDent
                                           }
-                                          className=" w-24 rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
+                                          className="rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "
                                           onChange={(e) =>
                                             this.handleSelecteDDent(
                                               e,
@@ -949,7 +983,7 @@ class DeviForm extends Form {
                   </table>
                   <SchemaDent className="min-w-fit" dents={colorDents} />
                 </div>
-                <div className="mr-6 mt-3 flex w-full justify-end">
+                <div className=" flex w-full justify-end p-2">
                   <button
                     onClick={this.handleSubmit}
                     className={

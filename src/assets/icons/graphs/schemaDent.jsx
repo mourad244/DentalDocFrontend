@@ -12,9 +12,9 @@ const SchemaDent = ({ dents }) => {
           width="310"
           height="382"
           rx="22"
-          fill="#CAECFF"
-          stroke={textColor}
-          strokeWidth="6"
+          fill="#D6E1E3"
+          stroke={"#4F6874"}
+          strokeWidth="5"
         />
         <g id="11">
           <path
