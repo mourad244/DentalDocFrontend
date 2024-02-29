@@ -35,7 +35,6 @@ function Rdvs() {
     const fetchData = async () => {
       setLoading(true);
       const { data: filtered } = await getRdvs(time);
-
       setRdvs(filtered);
       setLoading(false);
     };

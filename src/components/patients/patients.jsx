@@ -69,10 +69,11 @@ function Patients() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const { data: regionsData } = await getRegions();
       const { data: provincesData } = await getProvinces();
-
       setDatas({ regions: regionsData, provinces: provincesData });
+      setLoading(false);
     };
     fetchData();
   }, []);
