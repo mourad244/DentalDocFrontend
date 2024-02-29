@@ -6,14 +6,3 @@ const apiEndpoint = apiUrl + "/patientslist";
 export function getPatientsList() {
   return http.get(apiEndpoint);
 }
-
-export function getPatientsListWithPagination({
-  currentPage,
-  pageSize,
-  sortColumn,
-  searchQuery,
-}) {
-  return http.get(
-    `${apiEndpoint}?currentPage=${currentPage}&pageSize=${pageSize}&sortColumn=${sortColumn}&searchQuery=${searchQuery}`,
-  );
-}

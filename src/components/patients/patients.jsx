@@ -14,6 +14,7 @@ import { BsPersonAdd } from "react-icons/bs";
 import { useHistory } from "react-router-dom";
 import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
+import { getPatientsListWithPagination } from "../../services/patientListPaginateService";
 
 function Patients() {
   const [selectedFilterItems, setSelectedFilterItems] = useState({
@@ -61,10 +62,7 @@ function Patients() {
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ];
-  // const [formDisplay, setFormDisplay] = useState(false);
-
-  // const [showDetails, setShowDetails] = useState(false);
-  const pageSize = 5;
+  const pageSize = 6;
   const history = useHistory();
 
   useEffect(() => {
@@ -81,47 +79,33 @@ function Patients() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: patientsData } = await getPatientsList();
-      setPatients(patientsData);
+      console.log("currentPage", currentPage);
+      try {
+        const {
+          data: { data, totalCount },
+        } = await getPatientsListWithPagination({
+          currentPage,
+          pageSize,
+          sortColumn: sortColumn.path,
+          order: sortColumn.order,
+          searchQuery,
+        });
+        setPatients(data); // Assuming the response structure includes { data: [...], totalCount: Number }
+        setTotalCount(totalCount);
+      } catch (error) {
+        // Handle error
+        console.error("Failed to fetch data:", error);
+      }
       setLoading(false);
     };
-    if (dataUpdated) fetchData();
-    setDataUpdated(false);
-  }, [dataUpdated]);
+
+    if (dataUpdated || currentPage) fetchData();
+  }, [dataUpdated, currentPage, searchQuery, sortColumn]);
 
   useEffect(() => {
-    let filtered = patients;
-    const getData = async () => {
-      if (searchQuery)
-        filtered = patients.filter(
-          (m) =>
-            (m.nom !== undefined &&
-              m.nom.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (m.prenom !== undefined &&
-              m.prenom.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (m.cin !== undefined &&
-              m.cin !== null &&
-              m.cin.toLowerCase().includes(searchQuery.toLowerCase())),
-        );
-      const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
-      //pagination
-      const endOffset = itemOffset + pageSize;
-
-      // const newFilteredPatients = paginate(sorted, currentPage, pageSize);
-      setFilteredPatients(sorted.slice(itemOffset, endOffset));
-      setCurrentPage(Math.ceil(sorted.length / pageSize));
-    };
-    getData();
-    setTotalCount(filtered.length);
-  }, [
-    currentPage,
-    itemOffset,
-    patients,
-    searchQuery,
-    sortColumn.order,
-    sortColumn.path,
-  ]);
+    // Reset itemOffset on currentPage change
+    setItemOffset((currentPage - 1) * pageSize);
+  }, [currentPage, pageSize]);
 
   const handleSelectField = (field) => {
     const selectedFieldsA = [...selectedFields];
@@ -222,8 +206,8 @@ function Patients() {
   };
 
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * pageSize) % totalCount;
-    setItemOffset(newOffset);
+    const newCurrentPage = event.selected + 1; // ReactPaginate's `selected` is zero-indexed
+    setCurrentPage(newCurrentPage); // This should trigger data fetching in the useEffect
   };
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -241,12 +225,6 @@ function Patients() {
     setSortColumn(column);
   };
 
-  // const toggleForm = (toggle) => {
-  //   setSelectedPatient(null);
-  //   setSelectedPatients([]);
-  //   if (toggle) setFormDisplay(false);
-  //   else setFormDisplay(true);
-  // };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
       <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
@@ -273,7 +251,7 @@ function Patients() {
       ) : (
         <div className="m-2">
           <PatientsTable
-            patients={filteredPatients}
+            patients={patients}
             sortColumn={sortColumn}
             onSort={handleSort}
             fields={fields}
@@ -282,7 +260,7 @@ function Patients() {
             onValueChange={onFilterChange}
             headers={selectedFields}
             onFieldSelect={handleSelectField}
-            totalItems={filteredPatients.length}
+            totalItems={patients.length}
             onItemSelect={handleSelectPatient}
             onItemsSelect={handleSelectPatients}
             selectedItems={selectedPatients}
@@ -305,6 +283,7 @@ function Patients() {
             pageCount={Math.ceil(totalCount / pageSize)}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
+            forcePage={currentPage - 1}
             onPageChange={handlePageClick}
             // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#D6E1E3] p-3 font-bold text-white"
             previousLabel={"<"}
