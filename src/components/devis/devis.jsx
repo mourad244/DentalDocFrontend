@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-import { getDevis, deleteDevi } from "../../services/deviService";
+import { deleteDevi } from "../../services/deviService";
 import { getMedecins } from "../../services/medecinService";
+import { getDevis } from "../../services/deviPaginateService";
 
 import DevisTable from "./devisTable";
 
 import _ from "lodash";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
+import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
-import ClipLoader from "react-spinners/ClipLoader";
 
 function Devis() {
   const date = new Date();
@@ -71,15 +72,30 @@ function Devis() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: devisData } = await getDevis();
-      setDevis(devisData);
+      console.log("time", time);
+      try {
+        const {
+          data: { data, totalCount },
+        } = await getDevis({
+          time: time.nom,
+          date: time.value,
+          pageSize,
+          currentPage,
+          order: sortColumn.order,
+          sortColumn: sortColumn.path,
+        });
+        console.log(data);
+        setDevis(data);
+        setTotalCount(totalCount);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
       setLoading(false);
     };
-    if (dataUpdated) fetchData();
-    setDataUpdated(false);
-  }, [dataUpdated]);
+    fetchData();
+  }, [time, currentPage, sortColumn]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     let filtered = devis;
     const getData = async () => {
       switch (time.nom) {
@@ -121,7 +137,7 @@ function Devis() {
     };
     getData();
     setTotalCount(filtered.length);
-  }, [currentPage, itemOffset, devis, sortColumn.order, sortColumn.path, time]);
+  }, [currentPage, itemOffset, devis, sortColumn.order, sortColumn.path, time]); */
 
   const handleDelete = async (items) => {
     const originalDevis = devis;
@@ -266,8 +282,8 @@ function Devis() {
     setSortColumn(sortColumn);
   };
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * pageSize) % totalCount;
-    setItemOffset(newOffset);
+    const newCurrentPage = event.selected + 1; // ReactPaginate's `selected` is zero-indexed
+    setCurrentPage(newCurrentPage); // This should trigger data fetching in the useEffect
   };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
@@ -343,14 +359,14 @@ function Devis() {
       ) : (
         <div className="m-2">
           <DevisTable
-            devis={filteredDevis}
+            devis={devis}
             sortColumn={sortColumn}
             onSort={handleSort}
             datas={datas}
             selectedFilterItems={selectedFilterItems}
             onValueChange={onFilterChange}
             headers={fields}
-            totalItems={filteredDevis.length}
+            totalItems={devis.length}
             onItemSelect={handleSelectDevi}
             onItemsSelect={handleSelectDevis}
             selectedItems={selectedDevis}

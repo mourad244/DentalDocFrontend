@@ -3,11 +3,9 @@ import React, { useState, useEffect } from "react";
 import { getRegions } from "../../services/regionService";
 import { getProvinces } from "../../services/provinceService";
 import { deletePatient } from "../../services/patientService";
-import { getPatientsList } from "../../services/patientListService";
 
 import PatientsTable from "./patientsTable";
 
-import _ from "lodash";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { BsPersonAdd } from "react-icons/bs";
@@ -32,12 +30,11 @@ function Patients() {
     order: "desc",
   });
   const [loading, setLoading] = useState(false);
+  const [startSearch, setStartSearch] = useState(false);
   const [patients, setPatients] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [dataUpdated, setDataUpdated] = useState(true);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedPatients, setSelectedPatients] = useState([]);
@@ -62,7 +59,7 @@ function Patients() {
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ];
-  const pageSize = 6;
+  const pageSize = 15;
   const history = useHistory();
 
   useEffect(() => {
@@ -79,16 +76,15 @@ function Patients() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      console.log("currentPage", currentPage);
       try {
         const {
           data: { data, totalCount },
         } = await getPatientsListWithPagination({
-          currentPage,
           pageSize,
-          sortColumn: sortColumn.path,
-          order: sortColumn.order,
+          currentPage,
           searchQuery,
+          order: sortColumn.order,
+          sortColumn: sortColumn.path,
         });
         setPatients(data); // Assuming the response structure includes { data: [...], totalCount: Number }
         setTotalCount(totalCount);
@@ -96,16 +92,13 @@ function Patients() {
         // Handle error
         console.error("Failed to fetch data:", error);
       }
+      if (startSearch) setCurrentPage(1);
       setLoading(false);
+      setStartSearch(false);
     };
 
-    if (dataUpdated || currentPage) fetchData();
-  }, [dataUpdated, currentPage, searchQuery, sortColumn]);
-
-  useEffect(() => {
-    // Reset itemOffset on currentPage change
-    setItemOffset((currentPage - 1) * pageSize);
-  }, [currentPage, pageSize]);
+    if (currentPage) fetchData();
+  }, [currentPage, startSearch, /* searchQuery, */ sortColumn]);
 
   const handleSelectField = (field) => {
     const selectedFieldsA = [...selectedFields];
@@ -172,13 +165,7 @@ function Patients() {
       newSelectedPatients.length === 1 ? newSelectedPatients[0] : null,
     );
   };
-  // const handleViewDetails = () => {
-  //   setShowDetails(true);
-  // };
 
-  // const handleCloseDetails = () => {
-  //   // setShowDetails(false);
-  // };
   const handleEdit = () => {
     history.push(`/patients/${selectedPatient._id}`);
   };
@@ -209,17 +196,22 @@ function Patients() {
     const newCurrentPage = event.selected + 1; // ReactPaginate's `selected` is zero-indexed
     setCurrentPage(newCurrentPage); // This should trigger data fetching in the useEffect
   };
-  const handleSearch = (query) => {
-    setSearchQuery(query);
+  const handleSearch = async (e) => {
+    /* 
+    async () => {
+                if (searchQuery) {
+                  setLoading(true);
+                  const { data: newFoundedPatients } =
+                    await searchPatient(searchQuery);
+                  setPatients(newFoundedPatients);
+                  setLoading(false);
+                  setSearchDone(true);
+                }
+              }
+    */
+    // setSearchQuery(query);
     setCurrentPage(1);
   };
-
-  // const updateData = () => {
-  //   setDataUpdated(true);
-  //   setSelectedPatient(null);
-  //   setSelectedPatients([]);
-  //   setFormDisplay(false);
-  // };
 
   const handleSort = (column) => {
     setSortColumn(column);
@@ -242,7 +234,18 @@ function Patients() {
         </button>
       </div>
       <div className="ml-2 mt-2">
-        <SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
+        <div className="m-2 flex min-w-fit  rounded-sm bg-[#83BCCD] pb-2  pt-2 shadow-md ">
+          <div className="mr-3 h-[40px] w-28 text-right text-xs font-bold leading-9 text-[#72757c]">
+            Chercher un patient
+          </div>
+          <div className="flex w-fit items-start ">
+            <SearchBox
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e)}
+              onSearch={() => setStartSearch(true)}
+            />
+          </div>
+        </div>
       </div>
       {loading ? (
         <div className="m-auto my-4">
@@ -274,16 +277,18 @@ function Patients() {
                 ? handleDelete
                 : undefined
             }
-            // onViewDetails={selectedPatient ? handleViewDetails : undefined}
           />
           <ReactPaginate
             breakLabel={"..."}
             nextLabel={">"}
             breakClassName={"break-me"}
-            pageCount={Math.ceil(totalCount / pageSize)}
+            pageCount={Math.max(1, Math.ceil(totalCount / pageSize))} // Ensure at least 1 page
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
-            forcePage={currentPage - 1}
+            forcePage={Math.min(
+              currentPage - 1,
+              Math.ceil(totalCount / pageSize) - 1,
+            )}
             onPageChange={handlePageClick}
             // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#D6E1E3] p-3 font-bold text-white"
             previousLabel={"<"}
