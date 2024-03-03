@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { /*  withRouter, */ useHistory } from "react-router-dom";
 
-import { getPaiements, deletePaiement } from "../../services/paiementService";
-
+import { deletePaiement } from "../../services/paiementService";
 import PaiementsTable from "./paiementsTable";
-
-import _ from "lodash";
+import { getPaiements } from "../../services/paiementPaginateService";
+// import _ from "lodash";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -29,11 +28,9 @@ function Paiements() {
     active: true,
   });
   const [loading, setLoading] = useState(false);
-  const [dataUpdated, setDataUpdated] = useState(true);
 
   const [selectedPaiement, setSelectedPaiement] = useState(null);
   const [selectedPaiements, setSelectedPaiements] = useState([]);
-  const [itemOffset, setItemOffset] = useState(0);
   const [sortColumn, setSortColumn] = useState({
     path: "date",
     order: "asc",
@@ -42,8 +39,6 @@ function Paiements() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [paiements, setPaiements] = useState([]);
-  const [filteredPaiements, setFilteredPaiements] = useState([]);
-  // const [totalFilteredPaiements, setTotalFilteredPaiements] = useState([]);
   const pageSize = 20;
   const history = useHistory();
   const fields = [
@@ -58,64 +53,26 @@ function Paiements() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: paiementsData } = await getPaiements();
-      setPaiements(paiementsData);
+      try {
+        const {
+          data: { data, totalCount },
+        } = await getPaiements({
+          time: time.nom,
+          date: time.value,
+          pageSize,
+          currentPage,
+          order: sortColumn.order,
+          sortColumn: sortColumn.path,
+        });
+        setPaiements(data);
+        setTotalCount(totalCount);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
       setLoading(false);
     };
-    if (dataUpdated) fetchData();
-    setDataUpdated(false);
-  }, [dataUpdated]);
-
-  useEffect(() => {
-    let filtered = paiements;
-    const getData = async () => {
-      switch (time.nom) {
-        case "journee":
-          filtered = filtered.filter(
-            (m) =>
-              new Date(m.date).getFullYear() === time.value.getFullYear() &&
-              new Date(m.date).getMonth() === time.value.getMonth() &&
-              new Date(m.date).getDate() === time.value.getDate(),
-          );
-          break;
-        case "semaine":
-          break;
-        case "mois":
-          filtered = filtered.filter(
-            (m) =>
-              new Date(m.date).getFullYear() === time.value.getFullYear() &&
-              new Date(m.date).getMonth() === time.value.getMonth(),
-          );
-          break;
-        case "trimestre":
-          break;
-        case "semestre":
-          break;
-        case "annee":
-          filtered = filtered.filter(
-            (m) => new Date(m.date).getFullYear() === time.value.getFullYear(),
-          );
-          break;
-        default:
-          break;
-      }
-      // const totalFilteredPaiements = filtered;
-      const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-      const endOffset = itemOffset + pageSize;
-      // setTotalFilteredPaiements(totalFilteredPaiements);
-      setFilteredPaiements(sorted.slice(itemOffset, endOffset));
-      setCurrentPage(Math.ceil(sorted.length / pageSize));
-    };
-    getData();
-    setTotalCount(filtered.length);
-  }, [
-    currentPage,
-    itemOffset,
-    paiements,
-    sortColumn.order,
-    sortColumn.path,
-    time,
-  ]);
+    fetchData();
+  }, [time, currentPage, sortColumn]);
 
   const handleDelete = async (items) => {
     const originalPaiemnts = paiements;
@@ -161,9 +118,7 @@ function Paiements() {
   };
   const handleSelectPaiements = () => {
     let newSelectedPaiements =
-      selectedPaiements.length === filteredPaiements.length
-        ? []
-        : [...filteredPaiements];
+      selectedPaiements.length === paiements.length ? [] : [...paiements];
     setSelectedPaiements(newSelectedPaiements);
     setSelectedPaiement(
       newSelectedPaiements.length === 1 ? newSelectedPaiements[0] : null,
@@ -253,10 +208,9 @@ function Paiements() {
     setSortColumn(sortColumn);
   };
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * pageSize) % totalCount;
-    setItemOffset(newOffset);
+    const newCurrentPage = event.selected + 1;
+    setCurrentPage(newCurrentPage);
   };
-
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">
       <div className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
@@ -331,11 +285,11 @@ function Paiements() {
       ) : (
         <div className="m-2">
           <PaiementsTable
-            paiements={filteredPaiements}
+            paiements={paiements}
             sortColumn={sortColumn}
             onSort={handleSort}
             headers={fields}
-            totaItems={filteredPaiements.length}
+            totaItems={paiements.length}
             onItemSelect={handleSelectPaiement}
             onItemsSelect={handleSelectPaiements}
             selectedItems={selectedPaiements}

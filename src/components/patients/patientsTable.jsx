@@ -11,21 +11,21 @@ import { AiFillDelete } from "react-icons/ai";
 
 function PatientsTable({
   datas,
-  patients,
   onSort,
-  sortColumn,
   onEdit,
+  fields,
+  onPrint,
+  headers,
+  patients,
+  onDelete,
+  totalItems,
+  sortColumn,
   onItemSelect,
   onItemsSelect,
   selectedItems,
-  fields,
   onValueChange,
-  selectedFilterItems,
-  totalItems,
-  onDelete,
-  onPrint,
-  headers,
   onFieldSelect,
+  selectedFilterItems,
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isFieldsOpen, setIsFieldsOpen] = useState(false);
@@ -236,22 +236,22 @@ function PatientsTable({
     setIsCollapseOpen(!isCollapseOpen);
     setIsFilterOpen(false);
   };
-  const toggleFilter = () => {
+  /*  const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
     setSelectedCollapse(isFilterOpen ? "" : "filter");
     setIsCollapseOpen(!isCollapseOpen);
     setIsFieldsOpen(false);
-  };
+  }; */
 
   const collapseButton = (
     <div className="flex flex-col gap-2 ">
       <div className="flex w-fit flex-row items-center gap-2">
-        <button
+        {/*  <button
           onClick={toggleFilter}
           className="rounded-sm bg-slate-300 p-1 shadow-md"
         >
           <span className="text-xs font-medium md:block">Filter</span>
-        </button>
+        </button> */}
         <button
           onClick={toggleVisibleFields}
           className="rounded-sm bg-slate-300 p-1 shadow-md"

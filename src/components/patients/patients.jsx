@@ -35,7 +35,6 @@ function Patients() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedPatients, setSelectedPatients] = useState([]);
   const [selectedFields, setSelectedFields] = useState([
@@ -59,7 +58,8 @@ function Patients() {
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ];
-  const pageSize = 15;
+
+  const pageSize = 8;
   const history = useHistory();
 
   useEffect(() => {
@@ -86,10 +86,9 @@ function Patients() {
           order: sortColumn.order,
           sortColumn: sortColumn.path,
         });
-        setPatients(data); // Assuming the response structure includes { data: [...], totalCount: Number }
+        setPatients(data);
         setTotalCount(totalCount);
       } catch (error) {
-        // Handle error
         console.error("Failed to fetch data:", error);
       }
       if (startSearch) setCurrentPage(1);
@@ -97,8 +96,8 @@ function Patients() {
       setStartSearch(false);
     };
 
-    if (currentPage) fetchData();
-  }, [currentPage, startSearch, /* searchQuery, */ sortColumn]);
+    fetchData();
+  }, [currentPage, startSearch /* , searchQuery */, sortColumn]);
 
   const handleSelectField = (field) => {
     const selectedFieldsA = [...selectedFields];
@@ -112,8 +111,6 @@ function Patients() {
   };
 
   const onFilterChange = (name, e) => {
-    // e.target.value can be "masculin", "feminin", ""
-    //  i want the value to be true, false, ""
     let value = "";
     switch (e.target.value) {
       case "masculin":
@@ -133,7 +130,6 @@ function Patients() {
     }
     newSelectedFilterItems[name] = value;
     setSelectedFilterItems(newSelectedFilterItems);
-    setFilteredPatients(newPatients);
     setCurrentPage(1);
   };
   const handleSelectPatient = (patient) => {
@@ -157,9 +153,7 @@ function Patients() {
 
   const handleSelectPatients = () => {
     let newSelectedPatients =
-      selectedPatients.length === filteredPatients.length
-        ? []
-        : [...filteredPatients];
+      selectedPatients.length === patients.length ? [] : [...patients];
     setSelectedPatients(newSelectedPatients);
     setSelectedPatient(
       newSelectedPatients.length === 1 ? newSelectedPatients[0] : null,
@@ -180,6 +174,7 @@ function Patients() {
     );
     setSelectedPatient(null);
     setSelectedPatients([]);
+    console.log("items", items);
     try {
       items.forEach(async (item) => {
         await deletePatient(item._id);
@@ -193,24 +188,10 @@ function Patients() {
   };
 
   const handlePageClick = (event) => {
-    const newCurrentPage = event.selected + 1; // ReactPaginate's `selected` is zero-indexed
-    setCurrentPage(newCurrentPage); // This should trigger data fetching in the useEffect
-  };
-  const handleSearch = async (e) => {
-    /* 
-    async () => {
-                if (searchQuery) {
-                  setLoading(true);
-                  const { data: newFoundedPatients } =
-                    await searchPatient(searchQuery);
-                  setPatients(newFoundedPatients);
-                  setLoading(false);
-                  setSearchDone(true);
-                }
-              }
-    */
-    // setSearchQuery(query);
-    setCurrentPage(1);
+    const newCurrentPage = event.selected + 1;
+    setSelectedPatient(null);
+    setSelectedPatients([]);
+    setCurrentPage(newCurrentPage);
   };
 
   const handleSort = (column) => {

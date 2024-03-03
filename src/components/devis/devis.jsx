@@ -7,7 +7,6 @@ import { getDevis } from "../../services/deviPaginateService";
 
 import DevisTable from "./devisTable";
 
-import _ from "lodash";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -34,13 +33,11 @@ function Devis() {
     medecins: [],
   });
   const [loading, setLoading] = useState(false);
-  const [dataUpdated, setDataUpdated] = useState(true);
-  const [selectedFilterItems, setSelectedFilterItems] = useState({
-    medecinId: "",
-  });
+  // const [selectedFilterItems, setSelectedFilterItems] = useState({
+  //   medecinId: "",
+  // });
   const [selectedDevi, setSelectedDevi] = useState(null);
   const [selectedDevis, setSelectedDevis] = useState([]);
-  const [itemOffset, setItemOffset] = useState(0);
   const [sortColumn, setSortColumn] = useState({
     path: "montant",
     order: "asc",
@@ -49,7 +46,6 @@ function Devis() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [devis, setDevis] = useState([]);
-  const [filteredDevis, setFilteredDevis] = useState([]);
   const pageSize = 15;
   const history = useHistory();
   const fields = [
@@ -72,7 +68,6 @@ function Devis() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      console.log("time", time);
       try {
         const {
           data: { data, totalCount },
@@ -84,7 +79,6 @@ function Devis() {
           order: sortColumn.order,
           sortColumn: sortColumn.path,
         });
-        console.log(data);
         setDevis(data);
         setTotalCount(totalCount);
       } catch (error) {
@@ -94,50 +88,6 @@ function Devis() {
     };
     fetchData();
   }, [time, currentPage, sortColumn]);
-
-  /*  useEffect(() => {
-    let filtered = devis;
-    const getData = async () => {
-      switch (time.nom) {
-        case "journee":
-          filtered = filtered.filter(
-            (m) =>
-              new Date(m.dateDevi).getFullYear() === time.value.getFullYear() &&
-              new Date(m.dateDevi).getMonth() === time.value.getMonth() &&
-              new Date(m.dateDevi).getDate() === time.value.getDate(),
-          );
-          break;
-        case "semaine":
-          break;
-        case "mois":
-          filtered = filtered.filter(
-            (m) =>
-              new Date(m.dateDevi).getFullYear() === time.value.getFullYear() &&
-              new Date(m.dateDevi).getMonth() === time.value.getMonth(),
-          );
-          break;
-        case "trimestre":
-          break;
-        case "semestre":
-          break;
-        case "annee":
-          filtered = filtered.filter(
-            (m) =>
-              new Date(m.dateDevi).getFullYear() === time.value.getFullYear(),
-          );
-          break;
-
-        default:
-          break;
-      }
-      const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-      const endOffset = itemOffset + pageSize;
-      setFilteredDevis(sorted.slice(itemOffset, endOffset));
-      setCurrentPage(Math.ceil(sorted.length / pageSize));
-    };
-    getData();
-    setTotalCount(filtered.length);
-  }, [currentPage, itemOffset, devis, sortColumn.order, sortColumn.path, time]); */
 
   const handleDelete = async (items) => {
     const originalDevis = devis;
@@ -175,11 +125,11 @@ function Devis() {
   };
   const handleSelectDevis = () => {
     let newSelectedDevis =
-      selectedDevis.length === filteredDevis.length ? [] : [...filteredDevis];
+      selectedDevis.length === devis.length ? [] : [...devis];
     setSelectedDevis(newSelectedDevis);
     setSelectedDevi(newSelectedDevis.length === 1 ? newSelectedDevis[0] : null);
   };
-  const onFilterChange = (name, e) => {
+  /*  const onFilterChange = (name, e) => {
     let newDevis = [...devis];
     let newSelectedFilterItems = { ...selectedFilterItems };
     if (name === "medecinId") {
@@ -196,7 +146,7 @@ function Devis() {
     }
     setSelectedFilterItems(newSelectedFilterItems);
     setCurrentPage(1);
-  };
+  }; */
 
   const handleEdit = () => {
     history.push(`/devis/${selectedDevi._id}`);
@@ -363,8 +313,8 @@ function Devis() {
             sortColumn={sortColumn}
             onSort={handleSort}
             datas={datas}
-            selectedFilterItems={selectedFilterItems}
-            onValueChange={onFilterChange}
+            // selectedFilterItems={selectedFilterItems}
+            // onValueChange={onFilterChange}
             headers={fields}
             totalItems={devis.length}
             onItemSelect={handleSelectDevi}

@@ -1,9 +1,9 @@
 import http from "./httpService";
 // import { apiUrl } from "../config.json";
 const apiUrl = process.env.REACT_APP_API_URL;
-const apiEndpoint = apiUrl + "/devispaginate";
+const apiEndpoint = apiUrl + "/paiementspaginate";
 
-export function getDevis({
+export function getPaiements({
   time,
   date,
   currentPage,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React /* , { useState } */ from "react";
 
 import CustomeTable from "../../common/CustomeTable";
 
@@ -22,14 +22,14 @@ function DevisTable({
   onItemSelect,
   onItemsSelect,
   selectedItems,
-  onValueChange,
+  // onValueChange,
   onAddPaiement,
-  selectedFilterItems,
+  // selectedFilterItems,
 }) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  /*   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCollapseOpen, setIsCollapseOpen] = useState(false);
-  const [selectedCollapse, setSelectedCollapse] = useState("");
-  const collapseFunction = (collapse) => {
+  const [selectedCollapse, setSelectedCollapse] = useState(""); */
+  /* const collapseFunction = (collapse) => {
     let children = <></>;
     switch (collapse) {
       case "filter":
@@ -50,7 +50,7 @@ function DevisTable({
         {children}
       </div>
     );
-  };
+  }; */
   const tableRows = devis.map((devi) => {
     return (
       <tr
@@ -126,7 +126,7 @@ function DevisTable({
       </tr>
     );
   });
-  const filterFunctions = (
+  /*  const filterFunctions = (
     <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <div className="m-2">
         <div className=" flex w-fit flex-wrap">
@@ -159,13 +159,13 @@ function DevisTable({
         </div>
       </div>
     </div>
-  );
-  const toggleFilter = () => {
+  ); */
+  /*  const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
     setSelectedCollapse(isFilterOpen ? "" : "filter");
     setIsCollapseOpen(!isCollapseOpen);
-  };
-  const collapseButton = (
+  }; */
+  /* const collapseButton = (
     <div className="flex flex-col gap-2 ">
       <div className="flex w-fit flex-row items-center gap-2">
         <button
@@ -176,13 +176,13 @@ function DevisTable({
         </button>
       </div>
     </div>
-  );
-  const tableControlPanel = (
+  ); */
+  /*  const tableControlPanel = (
     <div className="mb-1 flex flex-col">
       <div className="flex flex-row">{collapseButton}</div>
       {collapseFunction(selectedCollapse)}
     </div>
-  );
+  ); */
   const itemActions = (
     <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbReportMoney
@@ -232,7 +232,7 @@ function DevisTable({
       tableRows={tableRows}
       itemActions={itemActions}
       totalItems={totalItems}
-      tableControlPanel={tableControlPanel}
+      // tableControlPanel={tableControlPanel}
       selectedItems={selectedItems}
       onSort={onSort}
       onItemsSelect={onItemsSelect}
