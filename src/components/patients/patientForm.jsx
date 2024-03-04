@@ -145,7 +145,9 @@ class PatientForm extends Form {
 
   doSubmit = async () => {
     let result = { ...this.state.data };
+    this.setState({ loading: true });
     await savePatient(result);
+    this.setState({ loading: false });
     if (this.props.match) this.props.history.push("/patients");
     else window.location.reload();
   };

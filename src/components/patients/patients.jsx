@@ -98,7 +98,13 @@ function Patients() {
 
     fetchData();
   }, [currentPage, startSearch /* , searchQuery */, sortColumn]);
+  const onChangeSearchQuery = (e) => {
+    setSearchQuery(e);
+  };
 
+  const onSearch = () => {
+    setStartSearch(true);
+  };
   const handleSelectField = (field) => {
     const selectedFieldsA = [...selectedFields];
     const index = selectedFieldsA.findIndex(
@@ -220,8 +226,8 @@ function Patients() {
           <div className="flex w-fit items-start ">
             <SearchBox
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e)}
-              onSearch={() => setStartSearch(true)}
+              onChange={onChangeSearchQuery}
+              onSearch={onSearch}
             />
           </div>
         </div>
