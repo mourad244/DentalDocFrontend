@@ -163,26 +163,24 @@ function Patients() {
   const handleEdit = () => {
     history.push(`/patients/${selectedPatient._id}`);
   };
+
   const handleDelete = async (items) => {
-    const originalPatients = patients;
-    setPatients(
-      patients.filter((c) => {
-        let founded = items.find((p) => p._id.toString() === c._id.toString());
-        if (founded) return false;
-        return true;
-      }),
-    );
-    setSelectedPatient(null);
-    setSelectedPatients([]);
-    console.log("items", items);
+    const originalPatients = [...patients];
     try {
-      items.forEach(async (item) => {
-        await deletePatient(item._id);
-      });
-      toast.success("patients supprimé");
+      await Promise.all(items.map((item) => deletePatient(item._id)));
+      const updatedPatients = originalPatients.filter(
+        (patient) => !items.some((item) => item._id === patient._id),
+      );
+      setPatients(updatedPatients);
+      setSelectedPatient(null);
+      setSelectedPatients([]);
+      toast.success("patient(s) supprimé(s)");
     } catch (ex) {
-      if (ex.response && ex.response.status === 404)
+      if (ex.response && ex.response.status === 404) {
         toast.error("patient déja supprimé");
+      } else {
+        toast.error("Une erreur est survenue lors de la suppression");
+      }
       setPatients(originalPatients);
     }
   };
