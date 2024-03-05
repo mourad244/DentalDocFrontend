@@ -15,28 +15,20 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { getPatientsListWithPagination } from "../../services/patientListPaginateService";
 
 function Patients() {
-  const [selectedFilterItems, setSelectedFilterItems] = useState({
-    isMasculin: undefined,
-    provinceId: "",
-    regionId: "",
-  });
-
   const [datas, setDatas] = useState({
     regions: [],
     provinces: [],
   });
+  const [loading, setLoading] = useState(false);
+  const [patients, setPatients] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [sortColumn, setSortColumn] = useState({
     path: "nom",
     order: "desc",
   });
-  const [loading, setLoading] = useState(false);
   const [startSearch, setStartSearch] = useState(false);
-  const [patients, setPatients] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [selectedPatients, setSelectedPatients] = useState([]);
   const [selectedFields, setSelectedFields] = useState([
     { order: 1, name: "select", label: "Select" },
     { order: 2, name: "genre", label: "Genre" },
@@ -47,6 +39,13 @@ function Patients() {
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [selectedPatients, setSelectedPatients] = useState([]);
+  const [selectedFilterItems, setSelectedFilterItems] = useState({
+    isMasculin: undefined,
+    provinceId: "",
+    regionId: "",
+  });
   const fields = [
     { order: 1, name: "select", label: "Select" },
     { order: 2, name: "genre", label: "Genre" },
