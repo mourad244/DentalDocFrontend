@@ -164,9 +164,11 @@ function Users(props) {
       >
         <BsPersonAdd className="mr-1" /> Nouveau utilisateur
       </button>
+      {console.log("roles", roles)}
       <UserForm
         selectedUser={selectedUser}
         formToggle={toggleForm}
+        roles={roles}
         updateData={updateData}
         formDisplay={displayForm}
       />
