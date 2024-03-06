@@ -10,6 +10,7 @@ import SearchBox from "../../../common/searchBox";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
+import ClipLoader from "react-spinners/ClipLoader";
 
 function Roles(props) {
   const [roles, setRoles] = useState([]);
@@ -26,11 +27,15 @@ function Roles(props) {
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const pageSize = 10;
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const { data: roles } = await getRoles();
       setRoles(roles);
+      setLoading(false);
     };
     if (dataUpdated) fetchData();
     setDataUpdated(false);
@@ -134,63 +139,6 @@ function Roles(props) {
     setSelectedRoles([]);
     setDisplayForm(!displayForm);
   };
-  if (totalCount === 0) {
-    return (
-      <>
-        <button
-          className="no-underlin mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
-          onClick={toggleForm}
-        >
-          + Nouveau role
-        </button>
-        <RoleForm
-          selectedRole={selectedRole}
-          formToggle={toggleForm}
-          updateData={updateData}
-          formDisplay={displayForm}
-        />
-        {!filterDisplay ? (
-          <button
-            onClick={toggleFilter}
-            className="mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
-          >
-            <svg className="mr-2" width="15" height="15" fill="none">
-              <rect width="15" height="15" rx="3" fill="#ffffff" />
-              <path
-                d="M3 9V7H6.5V3.5H8.5V7H12.5V9H8.5V13H6.5V9H3Z"
-                fill="#4F6874"
-              />
-            </svg>
-            Critère de recherche
-          </button>
-        ) : (
-          <div className="w-full min-w-fit  rounded-md        bg-white  pb-2 shadow-component  ">
-            <button
-              onClick={toggleFilter}
-              className=" mr-2 mt-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
-            >
-              <svg className="mr-2" width="15" height="15" viewBox="0 0 15 15">
-                <rect width="15" height="15" rx="3" fill="#ffffff" />
-                <path d="M3 9V7H12.5V9H3Z" fill="#4F6874" />
-              </svg>
-              Critère de recherche
-            </button>
-
-            <SearchBox
-              value={searchQuery}
-              onChange={handleSearch}
-              label={"nom du role"}
-            />
-          </div>
-        )}
-        <div className="mt-1 flex h-fit w-full min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
-          <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
-            Aucun rôle trouvé
-          </p>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
@@ -206,7 +154,6 @@ function Roles(props) {
         updateData={updateData}
         formDisplay={displayForm}
       />
-
       {!filterDisplay ? (
         <button
           onClick={toggleFilter}
@@ -237,47 +184,65 @@ function Roles(props) {
           <SearchBox
             value={searchQuery}
             onChange={handleSearch}
-            label={"Objet du role"}
+            label={"nom du role"}
           />
         </div>
       )}
-      <div className="mt-1 flex h-fit w-full min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
-        <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
-          Liste des rôles
-        </p>
-        {/* <p>Nombre de résultats: {totalCount} </p> */}
-        {/* <button>Génerer liste des roles</button> */}
-        <div className="m-2">
-          <RolesTable
-            roles={filteredRoles}
-            sortColumn={sortColumn}
-            onSort={handleSort}
-            onItemSelect={handleSelectRole}
-            onItemsSelect={handleSelectRoles}
-            selectedItem={selectedRole}
-            selectedItems={selectedRoles}
-            onEdit={selectedRole ? handleEdit : undefined}
-            onDelete={
-              selectedRole !== null || selectedRoles.length !== 0
-                ? handleDelete
-                : undefined
-            }
-          />
-          <ReactPaginate
-            breakLabel={"..."}
-            nextLabel={">"}
-            breakClassName={"break-me"}
-            pageCount={Math.ceil(totalCount / pageSize)}
-            marginPagesDisplayed={1}
-            pageRangeDisplayed={2}
-            onPageChange={handlePageClick}
-            // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#D6E1E3] p-3 font-bold text-white"
-            previousLabel={"<"}
-            renderOnZeroPageCount={null}
-            containerClassName={"pagination"}
-          />
+      {loading ? (
+        <div className="m-auto my-4">
+          <ClipLoader loading={loading} size={70} />
         </div>
-      </div>
+      ) : totalCount === 0 ? (
+        <div className="mt-1 flex h-fit w-full min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+          <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
+            Aucun rôle trouvé
+          </p>
+        </div>
+      ) : (
+        <div className="mt-1 flex h-fit w-full min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
+          <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
+            Liste des rôles
+          </p>
+          {/* <p>Nombre de résultats: {totalCount} </p> */}
+          {/* <button>Génerer liste des roles</button> */}
+          {loading ? (
+            <div className="m-auto my-4">
+              <ClipLoader loading={loading} size={70} />
+            </div>
+          ) : (
+            <div className="m-2">
+              <RolesTable
+                roles={filteredRoles}
+                sortColumn={sortColumn}
+                onSort={handleSort}
+                onItemSelect={handleSelectRole}
+                onItemsSelect={handleSelectRoles}
+                selectedItem={selectedRole}
+                selectedItems={selectedRoles}
+                onEdit={selectedRole ? handleEdit : undefined}
+                onDelete={
+                  selectedRole !== null || selectedRoles.length !== 0
+                    ? handleDelete
+                    : undefined
+                }
+              />
+              <ReactPaginate
+                breakLabel={"..."}
+                nextLabel={">"}
+                breakClassName={"break-me"}
+                pageCount={Math.ceil(totalCount / pageSize)}
+                marginPagesDisplayed={1}
+                pageRangeDisplayed={2}
+                onPageChange={handlePageClick}
+                // className="w-max-[92%] mx-3 my-auto flex  w-fit list-none justify-evenly rounded-lg bg-[#D6E1E3] p-3 font-bold text-white"
+                previousLabel={"<"}
+                renderOnZeroPageCount={null}
+                containerClassName={"pagination"}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }

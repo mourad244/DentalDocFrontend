@@ -147,11 +147,14 @@ function Rdvs() {
     data.isAnnule = true;
     data.patientId = data.patientId._id;
     data.acteId = data.acteId && data.acteId._id ? data.acteId._id : null;
-
+    data.deviId = data.deviId && data.deviId._id ? data.deviId._id : null;
     newRdvs.some((e, index) => {
       if (e._id === selectedRdv._id) {
         newRdvs[index].isHonnore = false;
-        newRdvs[index].isAnnule = true;
+        if (newRdvs[index].isAnnule === false) newRdvs[index].isAnnule = true;
+        else if (newRdvs[index].isAnnule === true)
+          newRdvs[index].isAnnule = false;
+        else newRdvs[index].isAnnule = true;
         return true;
       } else return false;
     });
@@ -245,6 +248,11 @@ function Rdvs() {
             selectedItem={selectedRdv}
             onPostpone={
               selectedRdv &&
+              (!selectedRdv.isHonnore ||
+                !selectedRdv.deviId ||
+                (selectedRdv.deviId &&
+                  selectedRdv.deviId.numOrdre === undefined)) &&
+              !selectedRdv.isAnnule &&
               !selectedRdv.isReporte &&
               new Date(
                 new Date().getFullYear(),
@@ -261,6 +269,10 @@ function Rdvs() {
             }
             onCancel={
               selectedRdv &&
+              (!selectedRdv.isHonnore ||
+                !selectedRdv.deviId ||
+                (selectedRdv.deviId &&
+                  selectedRdv.deviId.numOrdre === undefined)) &&
               !selectedRdv.isReporte &&
               new Date(
                 new Date().getFullYear(),
@@ -277,6 +289,7 @@ function Rdvs() {
             }
             onEdit={
               selectedRdv &&
+              !selectedRdv.isAnnule &&
               !selectedRdv.isReporte &&
               new Date(
                 new Date().getFullYear(),

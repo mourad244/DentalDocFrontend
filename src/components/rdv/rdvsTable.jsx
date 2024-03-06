@@ -97,7 +97,13 @@ function RdvsTable(props) {
           <input
             key={rdv._id}
             type="checkbox"
-            checked={rdv.isHonnore}
+            checked={
+              // si le rdv a  un devis, il est donc obligatoirement honoré sinon
+              // on voit la valeur de isHonnore
+              rdv.deviId && rdv.deviId._id ? true : rdv.isHonnore
+
+              // rdv.isHonnore
+            }
             onChange={() => {
               props.onCheck(rdv._id);
             }}

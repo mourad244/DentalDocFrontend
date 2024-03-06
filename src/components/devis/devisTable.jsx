@@ -52,6 +52,7 @@ function DevisTable({
     );
   }; */
   const tableRows = devis.map((devi) => {
+    console.log("devi", devi);
     return (
       <tr
         className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center"

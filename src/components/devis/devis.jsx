@@ -39,7 +39,7 @@ function Devis() {
   const [selectedDevi, setSelectedDevi] = useState(null);
   const [selectedDevis, setSelectedDevis] = useState([]);
   const [sortColumn, setSortColumn] = useState({
-    path: "montant",
+    path: "numOrdre",
     order: "asc",
   });
   const [totalCount, setTotalCount] = useState(0);
