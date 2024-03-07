@@ -38,15 +38,16 @@ function Devis() {
   // });
   const [selectedDevi, setSelectedDevi] = useState(null);
   const [selectedDevis, setSelectedDevis] = useState([]);
+
   const [sortColumn, setSortColumn] = useState({
     path: "numOrdre",
     order: "asc",
   });
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
 
   const [devis, setDevis] = useState([]);
-  const pageSize = 15;
   const history = useHistory();
   const fields = [
     { order: 1, name: "select", label: "Select" },
@@ -232,8 +233,8 @@ function Devis() {
     setSortColumn(sortColumn);
   };
   const handlePageClick = (event) => {
-    const newCurrentPage = event.selected + 1; // ReactPaginate's `selected` is zero-indexed
-    setCurrentPage(newCurrentPage); // This should trigger data fetching in the useEffect
+    const newCurrentPage = event.selected + 1;
+    setCurrentPage(newCurrentPage);
   };
   return (
     <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white shadow-component">

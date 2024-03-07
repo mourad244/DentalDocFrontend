@@ -210,7 +210,6 @@ function Accueil() {
                   .forEach((rdvItem) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
-
                     const dateRdv = new Date(rdvItem.datePrevu);
                     dateRdv.setHours(0, 0, 0, 0);
                     if (rdvItem.isHonnore || dateRdv >= today) {
