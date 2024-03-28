@@ -153,6 +153,103 @@ class SocieteForm extends Form {
               <div className="mt-3">
                 {this.renderInput("nom", "Nom", 170, 35, "text", 120)}
               </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "telephone",
+                  "Téléphone",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("adresse", "Adresse", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("ville", "Ville", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("banque", "Banque", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "lieuOuvertureBanque",
+                  "Lieu d'ouverture de la banque",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("RIB", "RIB", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "numPatente",
+                  "Numéro de patente",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "numRC",
+                  "Numéro de RC",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("numIF", "Numéro IF", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "numCNSS",
+                  "Numéro CNSS",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("numICE", "Numéro ICE", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("email", "Email", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("fax", "Fax", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("site", "Site", 170, 35, "text", 120)}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "taxPro",
+                  "Taxe professionnelle",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
+              <div className="mt-3">
+                {this.renderInput(
+                  "description",
+                  "Description",
+                  170,
+                  35,
+                  "text",
+                  120,
+                )}
+              </div>
 
               {this.renderButton("Sauvegarder")}
             </form>

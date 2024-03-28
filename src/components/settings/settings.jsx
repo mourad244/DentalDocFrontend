@@ -15,6 +15,7 @@ import Couvertures from "./couvertures/couvertures";
 import NatureActes from "./natureActes/natureActes";
 import UniteMesures from "./uniteMesures/uniteMesures";
 import ActeDentaires from "./acteDentaires/acteDentaires";
+import Societes from "./societes/societes";
 import DetailCouvertures from "./detailCouvertures/detailCouvertures";
 import UniteReglementaires from "./uniteReglementaires/uniteReglementaires";
 import CategorieMedicaments from "./categorieMedicaments/categorieMedicaments";
@@ -59,6 +60,10 @@ function Settings() {
           return setSelectedComponent(<UniteMesures />);
         case "uniteReglementaires":
           return setSelectedComponent(<UniteReglementaires />);
+        case "societes":
+          return setSelectedComponent(<Societes />);
+        default:
+          return setSelectedComponent(<Roles />);
       }
     };
     updateSelectedComponent();

@@ -211,6 +211,19 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         >
           Lots
         </li>
+        {/* societes */}
+        <li
+          className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
+            !selectedSetting.includes("societes")
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
+          }`}
+          onClick={() => {
+            onSelectSetting("societes");
+          }}
+        >
+          Sociétés
+        </li>
       </ul>
     </nav>
   );

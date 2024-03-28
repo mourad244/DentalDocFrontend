@@ -21,29 +21,11 @@ function societesTable(props) {
       path: "nom",
       label: "Nom",
     },
-    /* 
-  ville: String,
-  banque: String,
-  lieuOuvertureBanque: String,
-  RIB: String,
-  numPatente: String,
-  numRC: String,
-  numIF: String,
-  numCNSS: String,
-  numICE: String,
-  email: String,
-  fax: String,
-  site: String,
-  taxPro: String,
-  description: String,
-    */
-    //telephone: String,
 
     {
       path: "telephone",
       label: "télephone",
     },
-    // adresse: String,
     {
       path: "adresse",
       label: "Adresse",
@@ -56,50 +38,50 @@ function societesTable(props) {
       path: "banque",
       label: "Banque",
     },
-    {
-      path: "lieuOuvertureBanque",
-      label: "Lieu d'ouverture de la banque",
-    },
-    {
-      path: "RIB",
-      label: "RIB",
-    },
+    // {
+    //   path: "lieuOuvertureBanque",
+    //   label: "Lieu d'ouverture de la banque",
+    // },
+    // {
+    //   path: "RIB",
+    //   label: "RIB",
+    // },
     {
       path: "numPatente",
       label: "Numéro de patente",
     },
-    {
-      path: "numRC",
-      label: "Numéro de RC",
-    },
-    {
-      path: "numIF",
-      label: "Numéro IF",
-    },
-    {
-      path: "numCNSS",
-      label: "Numéro CNSS",
-    },
-    {
-      path: "numICE",
-      label: "Numéro ICE",
-    },
-    {
-      path: "email",
-      label: "Email",
-    },
-    {
-      path: "fax",
-      label: "Fax",
-    },
-    {
-      path: "site",
-      label: "Site",
-    },
-    {
-      path: "taxPro",
-      label: "Taxe professionnelle",
-    },
+    // {
+    //   path: "numRC",
+    //   label: "Numéro de RC",
+    // },
+    // {
+    //   path: "numIF",
+    //   label: "Numéro IF",
+    // },
+    // {
+    //   path: "numCNSS",
+    //   label: "Numéro CNSS",
+    // },
+    // {
+    //   path: "numICE",
+    //   label: "Numéro ICE",
+    // },
+    // {
+    //   path: "email",
+    //   label: "Email",
+    // },
+    // {
+    //   path: "fax",
+    //   label: "Fax",
+    // },
+    // {
+    //   path: "site",
+    //   label: "Site",
+    // },
+    // {
+    //   path: "taxPro",
+    //   label: "Taxe professionnelle",
+    // },
     {
       path: "description",
       label: "Description",
