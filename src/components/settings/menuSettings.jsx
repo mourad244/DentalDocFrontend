@@ -40,7 +40,6 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
         >
           Région
         </li>
-
         <li
           className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
             !selectedSetting.includes("provinces")
@@ -172,6 +171,45 @@ const MenuSettings = ({ onSelectSetting, selectedSetting }) => {
           }}
         >
           Medecins
+        </li>
+        {/* unite mesure */}
+        <li
+          className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
+            !selectedSetting.includes("uniteMesures")
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
+          }`}
+          onClick={() => {
+            onSelectSetting("uniteMesures");
+          }}
+        >
+          Unités de mesures
+        </li>
+        {/* unite reglementaire */}
+        <li
+          className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
+            !selectedSetting.includes("uniteReglementaires")
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
+          }`}
+          onClick={() => {
+            onSelectSetting("uniteReglementaires");
+          }}
+        >
+          Unités réglementaires
+        </li>
+        {/* lot */}
+        <li
+          className={`mx-2 my-1  cursor-pointer  rounded-sm  p-1 text-xs font-bold  ${
+            !selectedSetting.includes("lots")
+              ? " bg-[#4F6874] text-white"
+              : " bg-white text-[#4F6874]"
+          }`}
+          onClick={() => {
+            onSelectSetting("lots");
+          }}
+        >
+          Lots
         </li>
       </ul>
     </nav>
