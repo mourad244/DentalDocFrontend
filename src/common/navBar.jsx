@@ -13,6 +13,12 @@ import { ReactComponent as PaiementIconActive } from "../assets/icons/sidebar/pa
 import { ReactComponent as PaiementIcon } from "../assets/icons/sidebar/paiement.svg";
 import { ReactComponent as SettingsIcon } from "../assets/icons/sidebar/settings.svg";
 import { ReactComponent as SettingsIconActive } from "../assets/icons/sidebar/settings-active.svg";
+import { ReactComponent as LivraisonIcon } from "../assets/icons/sidebar/livraison.svg";
+import { ReactComponent as LivraisonIconActive } from "../assets/icons/sidebar/livraison-active.svg";
+import { ReactComponent as CommandeIcon } from "../assets/icons/sidebar/commande.svg";
+import { ReactComponent as CommandeIconActive } from "../assets/icons/sidebar/commande-active.svg";
+import { ReactComponent as ArticleIcon } from "../assets/icons/sidebar/article.svg";
+import { ReactComponent as ArticleIconActive } from "../assets/icons/sidebar/article-active.svg";
 
 const NavBar = ({ user }) => {
   const location = useLocation();
@@ -22,6 +28,9 @@ const NavBar = ({ user }) => {
   const [activeRdv, setActiveRdv] = useState(false);
   const [activeDevi, setActiveDevi] = useState(false);
   const [activePaiement, setActivePaiement] = useState(false);
+  const [activeLivraison, setActiveLivraison] = useState(false);
+  const [activeCommande, setActiveCommande] = useState(false);
+  const [activeArticle, setActiveArticle] = useState(false);
   const [activeSettings, setActiveSettings] = useState(false);
 
   useEffect(() => {
@@ -39,6 +48,12 @@ const NavBar = ({ user }) => {
       setActivePaiement(true);
     } else if (path.includes("/settings")) {
       setActiveSettings(true);
+    } else if (path.includes("/livraisons")) {
+      setActiveLivraison(true);
+    } else if (path.includes("/commandes")) {
+      setActiveCommande(true);
+    } else if (path.includes("/articles")) {
+      setActiveArticle(true);
     }
   }, [location]);
 
@@ -49,10 +64,13 @@ const NavBar = ({ user }) => {
     setActiveDevi(false);
     setActivePaiement(false);
     setActiveSettings(false);
+    setActiveLivraison(false);
+    setActiveCommande(false);
+    setActiveArticle(false);
   };
 
   return (
-    <nav className="bg-gradient-navbar flex flex-col gap-2 ">
+    <nav className="flex flex-col gap-2 bg-gradient-navbar ">
       {user.role === "admin" || user.role === "autorite" ? (
         <ul className="flex w-20">
           <li className=" m-auto my-1 w-fit">
@@ -147,6 +165,65 @@ const NavBar = ({ user }) => {
                   <PaiementIconActive />
                 ) : (
                   <PaiementIcon />
+                )}
+              </Link>
+            </li>
+          </ul>
+        </>
+      ) : null}
+
+      {user.role === "admin" ? (
+        <>
+          <ul className="flex w-20">
+            <li className=" m-auto my-1 w-fit">
+              <Link
+                className=""
+                to="/livraisons"
+                onClick={() => {
+                  resetIcon();
+                  setActiveLivraison(true);
+                }}
+              >
+                {location.pathname.includes("livraison") || activeLivraison ? (
+                  <LivraisonIconActive />
+                ) : (
+                  <LivraisonIcon />
+                )}
+              </Link>
+            </li>
+          </ul>
+          <ul className="flex w-20">
+            <li className=" m-auto my-1 w-fit">
+              <Link
+                className=""
+                to="/commandes"
+                onClick={() => {
+                  resetIcon();
+                  setActiveCommande(true);
+                }}
+              >
+                {location.pathname.includes("commande") || activeCommande ? (
+                  <CommandeIconActive />
+                ) : (
+                  <CommandeIcon />
+                )}
+              </Link>
+            </li>
+          </ul>
+          <ul className="flex w-20">
+            <li className=" m-auto my-1 w-fit">
+              <Link
+                className=""
+                to="/articles"
+                onClick={() => {
+                  resetIcon();
+                  setActiveArticle(true);
+                }}
+              >
+                {location.pathname.includes("article") || activeArticle ? (
+                  <ArticleIconActive />
+                ) : (
+                  <ArticleIcon />
                 )}
               </Link>
             </li>

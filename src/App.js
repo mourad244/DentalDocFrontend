@@ -25,6 +25,8 @@ import { ToastContainer } from "react-toastify";
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "./assets/icons/icon-dental.png";
+import ArticleForm from "./components/pharmacie/articles/articleForm";
+import Articles from "./components/pharmacie/articles/articles";
 
 function App() {
   const [user, setUser] = useState();
@@ -143,6 +145,30 @@ function App() {
               ) : (
                 ""
               )}
+              {/* articles */}
+              {user.role === "admin" ? (
+                <Route
+                  path="/articles/new/:articleid"
+                  exact
+                  component={ArticleForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" ? (
+                <Route
+                  path="/articles/:articleid"
+                  exact
+                  component={ArticleForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" ? (
+                <Route path="/articles" exact component={Articles} />
+              ) : (
+                ""
+              )}
               {/* paiements */}
               {user.role === "admin" || user.role === "comptable" ? (
                 <Route
@@ -194,7 +220,6 @@ function App() {
               ) : (
                 ""
               )}
-
               {user.role === "admin" && (
                 <Route path="/settings" exact component={Settings} />
               )}
