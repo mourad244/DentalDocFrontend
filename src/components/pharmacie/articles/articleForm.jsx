@@ -69,11 +69,13 @@ class ArticleForm extends Form {
         this.props.match &&
         this.props.match.params &&
         this.props.match.params.id;
+
       const selectedArticle = this.props.selectedArticle;
       if (selectedArticle) {
         return this.setState({ data: this.mapToViewModel(selectedArticle) });
       }
       if (articleId === "new" || articleId === undefined) return;
+
       const { data: article } = await getArticle(articleId);
 
       this.setState({ data: this.mapToViewModel(article) });
@@ -173,16 +175,13 @@ class ArticleForm extends Form {
       loading,
       data,
     } = this.state;
-    const { isRdvForm } = this.props;
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
       </div>
     ) : (
       <div
-        className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
-          !isRdvForm && "border border-white bg-white"
-        }`}
+        className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md border border-white bg-white`}
       >
         {(!this.props ||
           (this.props && !this.props.selectedArticle) ||
@@ -191,7 +190,7 @@ class ArticleForm extends Form {
             Formulaire du article
           </p>
         )}
-        {!isRdvForm && (
+        {
           <div className="ml-2  flex justify-start">
             <button
               className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
@@ -203,32 +202,48 @@ class ArticleForm extends Form {
               Retour à la Liste
             </button>
           </div>
-        )}
+        }
         <form
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
           onSubmit={this.handleSubmit}
         >
-          <div className="mt-3">{this.renderInput("nom", "Nom")}</div>
-          <div className="mt-3">{this.renderSelect("lotId", "Lot", lots)}</div>
-          <div className="mt-3">{this.renderInput("code", "Code")}</div>
+          <div className="mt-3">
+            {this.renderInput("nom", "Nom", 170, 35, "text", 115)}
+          </div>
+          <div className="mt-3">
+            {this.renderSelect("lotId", "Lot", lots, 170, 35, 115)}
+          </div>
+          <div className="mt-3">
+            {this.renderInput("code", "Code", 170, 35, "text", 115)}
+          </div>
           <div className="mt-3">
             {this.renderSelect(
               "uniteReglementaireId",
-              "UniteReglementaire",
+              "Unite Reglementaire",
               uniteReglementaires,
+              170,
+              35,
+              115,
             )}
           </div>
           <div className="mt-3">
-            {this.renderSelect("uniteMesureId", "UniteMesure", uniteMesures)}
+            {this.renderSelect(
+              "uniteMesureId",
+              "Unite Mesure",
+              uniteMesures,
+              170,
+              35,
+              115,
+            )}
           </div>
           <div className="mt-3">
-            {this.renderInput("prixHT", "Prix HT", 170, 35, "number")}
+            {this.renderInput("prixHT", "Prix HT", 170, 35, "number", 115)}
           </div>
           <div className="mt-3">
-            {this.renderInput("prixTTC", "Prix TTC", 170, 35, "number")}
+            {this.renderInput("prixTTC", "Prix TTC", 170, 35, "number", 115)}
           </div>
           <div className="mt-3">
-            {this.renderInput("tauxTVA", "Taux TVA", 170, 35, "number")}
+            {this.renderInput("tauxTVA", "Taux TVA", 170, 35, "number", 115)}
           </div>
           <div className="mt-3">
             {this.renderInput(
@@ -237,20 +252,36 @@ class ArticleForm extends Form {
               170,
               35,
               "number",
+              115,
             )}
           </div>
           <div className="mt-3">
-            {this.renderInput("stockAlerte", "Stock alert", 170, 35, "number")}
+            {this.renderInput(
+              "stockAlerte",
+              "Stock alert",
+              170,
+              35,
+              "number",
+              115,
+            )}
           </div>
           <div className="mt-3">
-            {this.renderBoolean("isExpiration", "Expiration ?", "Oui", "Non")}
+            {this.renderBoolean(
+              "isExpiration",
+              "Expiration ?",
+              "Oui",
+              "Non",
+              70,
+              35,
+              115,
+            )}
           </div>
           <div className="mt-3 w-full  ">
-            {this.renderUpload("image", "Photo")}
+            {this.renderUpload("image", "Photo", "file", 115)}
           </div>
           <div className="  mt-3 flex w-full flex-wrap">
             {data.images.length !== 0 &&
-              this.renderImage("images", "Images", 200)}
+              this.renderImage("images", "Images", 200, 200, 115)}
           </div>
           {this.renderButton("Sauvegarder")}
         </form>

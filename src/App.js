@@ -147,20 +147,7 @@ function App() {
               )}
               {/* articles */}
               {user.role === "admin" ? (
-                <Route
-                  path="/articles/new/:articleid"
-                  exact
-                  component={ArticleForm}
-                />
-              ) : (
-                ""
-              )}
-              {user.role === "admin" ? (
-                <Route
-                  path="/articles/:articleid"
-                  exact
-                  component={ArticleForm}
-                />
+                <Route path="/articles/:id" exact component={ArticleForm} />
               ) : (
                 ""
               )}

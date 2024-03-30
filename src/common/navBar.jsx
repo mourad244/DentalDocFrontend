@@ -178,20 +178,21 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/livraisons"
+                to="/articles"
                 onClick={() => {
                   resetIcon();
-                  setActiveLivraison(true);
+                  setActiveArticle(true);
                 }}
               >
-                {location.pathname.includes("livraison") || activeLivraison ? (
-                  <LivraisonIconActive />
+                {location.pathname.includes("article") || activeArticle ? (
+                  <ArticleIconActive />
                 ) : (
-                  <LivraisonIcon />
+                  <ArticleIcon />
                 )}
               </Link>
             </li>
           </ul>
+
           <ul className="flex w-20">
             <li className=" m-auto my-1 w-fit">
               <Link
@@ -214,16 +215,16 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/articles"
+                to="/livraisons"
                 onClick={() => {
                   resetIcon();
-                  setActiveArticle(true);
+                  setActiveLivraison(true);
                 }}
               >
-                {location.pathname.includes("article") || activeArticle ? (
-                  <ArticleIconActive />
+                {location.pathname.includes("livraison") || activeLivraison ? (
+                  <LivraisonIconActive />
                 ) : (
-                  <ArticleIcon />
+                  <LivraisonIcon />
                 )}
               </Link>
             </li>
