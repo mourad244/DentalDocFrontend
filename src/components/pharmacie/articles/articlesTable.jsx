@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Select from "../../../common/select";
 import CustomeTable from "../../../common/CustomeTable";
 
+import Moment from "react-moment";
 import { v4 as uuidv4 } from "uuid";
 import { FaPrint } from "react-icons/fa";
 import { AiTwotoneEdit } from "react-icons/ai";
@@ -37,8 +38,8 @@ function ArticlesTable({
       case "visibleFields":
         children = visibleFields;
         break;
-      case "filter":
-        children = filterFunctions;
+        // case "filter":
+        //   children = filterFunctions;
         break;
       default:
         break;
@@ -170,33 +171,35 @@ function ArticlesTable({
   const filterFunctions = (
     <div className="m-1 mt-2 flex  w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <div className="m-2">
-        <Select
-          options={[
-            {
-              _id: "oui",
-              nom: "Oui",
-            },
-            {
-              _id: "non",
-              nom: "Non",
-            },
-          ]}
-          label="Expiration ?"
-          name={"isExpiration"}
-          onChange={(e) => {
-            onValueChange("isExpiration", e);
-          }}
-          width={200}
-          widthLabel={100}
-          height={40}
-          value={
-            selectedFilterItems.isExpiration
-              ? "oui"
-              : selectedFilterItems.isExpiration === false
-              ? "non"
-              : ""
-          }
-        />
+        {selectedFilterItems && (
+          <Select
+            options={[
+              {
+                _id: "oui",
+                nom: "Oui",
+              },
+              {
+                _id: "non",
+                nom: "Non",
+              },
+            ]}
+            label="Expiration ?"
+            name={"isExpiration"}
+            onChange={(e) => {
+              onValueChange("isExpiration", e);
+            }}
+            width={200}
+            widthLabel={100}
+            height={40}
+            value={
+              selectedFilterItems.isExpiration
+                ? "oui"
+                : selectedFilterItems.isExpiration === false
+                ? "non"
+                : ""
+            }
+          />
+        )}
       </div>
     </div>
   );

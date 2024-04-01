@@ -27,6 +27,8 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "./assets/icons/icon-dental.png";
 import ArticleForm from "./components/pharmacie/articles/articleForm";
 import Articles from "./components/pharmacie/articles/articles";
+import BonCommandeForm from "./components/pharmacie/bonCommandes/bonCommandeForm";
+import BonCommandes from "./components/pharmacie/bonCommandes/bonCommandes";
 
 function App() {
   const [user, setUser] = useState();
@@ -177,6 +179,21 @@ function App() {
               )}
               {user.role === "admin" || user.role === "comptable" ? (
                 <Route path="/paiements" exact component={Paiements} />
+              ) : (
+                ""
+              )}
+              {/* bon commandes */}
+              {user.role === "admin" ? (
+                <Route
+                  path="/boncommandes/:id"
+                  exact
+                  component={BonCommandeForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" ? (
+                <Route path="/boncommandes" component={BonCommandes} />
               ) : (
                 ""
               )}

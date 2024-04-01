@@ -9,8 +9,10 @@ export function getArticlesListWithPagination({
   sortColumn,
   order,
   searchQuery,
+  selectedLots,
 }) {
   return http.get(
-    `${apiEndpoint}?currentPage=${currentPage}&pageSize=${pageSize}&sortColumn=${sortColumn}&order=${order}&searchQuery=${searchQuery}`,
+    `${apiEndpoint}?currentPage=${currentPage}&pageSize=${pageSize}&sortColumn=${sortColumn}&order=${order}&searchQuery=${searchQuery}
+    &selectedLots=${selectedLots}`,
   );
 }

@@ -50,7 +50,7 @@ const NavBar = ({ user }) => {
       setActiveSettings(true);
     } else if (path.includes("/livraisons")) {
       setActiveLivraison(true);
-    } else if (path.includes("/commandes")) {
+    } else if (path.includes("/boncommandes")) {
       setActiveCommande(true);
     } else if (path.includes("/articles")) {
       setActiveArticle(true);
@@ -197,7 +197,7 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/commandes"
+                to="/boncommandes"
                 onClick={() => {
                   resetIcon();
                   setActiveCommande(true);

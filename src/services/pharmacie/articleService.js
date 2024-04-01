@@ -7,8 +7,27 @@ function articleUrl(id) {
   return `${apiEndpoint}/${id}`;
 }
 
-export function getArticles() {
-  return http.get(apiEndpoint);
+export function getArticles({
+  currentPage,
+  pageSize,
+  sortColumn,
+  order,
+  searchQuery,
+  selectedLots,
+}) {
+  return http.get(
+    `${apiEndpoint}${currentPage ? `?currentPage=${currentPage}` : ""}${
+      pageSize ? `&pageSize=${pageSize}` : ""
+    }${sortColumn ? `&sortColumn=${sortColumn}` : ""}${
+      order ? `&order=${order}` : ""
+    }${searchQuery ? `&searchQuery=${searchQuery}` : ""}${
+      selectedLots ? `&selectedLots=${selectedLots}` : ""
+    }`,
+  );
+  // return http.get(
+  //   `${apiEndpoint}?currentPage=${currentPage}&pageSize=${pageSize}&sortColumn=${sortColumn}&order=${order}&searchQuery=${searchQuery}&selectedLots=${selectedLots}`,
+  // );
+  /*   return http.get(apiEndpoint); */
 }
 
 export function getArticle(articleId) {

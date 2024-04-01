@@ -7,9 +7,14 @@ import {
   getBonCommande,
   saveBonCommande,
 } from "../../../services/pharmacie/bonCommandeService";
-
+import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
+import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
+import ArticlesTable from "../articles/articlesTable";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
+import BooleanButton from "../../../assets/buttons/boolanButton";
+import Checkbox from "../../../common/checkbox";
+import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
 
 class BonCommandeForm extends Form {
   state = {
@@ -26,8 +31,42 @@ class BonCommandeForm extends Form {
       images: [],
       imagesDeletedIndex: [],
     },
-    lots: [],
+    datas: {
+      lots: [],
+      uniteMesures: [],
+      uniteReglementaires: [],
+    },
     filteredArticles: [],
+    selecteDLots: [],
+    filteredArticles: [],
+    fields: [
+      { order: 1, name: "select", label: "Select" },
+      { order: 2, name: "nom", label: "Nom" },
+      { order: 3, name: "code", label: "Code" },
+      { order: 4, name: "lotId", label: "Lot" },
+      { order: 5, name: "stockInitial", label: "Stock Initial" },
+      { order: 6, name: "stockAlerte", label: "Stock Alerte" },
+      { order: 7, name: "stockActuel", label: "Stock Actuel" },
+      { order: 8, name: "uniteMesureId", label: "Unite Mesure" },
+      { order: 9, name: "uniteReglementaireId", label: "Unite Reglementaire" },
+      { order: 10, name: "prixHT", label: "Prix HT" },
+      { order: 11, name: "tauxTVA", label: "Taux TVA" },
+      { order: 12, name: "prixTTC", label: "Prix TTC" },
+      { order: 13, name: "isExpiration", label: "Expiration" },
+    ],
+    selectedFields: [
+      { order: 2, name: "nom", label: "Nom" },
+      { order: 3, name: "code", label: "Code" },
+      { order: 7, name: "stockActuel", label: "Stock Actuel" },
+      { order: 8, name: "uniteMesureId", label: "Unite Mesure" },
+      { order: 9, name: "uniteReglementaireId", label: "Unite Reglementaire" },
+      { order: 12, name: "prixTTC", label: "Prix TTC" },
+      { order: 13, name: "isExpiration", label: "Expiration" },
+    ],
+    sortColumn: { path: "nom", order: "asc" },
+    currentPage: 1,
+    searchQuery: "",
+    pageSize: 8,
     errors: {},
     form: "bonCommandes",
     loading: false,
@@ -52,7 +91,9 @@ class BonCommandeForm extends Form {
 
   async populateDatas() {
     const { data: lots } = await getLots();
-    this.setState({ lots });
+    const { data: uniteMesures } = await getUniteMesures();
+    const { data: uniteReglementaires } = await getUniteReglementaires();
+    this.setState({ datas: { lots, uniteMesures, uniteReglementaires } });
   }
   async populateBonCommandes() {
     try {
@@ -105,6 +146,18 @@ class BonCommandeForm extends Form {
         data: this.mapToViewModel(this.props.selectedBonCommande),
       });
     }
+    if (prevState.selecteDLots !== this.state.selecteDLots) {
+      let { data: filteredArticles } = await getArticlesListWithPagination(
+        this.state.currentPage,
+        this.state.pageSize,
+        this.state.sortColumn,
+        this.state.searchQuery,
+        this.state.selecteDLots,
+      );
+      // fetch articles of selected lots
+
+      this.setState({ filteredArticles });
+    }
   }
 
   mapToViewModel(bonCommande) {
@@ -125,6 +178,24 @@ class BonCommandeForm extends Form {
       images: bonCommande.images ? bonCommande.images : [],
     };
   }
+  handleSort = (sortColumn) => {
+    this.setState({ sortColumn });
+  };
+  handleSelectLot = (lot) => {
+    console.log("lot", lot);
+    let selectedLots = [...this.state.selecteDLots];
+    const index = selectedLots.findIndex((c) => c._id === lot._id);
+    if (index === -1) selectedLots.push(lot);
+    else selectedLots.splice(index, 1);
+    this.setState({ selecteDLots: selectedLots });
+  };
+  handleSelectArticle = (article) => {
+    let articles = [...this.state.data.articles];
+    const index = articles.findIndex((c) => c._id === article._id);
+    if (index === -1) articles.push(article);
+    else articles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles } });
+  };
 
   doSubmit = async () => {
     let result = { ...this.state.data };
@@ -136,7 +207,8 @@ class BonCommandeForm extends Form {
   };
 
   render() {
-    const { lots, loading, data } = this.state;
+    const { datas, loading, data } = this.state;
+
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -153,23 +225,63 @@ class BonCommandeForm extends Form {
             Formulaire du bon de commande
           </p>
         )}
-        {
-          <div className="ml-2  flex justify-start">
-            <button
-              className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
-              onClick={() => {
-                this.props.history.push("/boncommandes");
-              }}
-            >
-              <IoChevronBackCircleSharp className="mr-1 " />
-              Retour à la Liste
-            </button>
-          </div>
-        }
+
+        <div className="ml-2  flex justify-start ">
+          <button
+            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            onClick={() => {
+              this.props.history.push("/boncommandes");
+            }}
+          >
+            <IoChevronBackCircleSharp className="mr-1 " />
+            Retour à la Liste
+          </button>
+        </div>
+
         <form
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
           onSubmit={this.handleSubmit}
         >
+          <div className="flex w-[50%] min-w-[320px] flex-wrap bg-[#F2F2F2]">
+            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+              1. Sélectionner les articles à commander
+            </p>
+            {datas.lots.map((lot) => {
+              return (
+                <div className={"mx-2 flex h-8 w-max"} key={lot._id}>
+                  <input
+                    type="checkbox"
+                    name={lot.nom}
+                    id={lot.nom}
+                    className="mx-1"
+                    checked={this.state.selecteDLots.find(
+                      (c) => c._id === lot._id,
+                    )}
+                    onChange={(e) => this.handleSelectLot(lot)}
+                  />
+                  <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
+                    <label htmlFor="">{lot.nom}</label>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex w-[50%] min-w-[320px] flex-wrap">
+            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+              2. Articles sélectionnés
+            </p>
+            <ArticlesTable
+              articles={this.state.filteredArticles}
+              sortColumn={this.state.sortColumn}
+              onSort={this.handleSort}
+              fields={this.state.fields}
+              datas={datas}
+              headers={this.state.selectedFields}
+              totalItems={this.state.filteredArticles.length}
+              onItemSelect={this.handleSelectArticle}
+              selectedItems={data.articles}
+            />
+          </div>
           <div className="mt-3 w-full  ">
             {this.renderUpload("image", "Photo")}
           </div>

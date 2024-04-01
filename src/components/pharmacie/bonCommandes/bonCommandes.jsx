@@ -4,19 +4,17 @@ import { useHistory } from "react-router-dom";
 import { deleteBonCommande } from "../../../services/pharmacie/bonCommandeService";
 import { getBonCommandes } from "../../../services/pharmacie/bonCommandeService";
 import BonCommadesTable from "./bonCommandesTable";
-
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
-import ButtonType from "../../../common/buttonType";
-import { ReactComponent as PrecedentButton } from "../../../assets/icons/precedent.svg";
-import { ReactComponent as SuivantButton } from "../../../assets/icons/suivant.svg";
+import ButtonType from "../../../assets/buttons/buttonType";
+import { ReactComponent as PrecedentButton } from "../../../assets/icons/precedent-btn.svg";
+import { ReactComponent as SuivantButton } from "../../../assets/icons/suivant-btn.svg";
 import SearchPeriode from "../../../common/searchPeriode";
+import { FaShoppingCart } from "react-icons/fa";
 
 function BonCommandes() {
-  const [datas, setDatas] = useState({
-    lots: [],
-  });
+  const [datas, setDatas] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedBonCommande, setSelectedBonCommande] = useState(null);
   const [selectedBonCommandes, setSelectedBonCommandes] = useState([]);
@@ -57,13 +55,6 @@ function BonCommandes() {
   const pageSize = 10;
   const history = useHistory();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: lots } = await getLots();
-      setDatas({ lots });
-    };
-    fetchData();
-  }, []);
   useEffect(() => {
     const fetchBonCommandes = async () => {
       setLoading(true);
@@ -155,6 +146,20 @@ function BonCommandes() {
       <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
         Liste des bons de commandes
       </p>
+      <div className="ml-2 flex justify-start">
+        <button
+          className="no-underlin mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
+          onClick={() => {
+            history.push("/boncommandes/new");
+          }}
+        >
+          <FaShoppingCart className="mr-1" />
+          Nouveau patient
+        </button>
+        <div></div>
+      </div>
     </div>
   );
 }
+
+export default BonCommandes;
