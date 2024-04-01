@@ -74,7 +74,6 @@ function ArticlesTable({
             onChange={() => onItemSelect(article)}
           />
         </td>
-
         {headers.map((header, index) => {
           const key = header.name;
           switch (key) {

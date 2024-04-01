@@ -26,6 +26,8 @@ const CustomeTable = ({
   };
   const tableHeaders = headers.map((header, index) => {
     if (header.label === "Select") {
+      if (header.isActivated === false)
+        return <th key={uuidv4()} className="w-8"></th>;
       return (
         <th
           key={uuidv4()}

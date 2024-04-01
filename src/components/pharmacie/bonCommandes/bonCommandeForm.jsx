@@ -15,6 +15,7 @@ import { IoChevronBackCircleSharp } from "react-icons/io5";
 import BooleanButton from "../../../assets/buttons/boolanButton";
 import Checkbox from "../../../common/checkbox";
 import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
+import { getArticles } from "../../../services/pharmacie/articleService";
 
 class BonCommandeForm extends Form {
   state = {
@@ -39,8 +40,9 @@ class BonCommandeForm extends Form {
     filteredArticles: [],
     selecteDLots: [],
     filteredArticles: [],
+    totalCount: 0,
     fields: [
-      { order: 1, name: "select", label: "Select" },
+      { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
       { order: 3, name: "code", label: "Code" },
       { order: 4, name: "lotId", label: "Lot" },
@@ -55,6 +57,7 @@ class BonCommandeForm extends Form {
       { order: 13, name: "isExpiration", label: "Expiration" },
     ],
     selectedFields: [
+      { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
       { order: 3, name: "code", label: "Code" },
       { order: 7, name: "stockActuel", label: "Stock Actuel" },
@@ -70,6 +73,7 @@ class BonCommandeForm extends Form {
     errors: {},
     form: "bonCommandes",
     loading: false,
+    loadingArticles: false,
   };
   schema = {
     _id: Joi.string(),
@@ -147,16 +151,21 @@ class BonCommandeForm extends Form {
       });
     }
     if (prevState.selecteDLots !== this.state.selecteDLots) {
-      let { data: filteredArticles } = await getArticlesListWithPagination(
-        this.state.currentPage,
-        this.state.pageSize,
-        this.state.sortColumn,
-        this.state.searchQuery,
-        this.state.selecteDLots,
-      );
-      // fetch articles of selected lots
+      let selectedLots = this.state.selecteDLots.map((c) => c._id);
 
-      this.setState({ filteredArticles });
+      this.setState({ loadingArticles: true });
+      let {
+        data: { data: filteredArticles, totalCount },
+      } = await getArticles({
+        currentPage: this.state.currentPage,
+        pageSize: this.state.pageSize,
+        sortColumn: this.state.sortColumn.path,
+        order: this.state.sortColumn.order,
+        searchQuery: this.state.searchQuery,
+        selectedLots,
+      });
+      // fetch articles of selected lots
+      this.setState({ filteredArticles, totalCount, loadingArticles: false });
     }
   }
 
@@ -181,13 +190,15 @@ class BonCommandeForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-  handleSelectLot = (lot) => {
-    console.log("lot", lot);
-    let selectedLots = [...this.state.selecteDLots];
-    const index = selectedLots.findIndex((c) => c._id === lot._id);
-    if (index === -1) selectedLots.push(lot);
-    else selectedLots.splice(index, 1);
-    this.setState({ selecteDLots: selectedLots });
+  handleSelectLot = (e, lot) => {
+    e.preventDefault();
+    // get the value of e
+    // console.log(e.target.checked);
+    let newSelectedLots = [...this.state.selecteDLots];
+    const index = newSelectedLots.findIndex((c) => c._id === lot._id);
+    if (index === -1) newSelectedLots.push(lot);
+    else newSelectedLots.splice(index, 1);
+    this.setState({ selecteDLots: newSelectedLots });
   };
   handleSelectArticle = (article) => {
     let articles = [...this.state.data.articles];
@@ -207,7 +218,14 @@ class BonCommandeForm extends Form {
   };
 
   render() {
-    const { datas, loading, data } = this.state;
+    const {
+      datas,
+      loading,
+      loadingArticles,
+      filteredArticles,
+      data,
+      selecteDLots,
+    } = this.state;
 
     return loading ? (
       <div className="m-auto my-4">
@@ -254,10 +272,10 @@ class BonCommandeForm extends Form {
                     name={lot.nom}
                     id={lot.nom}
                     className="mx-1"
-                    checked={this.state.selecteDLots.find(
-                      (c) => c._id === lot._id,
-                    )}
-                    onChange={(e) => this.handleSelectLot(lot)}
+                    checked={
+                      selecteDLots.find((c) => c._id === lot._id) ? true : false
+                    }
+                    onChange={(e) => this.handleSelectLot(e, lot)}
                   />
                   <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
                     <label htmlFor="">{lot.nom}</label>
@@ -266,21 +284,28 @@ class BonCommandeForm extends Form {
               );
             })}
           </div>
+
           <div className="flex w-[50%] min-w-[320px] flex-wrap">
             <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
               2. Articles sélectionnés
             </p>
-            <ArticlesTable
-              articles={this.state.filteredArticles}
-              sortColumn={this.state.sortColumn}
-              onSort={this.handleSort}
-              fields={this.state.fields}
-              datas={datas}
-              headers={this.state.selectedFields}
-              totalItems={this.state.filteredArticles.length}
-              onItemSelect={this.handleSelectArticle}
-              selectedItems={data.articles}
-            />
+            {loadingArticles ? (
+              <div className="m-auto my-4">
+                <ClipLoader loading={loadingArticles} size={70} />
+              </div>
+            ) : (
+              <ArticlesTable
+                articles={filteredArticles}
+                sortColumn={this.state.sortColumn}
+                onSort={this.handleSort}
+                fields={this.state.fields}
+                datas={datas}
+                headers={this.state.selectedFields}
+                totalItems={this.state.filteredArticles.length}
+                onItemSelect={this.handleSelectArticle}
+                selectedItems={data.articles}
+              />
+            )}
           </div>
           <div className="mt-3 w-full  ">
             {this.renderUpload("image", "Photo")}

@@ -3,10 +3,13 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import ArticlesTable from "./articlesTable";
-import { deleteArticle } from "../../../services/pharmacie/articleService";
+import {
+  deleteArticle,
+  getArticles,
+} from "../../../services/pharmacie/articleService";
 import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
 import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
-import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
+// import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
 
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
@@ -93,7 +96,7 @@ function Articles() {
       try {
         const {
           data: { data, totalCount },
-        } = await getArticlesListWithPagination({
+        } = await getArticles({
           pageSize,
           currentPage,
           searchQuery,
