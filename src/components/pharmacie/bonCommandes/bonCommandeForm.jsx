@@ -16,6 +16,7 @@ import BooleanButton from "../../../assets/buttons/boolanButton";
 import Checkbox from "../../../common/checkbox";
 import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
 import { getArticles } from "../../../services/pharmacie/articleService";
+import SearchBox from "../../../common/searchBox";
 
 class BonCommandeForm extends Form {
   state = {
@@ -40,6 +41,7 @@ class BonCommandeForm extends Form {
     filteredArticles: [],
     selecteDLots: [],
     filteredArticles: [],
+    startSearch: false,
     totalCount: 0,
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
@@ -148,6 +150,29 @@ class BonCommandeForm extends Form {
     ) {
       this.setState({
         data: this.mapToViewModel(this.props.selectedBonCommande),
+      });
+    }
+    if (prevState.startSearch !== this.state.startSearch) {
+      console.log("done");
+      console.log("startSearch", this.state.startSearch);
+      let selectedLots = this.state.selecteDLots.map((c) => c._id);
+      this.setState({ loadingArticles: true });
+      let {
+        data: { data: filteredArticles, totalCount },
+      } = await getArticles({
+        currentPage: this.state.currentPage,
+        pageSize: this.state.pageSize,
+        sortColumn: this.state.sortColumn.path,
+        order: this.state.sortColumn.order,
+        searchQuery: this.state.searchQuery,
+        selectedLots,
+      });
+      // fetch articles of selected lots
+      this.setState({
+        filteredArticles,
+        totalCount,
+        loadingArticles: false,
+        startSearch: false,
       });
     }
     if (prevState.selecteDLots !== this.state.selecteDLots) {
@@ -262,7 +287,7 @@ class BonCommandeForm extends Form {
         >
           <div className="flex w-[50%] min-w-[320px] flex-wrap bg-[#F2F2F2]">
             <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-              1. Sélectionner les articles à commander
+              1. Sélectionner les lots des articles
             </p>
             {datas.lots.map((lot) => {
               return (
@@ -284,7 +309,18 @@ class BonCommandeForm extends Form {
               );
             })}
           </div>
-
+          <div className="flex w-fit items-start ">
+            {console.log("searchQuery", this.state.searchQuery)}
+            <SearchBox
+              value={this.state.searchQuery}
+              onChange={(e) => {
+                this.setState({ searchQuery: e });
+              }}
+              onSearch={() =>
+                this.setState({ startSearch: true, currentPage: 1 })
+              }
+            />
+          </div>
           <div className="flex w-[50%] min-w-[320px] flex-wrap">
             <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
               2. Articles sélectionnés
