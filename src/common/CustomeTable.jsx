@@ -13,6 +13,8 @@ const CustomeTable = ({
   totalItems,
   tableControlPanel,
   selectedItems,
+  displayTableControlPanel = true,
+  displayItemActions = true,
 }) => {
   const raiseSort = (path) => {
     const newSortColumn = { ...sortColumn };
@@ -58,8 +60,10 @@ const CustomeTable = ({
   });
   return (
     <>
-      <div className="flex">{tableControlPanel}</div>
-      {itemActions}
+      {displayTableControlPanel && (
+        <div className="flex">{tableControlPanel}</div>
+      )}
+      {displayItemActions && itemActions}
       <table className="my-0 w-full">
         <thead className="h-12  text-[#4f5361]">
           <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">

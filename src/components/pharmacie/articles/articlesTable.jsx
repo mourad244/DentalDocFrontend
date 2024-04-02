@@ -26,6 +26,8 @@ function ArticlesTable({
   onValueChange,
   onFieldSelect,
   selectedFilterItems,
+  displayTableControlPanel = true,
+  displayItemActions = true,
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isFieldsOpen, setIsFieldsOpen] = useState(false);
@@ -69,7 +71,9 @@ function ArticlesTable({
           <input
             type="checkbox"
             checked={
-              selectedItems.findIndex((c) => c._id === article._id) !== -1
+              selectedItems.findIndex(
+                (c) => c._id === article._id || c.articleId === article._id,
+              ) !== -1
             }
             onChange={() => onItemSelect(article)}
           />
@@ -287,6 +291,8 @@ function ArticlesTable({
       onSort={onSort}
       onItemsSelect={onItemsSelect}
       sortColumn={sortColumn}
+      displayTableControlPanel={displayTableControlPanel}
+      displayItemActions={displayItemActions}
     />
   );
 }

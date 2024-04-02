@@ -6,21 +6,24 @@ const Input = ({
   width,
   widthLabel,
   height,
+  fontWeight = "bold",
   disabled,
   ...rest
 }) => {
   return (
-    <div className=" flex flex-col">
+    <div className=" flex flex-col items-center">
       <div className="flex w-fit flex-wrap">
-        <label
-          className={`mr-3  text-right text-xs font-bold leading-9 text-[#72757c]`}
-          htmlFor={name}
-          style={{ width: widthLabel }}
-        >
-          {label}
-        </label>
+        {label && (
+          <label
+            className={`mr-3  text-right text-xs font-${fontWeight} leading-9 text-[#72757c]`}
+            htmlFor={name}
+            style={{ width: widthLabel }}
+          >
+            {label}
+          </label>
+        )}
         <input
-          className={`rounded-md	border-0  pl-3 pr-3 text-xs font-bold text-[#1f2037]  ${
+          className={`rounded-md	border-0  pl-3 pr-3 text-xs font-${fontWeight} text-[#1f2037]  ${
             disabled ? "bg-[#b1b1b1]" : "bg-[#D6E1E3] shadow-inner"
           }`}
           {...rest}
