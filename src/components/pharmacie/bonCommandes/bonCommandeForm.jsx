@@ -155,18 +155,21 @@ class BonCommandeForm extends Form {
         data: this.mapToViewModel(this.props.selectedBonCommande),
       });
     }
-    if (prevState.searchQuerySociete !== this.state.searchQuerySociete) {
+    if (prevState.startSearchSociete !== this.state.startSearchSociete) {
       if (this.state.searchQuerySociete !== "") {
         this.setState({ loadingSocietes: true });
         let { data: filteredSocietes } = await searchSociete(
           this.state.searchQuerySociete,
         );
-        this.setState({ filteredSocietes, loadingSocietes: false });
+        this.setState({
+          filteredSocietes,
+          loadingSocietes: false,
+          startSearchSociete: false,
+        });
       }
     }
     if (prevState.startSearch !== this.state.startSearch) {
       let selectedLots = this.state.selecteDLots.map((c) => c._id);
-
       this.setState({ loadingArticles: true });
       let {
         data: { data: filteredArticles, totalCount },
@@ -506,15 +509,56 @@ class BonCommandeForm extends Form {
             </div>
           </div>
           {/* search societe */}
-          <SearchBox
-            value={this.state.searchQuerySociete}
-            onChange={(e) => {
-              this.setState({ searchQuerySociete: e });
-            }}
-            onSearch={() =>
-              this.setState({ startSearchSociete: true, currentPage: 1 })
-            }
-          />
+          <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+            4. Choisir la société retenue
+          </p>
+          <div className="flex ">
+            <SearchBox
+              value={this.state.searchQuerySociete}
+              onChange={(e) => {
+                this.setState({ searchQuerySociete: e });
+              }}
+              onSearch={() =>
+                this.setState({ startSearchSociete: true, currentPage: 1 })
+              }
+            />
+            {this.state.loadingSocietes ? (
+              <div className="m-auto my-4">
+                <ClipLoader loading={this.state.loadingSocietes} size={70} />
+              </div>
+            ) : (
+              <div className="flex w-full">
+                {this.state.filteredSocietes.map((societe) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        this.setState({
+                          data: {
+                            ...data,
+                            societeRetenuId: societe._id,
+                          },
+                          selectedSociete: societe,
+                        });
+                      }}
+                      key={societe._id}
+                      className="m-2 cursor-pointer rounded-md bg-slate-400 p-2 text-xs font-bold shadow-md"
+                    >
+                      {societe.nom}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="mt-2 flex w-full">
+            <Input
+              disabled={true}
+              name="societeRetenuId"
+              label="Société retenue"
+              value={this.state.selectedSociete.nom}
+              widthLabel={95}
+            />
+          </div>
           <div className="mt-3 w-full  ">
             {this.renderUpload("image", "Photo")}
           </div>
