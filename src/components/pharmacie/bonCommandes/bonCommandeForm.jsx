@@ -91,7 +91,7 @@ class BonCommandeForm extends Form {
       .label("Société retenue"),
     montantHT: Joi.number().allow("").allow(null).label("Montant HT"),
     montantTTC: Joi.number().allow("").allow(null).label("Montant TTC"),
-    tva: Joi.number().allow("").allow(null).label("TVA"),
+    tva: Joi.number().required().label("TVA"),
     commentaire: Joi.string().allow("").allow(null).label("Commentaire"),
     articles: Joi.array().items(Joi.object()).label("Articles"),
     images: Joi.label("Images").optional(),
@@ -301,233 +301,269 @@ class BonCommandeForm extends Form {
         </div>
 
         <form
-          className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
+          className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-col justify-start"
           onSubmit={this.handleSubmit}
         >
-          <div className="flex w-[50%] min-w-[320px] flex-wrap bg-[#F2F2F2]">
-            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-              1. Sélectionner les lots des articles
-            </p>
-            {datas.lots.map((lot) => {
-              return (
-                <div className={"mx-2 flex h-8 w-max"} key={lot._id}>
-                  <input
-                    type="checkbox"
-                    name={lot.nom}
-                    id={lot.nom}
-                    className="mx-1"
-                    checked={
-                      selecteDLots.find((c) => c._id === lot._id) ? true : false
-                    }
-                    onChange={(e) => this.handleSelectLot(e, lot)}
-                  />
-                  <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
-                    <label htmlFor="">{lot.nom}</label>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex w-fit items-start ">
-            <SearchBox
-              value={this.state.searchQuery}
-              onChange={(e) => {
-                this.setState({ searchQuery: e });
-              }}
-              onSearch={() =>
-                this.setState({ startSearch: true, currentPage: 1 })
-              }
-            />
-          </div>
-          <div className="flex w-[50%] min-w-[320px] flex-wrap">
-            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-              2. Sélectionner les arcticles à commander
-            </p>
-            {loadingArticles ? (
-              <div className="m-auto my-4">
-                <ClipLoader loading={loadingArticles} size={70} />
+          <div className="flex  flex-row items-start">
+            <div className="flex w-[30%] min-w-[320px]  flex-col rounded-sm bg-[#F2F2F2]">
+              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+                1. Recherche des articles
+              </p>
+              <div className="mb-2 flex">
+                <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
+                  a. chercher l'article
+                </p>
+                <SearchBox
+                  value={this.state.searchQuery}
+                  onChange={(e) => {
+                    this.setState({ searchQuery: e });
+                  }}
+                  onSearch={() =>
+                    this.setState({ startSearch: true, currentPage: 1 })
+                  }
+                />
               </div>
-            ) : (
-              <ArticlesTable
-                articles={filteredArticles}
-                sortColumn={this.state.sortColumn}
-                onSort={this.handleSort}
-                fields={this.state.fields}
-                datas={datas}
-                headers={this.state.selectedFields}
-                totalItems={this.state.filteredArticles.length}
-                onItemSelect={this.handleSelectArticle}
-                selectedItems={data.articles}
-                displayTableControlPanel={false}
-                displayItemActions={false}
-              />
-            )}
-          </div>
-          {/* 
-          code, nom, prixTTC, qta a commander, prixTotal
-          */}
-          <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-            3. Valider les articles à commander
-          </p>
-          <table className="my-0 w-full">
-            <thead className="h-12 text-[#4f5361]">
-              <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
-                <th key={uuidv4()} className="w-8"></th>
-                <th
-                  key={uuidv4()}
-                  className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                >
-                  Code
-                </th>
-                <th
-                  key={uuidv4()}
-                  className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                >
-                  Désignation
-                </th>
-                <th
-                  key={uuidv4()}
-                  className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                >
-                  Prix unitaire
-                </th>
-                <th
-                  key={uuidv4()}
-                  className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                >
-                  Qte à commander
-                </th>
-                <th
-                  key={uuidv4()}
-                  className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                >
-                  Prix Total
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.articles.map((article) => {
-                return (
-                  <tr
-                    className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                    key={article.articleId}
-                  >
-                    <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
+              <div className="mb-2 mr-2 flex  flex-wrap ">
+                <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
+                  b. Sélectionner les lots des articles
+                </p>
+                {datas.lots.map((lot) => {
+                  return (
+                    <div className={"mx-2  flex  w-max"} key={lot._id}>
                       <input
                         type="checkbox"
-                        checked={true}
-                        onChange={() => {}}
+                        name={lot.nom}
+                        id={lot.nom}
+                        className="mx-1"
+                        checked={
+                          selecteDLots.find((c) => c._id === lot._id)
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => this.handleSelectLot(e, lot)}
                       />
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {article.code}
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {article.nom}
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {/* {article.prixTTC} */}
-                      {/* faire le prix dans cet format : ex: 123 344,00 Dh, 123,00 Dh */}
-                      {article.prixTTC
-                        ? article.prixTTC.toLocaleString("fr-FR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }) + " Dh"
-                        : "0 Dh"}
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      <Input
-                        type="number"
-                        width={80}
-                        fontWeight="medium"
-                        height={35}
-                        disabled={false}
-                        value={article.quantiteTotal}
-                        onChange={(e) => {
-                          let articles = [...data.articles];
-                          const index = articles.findIndex(
-                            (c) =>
-                              c.articleId.toString() ===
-                              article.articleId.toString(),
-                          );
-                          if (e.target.value >= 1) {
-                            articles[index].quantiteTotal = e.target.value;
-                            this.setState({ data: { ...data, articles } });
-                          } else {
-                            articles[index].quantiteTotal = 1;
-                            this.setState({
-                              data: {
-                                ...data,
-                                articles,
-                              },
-                            });
-                          }
-                        }}
-                      />
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {article.prixTTC
-                        ? (
-                            article.prixTTC * article.quantiteTotal
-                          ).toLocaleString("fr-FR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }) + " Dh"
-                        : "0 Dh"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {/* ajouter une ligne séparant la table du reste de contenu  */}
-          <div className="mt-2 h-1 w-full bg-[#1b1b1b]" />
-          {/* ajouter le total des articls a gauches et montant total a droite */}
-          <div className="flex w-full justify-between">
-            <div className="flex  justify-start">
-              <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-[#151516]">
-                Total des articles:
-              </p>
-              {/* calculer le nombre total des articles */}
-              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-                {data.articles.length}
-              </p>
+                      <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
+                        <label htmlFor="">{lot.nom}</label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex  justify-end">
-              <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
-                Montant Total:
+            <div className="mx-2  flex min-w-[320px] flex-wrap">
+              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+                2. Sélectionner les arcticles à commander
               </p>
-              {/* calculer le montant total des articles */}
-              <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
-                {data.articles
-                  .reduce((a, b) => a + b.prixTTC * b.quantiteTotal, 0)
-                  .toLocaleString("fr-FR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) + " Dh"}
-              </p>
+              {loadingArticles ? (
+                <div className="m-auto my-4">
+                  <ClipLoader loading={loadingArticles} size={70} />
+                </div>
+              ) : filteredArticles.length > 0 ? (
+                <ArticlesTable
+                  articles={filteredArticles}
+                  sortColumn={this.state.sortColumn}
+                  onSort={this.handleSort}
+                  fields={this.state.fields}
+                  datas={datas}
+                  headers={this.state.selectedFields}
+                  totalItems={this.state.filteredArticles.length}
+                  onItemSelect={this.handleSelectArticle}
+                  selectedItems={data.articles}
+                  displayTableControlPanel={false}
+                  displayItemActions={false}
+                />
+              ) : (
+                <div className="ml-4 ">
+                  <p className="text-center text-sm font-bold text-slate-900">
+                    Aucun article trouvé
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+          <div className="flex min-w-[320px] flex-wrap">
+            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+              3. Valider les articles à commander
+            </p>
+            {data.articles.length > 0 ? (
+              <>
+                <table className="my-0 w-full">
+                  <thead className="h-12 text-[#4f5361]">
+                    <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
+                      <th key={uuidv4()} className="w-8"></th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Code
+                      </th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Désignation
+                      </th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Prix unitaire
+                      </th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Qte à commander
+                      </th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Prix Total
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.articles.map((article) => {
+                      return (
+                        <tr
+                          className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
+                          key={article.articleId}
+                        >
+                          <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
+                            <input
+                              type="checkbox"
+                              checked={true}
+                              onChange={() => {}}
+                            />
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {article.code}
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {article.nom}
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {/* {article.prixTTC} */}
+                            {/* faire le prix dans cet format : ex: 123 344,00 Dh, 123,00 Dh */}
+                            {article.prixTTC
+                              ? article.prixTTC.toLocaleString("fr-FR", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }) + " Dh"
+                              : "0 Dh"}
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            <Input
+                              type="number"
+                              width={80}
+                              fontWeight="medium"
+                              height={35}
+                              disabled={false}
+                              value={article.quantiteTotal}
+                              onChange={(e) => {
+                                let articles = [...data.articles];
+                                const index = articles.findIndex(
+                                  (c) =>
+                                    c.articleId.toString() ===
+                                    article.articleId.toString(),
+                                );
+                                if (e.target.value >= 1) {
+                                  articles[index].quantiteTotal =
+                                    e.target.value;
+                                  this.setState({
+                                    data: { ...data, articles },
+                                  });
+                                } else {
+                                  articles[index].quantiteTotal = 1;
+                                  this.setState({
+                                    data: {
+                                      ...data,
+                                      articles,
+                                    },
+                                  });
+                                }
+                              }}
+                            />
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {article.prixTTC
+                              ? (
+                                  article.prixTTC * article.quantiteTotal
+                                ).toLocaleString("fr-FR", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }) + " Dh"
+                              : "0 Dh"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div className="mt-2 h-1 w-full bg-[#1b1b1b]" />
+                <div className="flex w-full justify-between">
+                  <div className="flex  justify-start">
+                    <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-[#151516]">
+                      Total des articles:
+                    </p>
+                    {/* calculer le nombre total des articles */}
+                    <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+                      {data.articles.length}
+                    </p>
+                  </div>
+                  <div className="flex  justify-end">
+                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
+                      Montant Total:
+                    </p>
+                    {/* calculer le montant total des articles */}
+                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
+                      {data.articles
+                        .reduce((a, b) => a + b.prixTTC * b.quantiteTotal, 0)
+                        .toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }) + " Dh"}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="ml-4">
+                <p className=" text-sm font-bold text-slate-900">
+                  Aucun article séléctionné
+                </p>
+              </div>
+            )}
+          </div>
+          {/* ajouter une ligne séparant la table du reste de contenu  */}
+
           {/* search societe */}
           <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
             4. Choisir la société retenue
           </p>
           <div className="flex ">
-            <SearchBox
-              value={this.state.searchQuerySociete}
-              onChange={(e) => {
-                this.setState({ searchQuerySociete: e });
-              }}
-              onSearch={() =>
-                this.setState({ startSearchSociete: true, currentPage: 1 })
-              }
-            />
+            <div className="flex flex-row items-center">
+              <label className="m-2 h-fit w-[92px] text-xs font-bold">
+                Chercher société
+              </label>
+              <SearchBox
+                width={190}
+                value={this.state.searchQuerySociete}
+                onChange={(e) => {
+                  this.setState({ searchQuerySociete: e });
+                }}
+                onSearch={() =>
+                  this.setState({ startSearchSociete: true, currentPage: 1 })
+                }
+              />
+            </div>
             {this.state.loadingSocietes ? (
-              <div className="m-auto my-4">
-                <ClipLoader loading={this.state.loadingSocietes} size={70} />
+              <div className="my-2 ml-4">
+                <ClipLoader loading={this.state.loadingSocietes} size={30} />
               </div>
             ) : (
-              <div className="flex w-full">
+              <div className="mx-2 flex w-full flex-wrap">
                 {this.state.filteredSocietes.map((societe) => {
                   return (
                     <div
@@ -538,12 +574,16 @@ class BonCommandeForm extends Form {
                             societeRetenuId: societe._id,
                           },
                           selectedSociete: societe,
+                          filteredSocietes: [],
+                          searchQuerySociete: "",
                         });
                       }}
                       key={societe._id}
                       className="m-2 cursor-pointer rounded-md bg-slate-400 p-2 text-xs font-bold shadow-md"
                     >
                       {societe.nom}
+                      {societe.telephone ? ` - N°:${societe.telephone}` : ""}
+                      {societe.ville ? ` - ${societe.ville}` : ""}
                     </div>
                   );
                 })}
@@ -555,17 +595,49 @@ class BonCommandeForm extends Form {
               disabled={true}
               name="societeRetenuId"
               label="Société retenue"
-              value={this.state.selectedSociete.nom}
+              value={
+                this.state.selectedSociete.nom
+                  ? this.state.selectedSociete.nom
+                  : ""
+              }
               widthLabel={95}
+              width={190}
             />
+            <button
+              className="ml-2 rounded-md bg-red-500 p-2 text-xs font-bold text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                this.setState({
+                  selectedSociete: {},
+                  data: { ...data, societeRetenuId: "" },
+                });
+              }}
+            >
+              X
+            </button>
           </div>
-          <div className="">
-            <div className="mt-3 w-full">{this.renderDate("date", "Date")}</div>
-            <div className="mt-3 w-full">
-              {this.renderInput("objet", "Objet")}
+          <div className="flex w-[100%] flex-wrap justify-start">
+            <div className="mt-3 ">
+              {this.renderDate("date", "Date", 190, 35, 95)}
+            </div>
+            <div className="mt-3 ">
+              {this.renderInput("objet", "Objet", 190, 35, "text", 95)}
             </div>
 
-            <div className="mt-3 w-full">{this.renderInput("tva", "TVA")}</div>
+            <div className="mt-3 ">
+              {this.renderInput("tva", "TVA", 190, 35, "number", 95)}
+            </div>
+
+            <div className="mt-3 ">
+              {this.renderInput(
+                "commentaire",
+                "Description",
+                190,
+                35,
+                "text",
+                95,
+              )}
+            </div>
           </div>
 
           <div className="mt-3 w-full  ">

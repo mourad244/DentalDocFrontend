@@ -24,10 +24,11 @@ const Input = ({
         )}
         <input
           className={`rounded-md	border-0  pl-3 pr-3 text-xs font-${fontWeight} text-[#1f2037]  ${
-            disabled ? "bg-[#b1b1b1]" : "bg-[#D6E1E3] shadow-inner"
+            disabled ? "bg-[#b1b1b1] shadow-inner" : "bg-[#D6E1E3] shadow-inner"
           }`}
           {...rest}
           name={name}
+          disabled={disabled}
           id={name}
           style={{ width: width, height: height }}
         />
