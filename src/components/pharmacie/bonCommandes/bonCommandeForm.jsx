@@ -270,7 +270,7 @@ class BonCommandeForm extends Form {
       data,
       selecteDLots,
     } = this.state;
-
+    console.log("data", data);
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -559,6 +559,15 @@ class BonCommandeForm extends Form {
               widthLabel={95}
             />
           </div>
+          <div className="">
+            <div className="mt-3 w-full">{this.renderDate("date", "Date")}</div>
+            <div className="mt-3 w-full">
+              {this.renderInput("objet", "Objet")}
+            </div>
+
+            <div className="mt-3 w-full">{this.renderInput("tva", "TVA")}</div>
+          </div>
+
           <div className="mt-3 w-full  ">
             {this.renderUpload("image", "Photo")}
           </div>
