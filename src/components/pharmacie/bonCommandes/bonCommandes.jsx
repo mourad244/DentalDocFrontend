@@ -33,8 +33,8 @@ function BonCommandes() {
   const [bonCommandes, setBonCommandes] = useState([]);
   const [selectedFields, setSelectedFields] = useState([
     { order: 1, name: "select", label: "Select" },
-    { order: 2, name: "objet", label: "Objet" },
-    { order: 3, name: "numOrdre", label: "Numéro d'ordre" },
+    { order: 2, name: "numOrdre", label: "N°" },
+    { order: 3, name: "objet", label: "Objet" },
     { order: 4, name: "date", label: "Date" },
     { order: 5, name: "societeRetenuId", label: "Société retenue" },
     { order: 7, name: "montantTTC", label: "Montant TTC" },
@@ -46,8 +46,8 @@ function BonCommandes() {
   const [searchQuery, setSearchQuery] = useState("");
   const fields = [
     { order: 1, name: "select", label: "Select" },
-    { order: 2, name: "objet", label: "Objet" },
-    { order: 3, name: "numOrdre", label: "Numéro d'ordre" },
+    { order: 2, name: "numOrdre", label: "N°" },
+    { order: 3, name: "objet", label: "Objet" },
     { order: 4, name: "date", label: "Date" },
     { order: 5, name: "societeRetenuId", label: "Société retenue" },
     { order: 6, name: "montantHT", label: "Montant HT" },
