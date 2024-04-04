@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import { deleteBonCommande } from "../../../services/pharmacie/bonCommandeService";
 import { getBonCommandes } from "../../../services/pharmacie/bonCommandeService";
-import BonCommadesTable from "./bonCommandesTable";
+import BonCommandesTable from "./bonCommandesTable";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -12,6 +12,7 @@ import { ReactComponent as PrecedentButton } from "../../../assets/icons/precede
 import { ReactComponent as SuivantButton } from "../../../assets/icons/suivant-btn.svg";
 import SearchPeriode from "../../../common/searchPeriode";
 import { FaShoppingCart } from "react-icons/fa";
+import { getBonCommandesListWithPagination } from "../../../services/pharmacie/bonCommandeListPaginateService";
 
 function BonCommandes() {
   const [datas, setDatas] = useState({});
@@ -32,11 +33,12 @@ function BonCommandes() {
   const [bonCommandes, setBonCommandes] = useState([]);
   const [selectedFields, setSelectedFields] = useState([
     { order: 1, name: "select", label: "Select" },
-    { order: 2, name: "numOrdre", label: "Numéro d'ordre" },
-    { order: 3, name: "date", label: "Date" },
-    { order: 4, name: "societeRetenuId", label: "Société retenue" },
-    { order: 6, name: "montantTTC", label: "Montant TTC" },
-    { order: 8, name: "commentaire", label: "Commentaire" },
+    { order: 2, name: "objet", label: "Objet" },
+    { order: 3, name: "numOrdre", label: "Numéro d'ordre" },
+    { order: 4, name: "date", label: "Date" },
+    { order: 5, name: "societeRetenuId", label: "Société retenue" },
+    { order: 7, name: "montantTTC", label: "Montant TTC" },
+    { order: 9, name: "commentaire", label: "Commentaire" },
   ]);
   const [selectedFilterItems, setSelectedFilterItems] = useState({
     statut: "",
@@ -44,13 +46,14 @@ function BonCommandes() {
   const [searchQuery, setSearchQuery] = useState("");
   const fields = [
     { order: 1, name: "select", label: "Select" },
-    { order: 2, name: "numOrdre", label: "Numéro d'ordre" },
-    { order: 3, name: "date", label: "Date" },
-    { order: 4, name: "societeRetenuId", label: "Société retenue" },
-    { order: 5, name: "montantHT", label: "Montant HT" },
-    { order: 6, name: "montantTTC", label: "Montant TTC" },
-    { order: 7, name: "tva", label: "TVA" },
-    { order: 8, name: "commentaire", label: "Commentaire" },
+    { order: 2, name: "objet", label: "Objet" },
+    { order: 3, name: "numOrdre", label: "Numéro d'ordre" },
+    { order: 4, name: "date", label: "Date" },
+    { order: 5, name: "societeRetenuId", label: "Société retenue" },
+    { order: 6, name: "montantHT", label: "Montant HT" },
+    { order: 7, name: "montantTTC", label: "Montant TTC" },
+    { order: 8, name: "tva", label: "TVA" },
+    { order: 9, name: "commentaire", label: "Commentaire" },
   ];
   const pageSize = 10;
   const history = useHistory();
@@ -59,7 +62,9 @@ function BonCommandes() {
     const fetchBonCommandes = async () => {
       setLoading(true);
       try {
-        const { data, totalCount } = await getBonCommandes({
+        const {
+          data: { data, totalCount },
+        } = await getBonCommandesListWithPagination({
           currentPage,
           pageSize,
           order: sortColumn.order,
@@ -100,6 +105,7 @@ function BonCommandes() {
   };
 
   const handleSelectBonCommande = (bonCommande) => {
+    console.log("bonCommande", bonCommande);
     let bonCommandes = [...selectedBonCommandes];
     const index = bonCommandes.findIndex((c) => c._id === bonCommande._id);
     if (index === -1) bonCommandes.push(bonCommande);
@@ -109,9 +115,7 @@ function BonCommandes() {
     if (founded && selectedBonCommandes.length === 1)
       selectedBonCommande = founded;
     setSelectedBonCommandes(bonCommandes);
-    setSelectedBonCommande(
-      bonCommandes.length === 1 ? selectedBonCommande : null,
-    );
+    setSelectedBonCommande(bonCommandes.length === 1 ? bonCommandes[0] : null);
   };
 
   const handleSelectBonCommandes = () => {
@@ -124,6 +128,7 @@ function BonCommandes() {
   };
 
   const handleEdit = () => {
+    console.log("selctedBonCommande", selectedBonCommande);
     history.push(`/boncommandes/${selectedBonCommande._id}`);
   };
   const handleAddPaiement = () => {
@@ -154,10 +159,44 @@ function BonCommandes() {
           }}
         >
           <FaShoppingCart className="mr-1" />
-          Nouveau patient
+          Nouveau bon de commande
         </button>
-        <div></div>
       </div>
+      {loading ? (
+        <div className="m-auto my-4">
+          <ClipLoader loading={loading} size={70} />
+        </div>
+      ) : (
+        <div className="m-2">
+          <BonCommandesTable
+            bonCommandes={bonCommandes}
+            selectedItem={selectedBonCommande}
+            selectedItems={selectedBonCommandes}
+            onSort={handleSort}
+            headers={selectedFields}
+            fields={fields}
+            sortColumn={sortColumn}
+            onItemSelect={handleSelectBonCommande}
+            onItemsSelect={handleSelectBonCommandes}
+            selectedFields={selectedFields}
+            onEdit={handleEdit}
+            onAddPaiement={handleAddPaiement}
+            onDelete={handleDelete}
+          />
+          <ReactPaginate
+            breakLabel={"..."}
+            nextLabel={"Suivant"}
+            breakClassName={"break-me"}
+            pageCount={Math.ceil(totalCount / pageSize)}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            previousLabel={"Précédent"}
+            renderOnZeroPageCount={null}
+            containerClassName={"pagination"}
+          />
+        </div>
+      )}
     </div>
   );
 }

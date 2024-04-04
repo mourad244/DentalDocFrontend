@@ -43,7 +43,7 @@ class BonCommandeForm extends Form {
     filteredSocietes: [],
     selecteDLots: [],
     startSearch: false,
-    selectedSociete: {},
+    selecteDSociete: {},
     startSearchSociete: false,
     totalCount: 0,
     fields: [
@@ -99,41 +99,57 @@ class BonCommandeForm extends Form {
   };
 
   async populateDatas() {
+    this.setState({ loading: true });
     const { data: lots } = await getLots();
     const { data: uniteMesures } = await getUniteMesures();
     const { data: uniteReglementaires } = await getUniteReglementaires();
-    this.setState({ datas: { lots, uniteMesures, uniteReglementaires } });
-  }
-  async populateBonCommandes() {
-    try {
-      const bonCommandeId =
-        this.props.match &&
-        this.props.match.params &&
-        this.props.match.params.id;
-      const selectedBonCommande = this.props.selectedBonCommande;
-      if (selectedBonCommande) {
-        return this.setState({
-          data: this.mapToViewModel(selectedBonCommande),
-        });
-      }
-      if (bonCommandeId === "new" || bonCommandeId === undefined) return;
-      const { data: bonCommande } = await getBonCommande(bonCommandeId);
 
-      this.setState({ data: this.mapToViewModel(bonCommande) });
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        this.props.history.replace(":not-found");
+    const bonCommandeId = this.props.match.params.id;
+    if (bonCommandeId === "new" || bonCommandeId === undefined) {
+      return this.setState({
+        datas: { lots, uniteMesures, uniteReglementaires },
+        loading: false,
+      });
+    } else {
+      const { data: bonCommande } = await getBonCommande(bonCommandeId);
+      // get the : filteredSocietes from fetched bonCommande if existe
+      /* 1.selecteDLots */
+      let selecteDLots = [];
+      bonCommande.articles = bonCommande.articles.map((item) => {
+        // item.articleId.lotId
+        let lot = lots.find(
+          (c) => c._id === (item.articleId && item.articleId.lotId),
+        );
+        if (lot) selecteDLots.push(lot);
+        //2 .filteredArticles,
+        // return item add add
+        return {
+          articleId: item.articleId._id,
+          code: item.articleId.code,
+          nom: item.articleId.nom,
+          prixTTC: item.articleId.prixTTC,
+          quantiteTotal: item.quantiteTotal,
+        };
+      });
+      // 3. selecteSociete
+      let selecteDSociete = bonCommande.societeRetenuId
+        ? bonCommande.societeRetenuId
+        : {};
+      return this.setState({
+        data: this.mapToViewModel(bonCommande),
+        datas: { lots, uniteMesures, uniteReglementaires },
+        selecteDLots,
+        loading: false,
+        selecteDSociete,
+      });
     }
   }
 
   async componentDidMount() {
-    this.setState({ loading: true });
     await this.populateDatas();
-    await this.populateBonCommandes();
-    this.setState({ loading: false });
-    this.props &&
-      this.props.dataIsValid &&
-      this.props.dataIsValid(this.validate() ? false : true);
+    // this.props &&
+    //   this.props.dataIsValid &&
+    //   this.props.dataIsValid(this.validate() ? false : true);
   }
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.formDisplay !== this.props.formDisplay) {
@@ -143,7 +159,7 @@ class BonCommandeForm extends Form {
     if (prevState.data !== this.state.data && this.props.onBonCommandeChange) {
       const { data } = this.state;
       this.props.onBonCommandeChange(data);
-      this.props.dataIsValid(this.validate() ? false : true);
+      // this.props.dataIsValid(this.validate() ? false : true);
     }
     // if selectedBonCommande is updated
     if (
@@ -214,9 +230,10 @@ class BonCommandeForm extends Form {
       numOrdre: bonCommande.numOrdre,
       date: bonCommande.date,
       objet: bonCommande.objet,
-      societeRetenuId: bonCommande.societeRetenuId
-        ? bonCommande.societeRetenuId._id
-        : "",
+      societeRetenuId:
+        bonCommande.societeRetenuId && bonCommande.societeRetenuId
+          ? bonCommande.societeRetenuId._id
+          : "",
       montantHT: bonCommande.montantHT,
       montantTTC: bonCommande.montantTTC,
       tva: bonCommande.tva,
@@ -270,7 +287,6 @@ class BonCommandeForm extends Form {
       data,
       selecteDLots,
     } = this.state;
-    console.log("data", data);
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -434,7 +450,18 @@ class BonCommandeForm extends Form {
                             <input
                               type="checkbox"
                               checked={true}
-                              onChange={() => {}}
+                              onChange={() => {
+                                let articles = [...data.articles];
+                                const index = articles.findIndex(
+                                  (c) =>
+                                    c.articleId.toString() ===
+                                    article.articleId.toString(),
+                                );
+                                articles.splice(index, 1);
+                                this.setState({
+                                  data: { ...data, articles },
+                                });
+                              }}
                             />
                           </td>
                           <td className="px-1 text-xs font-medium text-[#2f2f2f]">
@@ -539,82 +566,96 @@ class BonCommandeForm extends Form {
           {/* ajouter une ligne séparant la table du reste de contenu  */}
 
           {/* search societe */}
-          <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
-            4. Choisir la société retenue
-          </p>
-          <div className="flex ">
-            <div className="flex flex-row items-center">
-              <label className="m-2 h-fit w-[92px] text-xs font-bold">
-                Chercher société
-              </label>
-              <SearchBox
-                width={190}
-                value={this.state.searchQuerySociete}
-                onChange={(e) => {
-                  this.setState({ searchQuerySociete: e });
-                }}
-                onSearch={() =>
-                  this.setState({ startSearchSociete: true, currentPage: 1 })
-                }
-              />
+          {Object.keys(this.state.selecteDSociete).length === 0 && (
+            <div>
+              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+                4. Choisir la société retenue
+              </p>
+              <div className="flex ">
+                <div className="flex flex-row items-center">
+                  <label className="m-2 h-fit w-[92px] text-xs font-bold">
+                    Chercher société
+                  </label>
+                  <SearchBox
+                    width={190}
+                    value={this.state.searchQuerySociete}
+                    onChange={(e) => {
+                      this.setState({ searchQuerySociete: e });
+                    }}
+                    onSearch={() =>
+                      this.setState({
+                        startSearchSociete: true,
+                        currentPage: 1,
+                      })
+                    }
+                  />
+                </div>
+                {this.state.loadingSocietes ? (
+                  <div className="my-2 ml-4">
+                    <ClipLoader
+                      loading={this.state.loadingSocietes}
+                      size={30}
+                    />
+                  </div>
+                ) : (
+                  <div className="mx-2 flex w-full flex-wrap">
+                    {this.state.filteredSocietes.map((societe) => {
+                      return (
+                        <div
+                          onClick={() => {
+                            this.setState({
+                              data: {
+                                ...data,
+                                societeRetenuId: societe._id,
+                              },
+                              selecteDSociete: societe,
+                              filteredSocietes: [],
+                              searchQuerySociete: "",
+                            });
+                          }}
+                          key={societe._id}
+                          className="m-2 cursor-pointer rounded-md bg-slate-400 p-2 text-xs font-bold shadow-md"
+                        >
+                          {societe.nom}
+                          {societe.telephone
+                            ? ` - N°:${societe.telephone}`
+                            : ""}
+                          {societe.ville ? ` - ${societe.ville}` : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
-            {this.state.loadingSocietes ? (
-              <div className="my-2 ml-4">
-                <ClipLoader loading={this.state.loadingSocietes} size={30} />
-              </div>
-            ) : (
-              <div className="mx-2 flex w-full flex-wrap">
-                {this.state.filteredSocietes.map((societe) => {
-                  return (
-                    <div
-                      onClick={() => {
-                        this.setState({
-                          data: {
-                            ...data,
-                            societeRetenuId: societe._id,
-                          },
-                          selectedSociete: societe,
-                          filteredSocietes: [],
-                          searchQuerySociete: "",
-                        });
-                      }}
-                      key={societe._id}
-                      className="m-2 cursor-pointer rounded-md bg-slate-400 p-2 text-xs font-bold shadow-md"
-                    >
-                      {societe.nom}
-                      {societe.telephone ? ` - N°:${societe.telephone}` : ""}
-                      {societe.ville ? ` - ${societe.ville}` : ""}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          )}
           <div className="mt-2 flex w-full">
             <Input
               disabled={true}
               name="societeRetenuId"
               label="Société retenue"
               value={
-                this.state.selectedSociete.nom
-                  ? this.state.selectedSociete.nom
+                this.state.selecteDSociete && this.state.selecteDSociete.nom
+                  ? this.state.selecteDSociete.nom
                   : ""
               }
               widthLabel={95}
               width={190}
             />
-            <button
-              className="ml-2 rounded-md bg-red-500 p-2 text-xs font-bold text-white"
-              onClick={(e) => {
-                e.preventDefault();
-                this.setState({
-                  selectedSociete: {},
-                  data: { ...data, societeRetenuId: "" },
-                });
-              }}
-            >
-              X
-            </button>
+            {Object.keys(this.state.selecteDSociete).length !== 0 && (
+              <button
+                className="ml-2 rounded-md bg-red-500 p-2 text-xs font-bold text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({
+                    selecteDSociete: {},
+                    data: { ...data, societeRetenuId: "" },
+                  });
+                }}
+              >
+                X
+              </button>
+            )}
           </div>
           <div className="flex w-[100%] flex-wrap justify-start">
             <div className="mt-3 ">
@@ -640,7 +681,7 @@ class BonCommandeForm extends Form {
             </div>
           </div>
 
-          <div className="mt-3 w-full  ">
+          <div className="mt-3 w-full">
             {this.renderUpload("image", "Photo")}
           </div>
           <div className="  mt-3 flex w-full flex-wrap">

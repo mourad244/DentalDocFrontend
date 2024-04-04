@@ -17,6 +17,7 @@ function BonCommandesTable({
   onPrint,
   headers,
   onDelete,
+  fields,
   sortColumn,
   totalItems,
   onItemSelect,
@@ -71,14 +72,16 @@ function BonCommandesTable({
           const key = header.name;
           switch (key) {
             case "montantTTC":
+              let montant = 0;
+              bonCommande.articles.forEach((article) => {
+                montant += article.prixTTC * article.quantiteTotal;
+              });
               return (
                 <td
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  {bonCommande.montantTTC
-                    ? `${bonCommande.montantTTC} Dh`
-                    : `Non défini`}
+                  {montant ? `${montant} Dh` : `Non défini`}
                 </td>
               );
             case "select":

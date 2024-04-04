@@ -72,7 +72,10 @@ function ArticlesTable({
             type="checkbox"
             checked={
               selectedItems.findIndex(
-                (c) => c._id === article._id || c.articleId === article._id,
+                (c) =>
+                  c._id === article._id ||
+                  c.articleId === article._id ||
+                  (c.articleId && c.articleId._id === article._id),
               ) !== -1
             }
             onChange={() => onItemSelect(article)}
