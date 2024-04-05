@@ -229,8 +229,8 @@ function BonCommandesTable({
       tableRows={tableRows}
       itemActions={itemActions}
       totalItems={totalItems}
-      // tableControlPanel={tableControlPanel}
       selectedItems={selectedItems}
+      // tableControlPanel={tableControlPanel}
       onSort={onSort}
       onItemsSelect={onItemsSelect}
       sortColumn={sortColumn}

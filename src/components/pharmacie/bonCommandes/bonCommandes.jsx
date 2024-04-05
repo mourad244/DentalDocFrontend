@@ -105,30 +105,31 @@ function BonCommandes() {
   };
 
   const handleSelectBonCommande = (bonCommande) => {
-    console.log("bonCommande", bonCommande);
-    let bonCommandes = [...selectedBonCommandes];
-    const index = bonCommandes.findIndex((c) => c._id === bonCommande._id);
-    if (index === -1) bonCommandes.push(bonCommande);
-    else bonCommandes.splice(index, 1);
+    let newBonCommandes = [...selectedBonCommandes];
+    const index = newBonCommandes.findIndex((c) => c._id === bonCommande._id);
+    if (index === -1) newBonCommandes.push(bonCommande);
+    else newBonCommandes.splice(index, 1);
     let selectedBonCommande = null;
     let founded = bonCommandes.find((c) => c._id === bonCommande._id);
-    if (founded && selectedBonCommandes.length === 1)
-      selectedBonCommande = founded;
-    setSelectedBonCommandes(bonCommandes);
-    setSelectedBonCommande(bonCommandes.length === 1 ? bonCommandes[0] : null);
+    if (founded && newBonCommandes.length === 1) selectedBonCommande = founded;
+    setSelectedBonCommandes(newBonCommandes);
+    setSelectedBonCommande(
+      newBonCommandes.length === 1 ? newBonCommandes[0] : null,
+    );
   };
 
   const handleSelectBonCommandes = () => {
-    let bonCommandes =
+    let newBonCommandes =
       selectedBonCommandes.length === bonCommandes.length
         ? []
         : [...bonCommandes];
-    setSelectedBonCommandes(bonCommandes);
-    setSelectedBonCommande(bonCommandes.length === 1 ? bonCommandes[0] : null);
+    setSelectedBonCommandes(newBonCommandes);
+    setSelectedBonCommande(
+      newBonCommandes.length === 1 ? newBonCommandes[0] : null,
+    );
   };
 
   const handleEdit = () => {
-    console.log("selctedBonCommande", selectedBonCommande);
     history.push(`/boncommandes/${selectedBonCommande._id}`);
   };
   const handleAddPaiement = () => {
@@ -147,7 +148,7 @@ function BonCommandes() {
     setSelectedDates(dates);
   };
   return (
-    <div className="mt-1 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
+    <div className="mt-2 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
       <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
         Liste des bons de commandes
       </p>
@@ -172,6 +173,7 @@ function BonCommandes() {
             bonCommandes={bonCommandes}
             selectedItem={selectedBonCommande}
             selectedItems={selectedBonCommandes}
+            totalItems={bonCommandes.length}
             onSort={handleSort}
             headers={selectedFields}
             fields={fields}

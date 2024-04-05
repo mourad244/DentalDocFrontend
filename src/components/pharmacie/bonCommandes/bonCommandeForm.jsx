@@ -320,9 +320,9 @@ class BonCommandeForm extends Form {
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-col justify-start"
           onSubmit={this.handleSubmit}
         >
-          <div className="flex  flex-row items-start">
-            <div className="flex w-[30%] min-w-[320px]  flex-col rounded-sm bg-[#F2F2F2]">
-              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+          <div className="mb-2  flex flex-row items-start">
+            <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
+              <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
                 1. Recherche des articles
               </p>
               <div className="mb-2 flex">
@@ -366,8 +366,8 @@ class BonCommandeForm extends Form {
                 })}
               </div>
             </div>
-            <div className="mx-2  flex min-w-[320px] flex-wrap">
-              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+            <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
+              <p className="m-2 mt-2 w-full text-base font-bold text-white">
                 2. Sélectionner les arcticles à commander
               </p>
               {loadingArticles ? (
@@ -397,8 +397,8 @@ class BonCommandeForm extends Form {
               )}
             </div>
           </div>
-          <div className="flex min-w-[320px] flex-wrap">
-            <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+          <div className="mr-2 flex min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
+            <p className="m-2 mt-2 w-full text-base font-bold text-white">
               3. Valider les articles à commander
             </p>
             {data.articles.length > 0 ? (
@@ -528,23 +528,23 @@ class BonCommandeForm extends Form {
                     })}
                   </tbody>
                 </table>
-                <div className="mt-2 h-1 w-full bg-[#1b1b1b]" />
+                <div className=" h-1 w-full bg-white" />
                 <div className="flex w-full justify-between">
                   <div className="flex  justify-start">
-                    <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-[#151516]">
+                    <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-white">
                       Total des articles:
                     </p>
                     {/* calculer le nombre total des articles */}
-                    <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+                    <p className="m-2 mt-2 w-full text-base font-bold text-white">
                       {data.articles.length}
                     </p>
                   </div>
                   <div className="flex  justify-end">
-                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
+                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-white">
                       Montant Total:
                     </p>
                     {/* calculer le montant total des articles */}
-                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-[#151516]">
+                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-white">
                       {data.articles
                         .reduce((a, b) => a + b.prixTTC * b.quantiteTotal, 0)
                         .toLocaleString("fr-FR", {
