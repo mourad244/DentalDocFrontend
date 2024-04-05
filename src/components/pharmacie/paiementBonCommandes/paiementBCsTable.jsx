@@ -8,8 +8,8 @@ import { FaPrint } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
 
-function PaiementsTable({
-  paiements,
+function PaiementBCsTable({
+  paiementBCs,
   onSort,
   sortColumn,
   onEdit,
@@ -21,7 +21,7 @@ function PaiementsTable({
   onPrint,
   headers,
 }) {
-  const tableRows = paiements.map((paiement) => {
+  const tableRows = paiementBCs.map((paiementBC) => {
     return (
       <tr
         className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center"
@@ -31,9 +31,9 @@ function PaiementsTable({
           <input
             type="checkbox"
             checked={
-              selectedItems.findIndex((c) => c._id === paiement._id) !== -1
+              selectedItems.findIndex((c) => c._id === paiementBC._id) !== -1
             }
-            onChange={() => onItemSelect(paiement)}
+            onChange={() => onItemSelect(paiementBC)}
           />
         </td>
 
@@ -48,28 +48,31 @@ function PaiementsTable({
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  {paiement.montant ? `${paiement.montant} Dh` : `Non défini`}
+                  {paiementBC.montant
+                    ? `${paiementBC.montant} Dh`
+                    : `Non défini`}
                 </td>
               );
-            case "patientId":
+            case "societeRetenuId":
               return (
                 <td
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  {paiement.patientId.nom} {paiement.patientId.prenom}
+                  {paiementBC.societeRetenuId.nom}{" "}
+                  {paiementBC.societeRetenuId.prenom}
                 </td>
               );
 
             case "date":
-              if (paiement.date === undefined) return <td key={uuidv4()} />;
+              if (paiementBC.date === undefined) return <td key={uuidv4()} />;
               return (
                 <td
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  <Moment date={paiement.date} format="DD/MM/YYYY">
-                    {paiement.date}
+                  <Moment date={paiementBC.date} format="DD/MM/YYYY">
+                    {paiementBC.date}
                   </Moment>
                 </td>
               );
@@ -79,7 +82,7 @@ function PaiementsTable({
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  {paiement[key]}
+                  {paiementBC[key]}
                 </td>
               );
           }
@@ -136,4 +139,4 @@ function PaiementsTable({
   );
 }
 
-export default PaiementsTable;
+export default PaiementBCsTable;

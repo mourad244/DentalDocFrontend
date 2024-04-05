@@ -528,7 +528,7 @@ class BonCommandeForm extends Form {
                     })}
                   </tbody>
                 </table>
-                <div className=" h-1 w-full bg-white" />
+                <div className=" h-1 w-full bg-[#414040]" />
                 <div className="flex w-full justify-between">
                   <div className="flex  justify-start">
                     <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-white">
@@ -568,12 +568,12 @@ class BonCommandeForm extends Form {
           {/* search societe */}
           {Object.keys(this.state.selecteDSociete).length === 0 && (
             <div>
-              <p className="m-2 mt-2 w-full text-base font-bold text-[#151516]">
+              <p className="mr-2 mt-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
                 4. Choisir la société retenue
               </p>
-              <div className="flex ">
-                <div className="flex flex-row items-center">
-                  <label className="m-2 h-fit w-[92px] text-xs font-bold">
+              <div className="flex bg-[#F2F2F2] ">
+                <div className="my-2 flex flex-row items-center">
+                  <label className="m-2 h-fit w-[92px] text-xs font-bold text-[#72757c]">
                     Chercher société
                   </label>
                   <SearchBox

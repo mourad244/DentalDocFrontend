@@ -2,9 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 
 import { getDevi } from "../../services/deviService";
-import { getPatient } from "../../services/patientService";
-import { getNatureActes } from "../../services/natureActeService";
-import { getActeDentaires } from "../../services/acteDentaireService";
+import { getBonCommandes } from "../../services/bonCommandeService";
 import { savePaiementBC, getPaiementBC } from "../../services/paiementService";
 
 import Form from "../../common/form";
@@ -15,13 +13,14 @@ import Joi from "joi-browser";
 import ClipLoader from "react-spinners/ClipLoader";
 
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import SearchPatient from "../../common/searchPatient";
+import SearchBonCommande from "../../common/searchPatient";
 // import RecuPaiementBC from "../../documents/recuPaiementBC";
+import { getBonCommande } from "../../../services/pharmacie/bonCommandeService";
 
 class PaiementBCForm extends Form {
   state = {
     data: {
-      patientId: "",
+      bonCommandeId: "",
       date: new Date(),
       montant: "",
       mode: "Espèce",
@@ -29,22 +28,19 @@ class PaiementBCForm extends Form {
       numOrdre: "",
     },
     errors: {},
-    patients: [],
-    selectedPatient: {},
-    acteDentaires: [],
-    natureActes: [],
+    selectedBonCommande: {},
     sortColumn: { path: "date", order: "desc" },
     devis: [],
-    paiements: [],
+    paiementBCs: [],
     actesEffectues: [],
     nombreActes: 1,
     loading: false,
-    loadingPatient: false,
+    loadingBonCommande: false,
   };
 
   schema = {
     _id: Joi.string(),
-    patientId: Joi.string().allow("").label("Patient"),
+    bonCommandeId: Joi.string().allow("").label("Patient"),
     date: Joi.date().label("Date"),
     montant: Joi.number().required().label("Montant"),
     mode: Joi.string().label("Mode PaiementBC"),
@@ -54,183 +50,73 @@ class PaiementBCForm extends Form {
 
   async populateDatas() {
     this.setState({ loading: true });
-    const paiementId = this.props.match.params.paiementid;
-    const patientId = this.props.match.params.patientid;
-    console.log("paiementId", paiementId);
-    console.log("patientId", patientId);
-    if (paiementId === "new" || paiementId === undefined) {
-      const { data: natureActes } = await getNatureActes();
-      const { data: acteDentaires } = await getActeDentaires();
-      if (patientId) {
-        const { data: patient } = await getPatient(patientId);
+    const paiementBCId = this.props.match.params.paiementBCId;
+    const bonCommandeId = this.props.match.params.bonCommandeid;
+    console.log("paiementBCId", paiementBCId);
+    console.log("bonCommandeId", bonCommandeId);
+    if (paiementBCId === "new" || paiementBCId === undefined) {
+      if (bonCommandeId) {
+        const { data: bonCommande } = await getBonCommande(bonCommandeId);
         let newData = { ...this.state.data };
         let newSelectedPaiementBCs = [];
-        let newSelectedDevis = [];
+
         if (
-          patient.deviIds !== undefined &&
-          patient.deviIds !== null &&
-          patient.deviIds.length !== 0
+          bonCommande.paiementIds !== undefined &&
+          bonCommande.paiementIds !== null &&
+          bonCommande.paiementIds.length !== 0
         ) {
-          const promises = patient.deviIds.map((item) =>
-            getDevi(item.deviId._id),
+          const promises = bonCommande.paiementIds.map((item) =>
+            getPaiementBC(item._id),
           );
-          const devisResults = await Promise.all(promises);
-          newSelectedDevis = devisResults.map(({ data: devi }) => devi);
-        }
-        if (
-          patient.paiementIds !== undefined &&
-          patient.paiementIds !== null &&
-          patient.paiementIds.length !== 0
-        ) {
-          const promises = patient.paiementIds.map((item) =>
-            getPaiementBC(item.paiementId._id),
-          );
-          const paiementsResults = await Promise.all(promises);
-          newSelectedPaiementBCs = paiementsResults.map(
+          const paiementBCsResults = await Promise.all(promises);
+          newSelectedPaiementBCs = paiementBCsResults.map(
             ({ data: paiement }) => paiement,
           );
         }
-        newData.patientId = patient._id;
+        newData.bonCommandeId = bonCommande._id;
         this.setState({
           data: newData,
-          selectedPatient: patient,
-          devis: newSelectedDevis,
-          paiements: newSelectedPaiementBCs,
-          natureActes,
-          acteDentaires,
+          selectedBonCommande: bonCommande,
+          paiementBCs: newSelectedPaiementBCs,
           loaded: true,
         });
       }
-      this.setState({
-        natureActes,
-        acteDentaires,
-      });
+      this.setState({});
     } else {
-      const { data: paiement } = await getPaiementBC(paiementId);
-      const { data: natureActes } = await getNatureActes();
-      const { data: acteDentaires } = await getActeDentaires();
+      const { data: paiement } = await getPaiementBC(paiementBCId);
       this.setState({
         data: this.mapToViewModel(paiement),
-        selectedPatient: paiement.patientId,
-        acteDentaires,
-        natureActes,
+        selectedBonCommande: paiement.bonCommandeId,
       });
     }
     this.setState({ loading: false });
   }
 
-  onSelectPatient = async (patient) => {
+  onSelectBonCommande = async (bonCommande) => {
     this.setState({
-      loadingPatient: true,
+      loadingBonCommande: true,
     });
     let data = { ...this.state.data };
-    const { data: fetchedPatient } = await getPatient(patient._id);
+    const { data: fetchedBonCommande } = await getBonCommandes(bonCommande._id);
     let newSelectedPaiementBCs = [];
-    let newSelectedDevis = [];
 
-    if (
-      fetchedPatient.deviIds !== undefined &&
-      fetchedPatient.deviIds !== null &&
-      fetchedPatient.deviIds.length !== 0
-    ) {
-      const promises = fetchedPatient.deviIds.map((item) =>
-        getDevi(item.deviId._id),
-      );
-      const devisResults = await Promise.all(promises);
-      newSelectedDevis = devisResults.map(({ data: devi }) => devi);
-    }
-    if (
-      fetchedPatient.paiementIds !== undefined &&
-      fetchedPatient.paiementIds !== null &&
-      fetchedPatient.paiementIds.length !== 0
-    ) {
-      const promises = fetchedPatient.paiementIds.map((item) =>
-        getPaiementBC(item.paiementId._id),
-      );
-      const paiementsResults = await Promise.all(promises);
-      newSelectedPaiementBCs = paiementsResults.map(
-        ({ data: paiement }) => paiement,
-      );
-    }
-    data.patientId = fetchedPatient._id;
+    data.bonCommandeId = fetchedBonCommande._id;
     this.setState({
       data,
-      selectedPatient: fetchedPatient,
-      devis: newSelectedDevis,
-      paiements: newSelectedPaiementBCs,
-      loadingPatient: false,
+      selectedBonCommande: fetchedBonCommande,
+      paiementBCs: newSelectedPaiementBCs,
+      loadingBonCommande: false,
     });
   };
   async componentDidMount() {
     await this.populateDatas();
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    // if searchQuery change filteredPatients
-
-    if (prevState.devis !== this.state.devis) {
-      let actes = [];
-      const totalPaiementBCs = this.state.selectedPatient.totalPaiementBCs;
-      let restePaiementBCs = totalPaiementBCs;
-
-      this.state.devis.map((itemDevi) => {
-        if (itemDevi.acteEffectues !== undefined)
-          itemDevi.acteEffectues.map((itemActe) => {
-            let acte = {
-              date: "",
-              medecin: "",
-              nature: "",
-              code: "",
-              nom: "",
-              dents: [],
-              prix: 0,
-              reste: 0,
-            };
-            //       date
-            acte.date = itemDevi.dateDevi;
-            //       medecinId
-            acte.medecin = `${itemDevi.medecinId.nom} ${
-              itemDevi.medecinId.prenom ? itemDevi.medecinId.prenom : ""
-            } `;
-            //       nature Acte
-            acte.nature = itemActe.acteId.natureId
-              ? itemActe.acteId.natureId.nom
-              : "";
-            //       code acte
-            acte.code = itemActe.acteId.code;
-            //       description
-            acte.nom = itemActe.acteId.nom;
-
-            //       Num Acte
-            //       dent
-            let dents = "-";
-            itemActe.dentIds.map((e) => {
-              return (dents += e.numeroFDI + "-");
-            });
-            acte.dents = dents;
-            acte.prix = itemActe.prix ? itemActe.prix : 0;
-            if (restePaiementBCs >= acte.prix) {
-              restePaiementBCs -= acte.prix;
-              acte.reste = 0;
-            } else if (restePaiementBCs < acte.prix && restePaiementBCs !== 0) {
-              acte.reste = acte.prix - restePaiementBCs;
-              restePaiementBCs = 0;
-            } else {
-              acte.reste = acte.prix;
-            }
-
-            actes.push(acte);
-            return true;
-          });
-        return true;
-      });
-      this.setState({ actesEffectues: actes });
-    }
-  }
+  async componentDidUpdate(prevProps, prevState) {}
   mapToViewModel(paiement) {
     return {
       _id: paiement._id,
-      patientId: paiement.patientId._id,
+      bonCommandeId: paiement.bonCommandeId._id,
       date: paiement.date,
       montant: paiement.montant,
       mode: paiement.mode,
@@ -241,12 +127,12 @@ class PaiementBCForm extends Form {
   doSubmit = async () => {
     let data = { ...this.state.data };
     await savePaiementBC(data);
-    this.props.history.push("/paiements");
+    this.props.history.push("/paiementBCs");
   };
   handleModePaiementBCSelect = (e) => {
-    let paiements = { ...this.state.data };
-    paiements.mode = e.target.value;
-    this.setState({ data: paiements });
+    let paiementBCs = { ...this.state.data };
+    paiementBCs.mode = e.target.value;
+    this.setState({ data: paiementBCs });
   };
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
@@ -254,15 +140,14 @@ class PaiementBCForm extends Form {
   render() {
     const {
       // data,
-      selectedPatient,
+      selectedBonCommande,
       loading,
-      loadingPatient,
-      actesEffectues,
-      paiements,
+      loadingBonCommande,
+      paiementBCs,
       // devis,
     } = this.state;
-    const paiementId = this.props.match.params.paiementid;
-    const patientId = this.props.match.params.patientid;
+    const paiementBCId = this.props.match.params.paiementid;
+    const bonCommandeId = this.props.match.params.bonCommandeid;
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -276,51 +161,36 @@ class PaiementBCForm extends Form {
           <button
             className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
             onClick={() => {
-              this.props.history.push("/paiements");
+              this.props.history.push("/paiementBCs");
             }}
           >
             <IoChevronBackCircleSharp className="mr-1" />
             Retour à la Liste
           </button>
         </div>
-        {paiementId === "new" && (
-          <SearchPatient onPatientSelect={this.onSelectPatient} />
+        {paiementBCId === "new" && (
+          <SearchBonCommande onBonCommandeSelect={this.onSelectBonCommande} />
         )}
-        {loadingPatient ? (
+        {loadingBonCommande ? (
           <div className="m-auto my-4">
-            <ClipLoader loading={loadingPatient} size={70} />
+            <ClipLoader loading={loadingBonCommande} size={70} />
           </div>
         ) : (
-          Object.keys(selectedPatient).length !== 0 && (
+          Object.keys(selectedBonCommande).length !== 0 && (
             <>
               <div className="m-2  rounded-sm bg-[#4F6874] p-2">
                 <p className="text-center text-base font-bold text-white">{`${
-                  selectedPatient.nom && selectedPatient.nom.toUpperCase()
+                  selectedBonCommande.nom &&
+                  selectedBonCommande.nom.toUpperCase()
                 } ${
-                  selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
+                  selectedBonCommande.prenom &&
+                  selectedBonCommande.prenom.toUpperCase()
                 }`}</p>
               </div>
-              {(paiementId === "new" || patientId) && (
-                <div className="flex flex-wrap">
-                  <PaiementBCActesTable
-                    actesEffectuees={actesEffectues}
-                    onSort={this.handleSort}
-                    sortColumn={this.state.sortColumn}
-                    totalDevis={selectedPatient.totalDevis}
-                    totalPaiementBCs={selectedPatient.totalPaiementBCs}
-                  />
 
-                  <PaiementBCEffectuesTable
-                    paiements={paiements}
-                    onSort={this.handleSort}
-                    sortColumn={this.state.sortColumn}
-                    totalPaiementBCs={selectedPatient.totalPaiementBCs}
-                  />
-                </div>
-              )}
               <div className="m-2 bg-[#a2bdc5]">
                 <p className="w-full bg-[#81b9ca] p-2 text-xl font-bold text-[#474a52]">
-                  PaiementBC
+                  Paiement
                 </p>
                 <form onSubmit={this.handleSubmit}>
                   <div className="flex flex-wrap">
@@ -375,16 +245,6 @@ class PaiementBCForm extends Form {
             </>
           )
         )}
-
-        {/* {data.patientId ? (
-          <RecuPaiementBC
-            data={{ ...this.state.data }}
-            selectedPatient={this.props.selectedPatient}
-            natureActes={this.props.natureActes}
-          />
-        ) : (
-          ""
-        )} */}
       </div>
     );
   }
