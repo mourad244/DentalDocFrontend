@@ -8,12 +8,14 @@ import { FaPrint } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { TbReportMoney } from "react-icons/tb";
+import { MdLocalGroceryStore } from "react-icons/md";
 
 function BonCommandesTable({
   bonCommandes,
   datas,
   onSort,
   onEdit,
+  onAddReceptionBC,
   onPrint,
   headers,
   onDelete,
@@ -86,6 +88,15 @@ function BonCommandesTable({
               );
             case "select":
               return null;
+            case "statut":
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {bonCommande.statut}
+                </td>
+              );
             case "societeRetenuId":
               return (
                 <td
@@ -182,15 +193,6 @@ function BonCommandesTable({
   ); */
   const itemActions = (
     <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
-      <TbReportMoney
-        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
-          onAddPaiement === undefined ? "pointer-events-none opacity-50 " : ""
-        }`}
-        color="#474a52"
-        onClick={onAddPaiement}
-        title="Ajouter un paiement"
-      />
-
       <AiTwotoneEdit
         className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
           onEdit === undefined ? "pointer-events-none opacity-50 " : ""
@@ -198,6 +200,25 @@ function BonCommandesTable({
         color="#474a52"
         onClick={onEdit}
         title="Modifier"
+      />
+      <MdLocalGroceryStore
+        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
+          onAddReceptionBC === undefined
+            ? "pointer-events-none opacity-50 "
+            : ""
+        }`}
+        color="#474a52"
+        title="Ajouter des articles"
+        onClick={onAddReceptionBC}
+      />
+
+      <TbReportMoney
+        className={`h-6 w-7 cursor-pointer rounded-md  p-1  shadow-md  ${
+          onAddPaiement === undefined ? "pointer-events-none opacity-50 " : ""
+        }`}
+        color="#474a52"
+        onClick={onAddPaiement}
+        title="Ajouter un paiement"
       />
       {/*  <GrFormView
         className="  h-6 w-7 cursor-pointer rounded-md  "

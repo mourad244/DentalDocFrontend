@@ -215,13 +215,14 @@ const NavBar = ({ user }) => {
             <li className=" m-auto my-1 w-fit">
               <Link
                 className=""
-                to="/livraisons"
+                to="/receptionbcs"
                 onClick={() => {
                   resetIcon();
                   setActiveLivraison(true);
                 }}
               >
-                {location.pathname.includes("livraison") || activeLivraison ? (
+                {location.pathname.includes("receptionbc") ||
+                activeLivraison ? (
                   <LivraisonIconActive />
                 ) : (
                   <LivraisonIcon />

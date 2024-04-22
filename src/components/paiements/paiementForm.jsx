@@ -56,8 +56,6 @@ class PaiementForm extends Form {
     this.setState({ loading: true });
     const paiementId = this.props.match.params.paiementid;
     const patientId = this.props.match.params.patientid;
-    console.log("paiementId", paiementId);
-    console.log("patientId", patientId);
     if (paiementId === "new" || paiementId === undefined) {
       const { data: natureActes } = await getNatureActes();
       const { data: acteDentaires } = await getActeDentaires();

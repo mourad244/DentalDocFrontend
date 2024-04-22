@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-import { deleteBonCommande } from "../../../services/pharmacie/bonCommandeService";
-import { getBonCommandes } from "../../../services/pharmacie/bonCommandeService";
-import BonCommandesTable from "./bonCommandesTable";
+import { deleteReceptionBC } from "../../../services/pharmacie/receptionBCService";
+import { getReceptionBCs } from "../../../services/pharmacie/receptionBCService";
+import ReceptionBCsTable from "./receptionBCsTable";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -12,13 +12,12 @@ import { ReactComponent as PrecedentButton } from "../../../assets/icons/precede
 import { ReactComponent as SuivantButton } from "../../../assets/icons/suivant-btn.svg";
 import SearchPeriode from "../../../common/searchPeriode";
 import { FaShoppingCart } from "react-icons/fa";
-import { getBonCommandesListWithPagination } from "../../../services/pharmacie/bonCommandeListPaginateService";
 
-function BonCommandes() {
+function ReceptionBCs() {
   const [datas, setDatas] = useState({});
   const [loading, setLoading] = useState(false);
-  const [selectedBonCommande, setSelectedBonCommande] = useState(null);
-  const [selectedBonCommandes, setSelectedBonCommandes] = useState([]);
+  const [selectedReceptionBC, setSelectedReceptionBC] = useState(null);
+  const [selectedReceptionBCs, setSelectedReceptionBCs] = useState([]);
 
   const [sortColumn, setSortColumn] = useState({
     path: "numOrdre",
@@ -30,15 +29,13 @@ function BonCommandes() {
     dateDebut: "",
     dateFin: "",
   });
-  const [bonCommandes, setBonCommandes] = useState([]);
+  const [receptionBCs, setReceptionBCs] = useState([]);
   const [selectedFields, setSelectedFields] = useState([
     { order: 1, name: "select", label: "Select" },
     { order: 2, name: "numOrdre", label: "N°" },
-    { order: 3, name: "objet", label: "Objet" },
     { order: 4, name: "date", label: "Date" },
-    { order: 5, name: "societeRetenuId", label: "Société retenue" },
-    { order: 7, name: "montantTTC", label: "Montant TTC" },
-    { order: 10, name: "statut", label: "Statut" },
+    { order: 5, name: "societeRetenuId", label: "Société" },
+    { order: 9, name: "commentaire", label: "Commentaire" },
   ]);
   const [selectedFilterItems, setSelectedFilterItems] = useState({
     statut: "",
@@ -47,25 +44,21 @@ function BonCommandes() {
   const fields = [
     { order: 1, name: "select", label: "Select" },
     { order: 2, name: "numOrdre", label: "N°" },
-    { order: 3, name: "objet", label: "Objet" },
     { order: 4, name: "date", label: "Date" },
-    { order: 5, name: "societeRetenuId", label: "Société retenue" },
-    { order: 6, name: "montantHT", label: "Montant HT" },
-    { order: 7, name: "montantTTC", label: "Montant TTC" },
+    { order: 5, name: "societeRetenuId", label: "Société" },
     { order: 8, name: "tva", label: "TVA" },
     { order: 9, name: "commentaire", label: "Commentaire" },
-    { order: 10, name: "statut", label: "Statut" },
   ];
   const pageSize = 10;
   const history = useHistory();
 
   useEffect(() => {
-    const fetchBonCommandes = async () => {
+    const fetchReceptionBCs = async () => {
       setLoading(true);
       try {
         const {
           data: { data, totalCount },
-        } = await getBonCommandesListWithPagination({
+        } = await getReceptionBCs({
           currentPage,
           pageSize,
           order: sortColumn.order,
@@ -76,97 +69,90 @@ function BonCommandes() {
           statut: selectedFilterItems.statut,
           searchQuery,
         });
-        console.log("data", data);
-        setBonCommandes(data);
+        setReceptionBCs(data);
         setTotalCount(totalCount);
       } catch (error) {
         console.log(error);
       }
       setLoading(false);
     };
-    fetchBonCommandes();
+    fetchReceptionBCs();
   }, [currentPage, sortColumn]);
 
   const handleDelete = async (items) => {
-    const originalBonCommandes = [...bonCommandes];
+    const originalReceptionBCs = [...receptionBCs];
+
     try {
       await Promise.all(
-        items.map(async (item) => await deleteBonCommande(item._id)),
+        items.map(async (item) => await deleteReceptionBC(item._id)),
       );
-      const updatedBonCommandes = bonCommandes.filter(
-        (c) => !items.some((item) => item._id === c._id),
+      const updatedReceptionBCs = receptionBCs.filter(
+        (item) => !items.some((selectedItem) => selectedItem._id === item._id),
       );
-      setBonCommandes(updatedBonCommandes);
-      setSelectedBonCommande(null);
-      setSelectedBonCommandes([]);
-      toast.success("Bons de commande(s) supprimé(s).");
+      setReceptionBCs(updatedReceptionBCs);
+      setSelectedReceptionBC(null);
+      setSelectedReceptionBCs([]);
+      toast.success("Reception Bons de commande(s) supprimé(s).");
     } catch (error) {
-      if (error.response && error.response.statut === 404)
-        toast.error("This bonCommande has already been deleted.");
-      setBonCommandes(originalBonCommandes);
+      if (error.response && error.response.status === 404)
+        toast.error("This receptionBC has already been deleted.");
+      setReceptionBCs(originalReceptionBCs);
     }
   };
 
-  const handleSelectBonCommande = (bonCommande) => {
-    let newBonCommandes = [...selectedBonCommandes];
-    const index = newBonCommandes.findIndex((c) => c._id === bonCommande._id);
-    if (index === -1) newBonCommandes.push(bonCommande);
-    else newBonCommandes.splice(index, 1);
-    let selectedBonCommande = null;
-    let founded = bonCommandes.find((c) => c._id === bonCommande._id);
-    if (founded && newBonCommandes.length === 1) selectedBonCommande = founded;
-    setSelectedBonCommandes(newBonCommandes);
-    setSelectedBonCommande(
-      newBonCommandes.length === 1 ? newBonCommandes[0] : null,
+  const handleSelectReceptionBC = (receptionBC) => {
+    let newReceptionBCs = [...selectedReceptionBCs];
+    const index = newReceptionBCs.findIndex((c) => c._id === receptionBC._id);
+    if (index === -1) newReceptionBCs.push(receptionBC);
+    else newReceptionBCs.splice(index, 1);
+    let selectedReceptionBC = null;
+    let founded = receptionBCs.find((c) => c._id === receptionBC._id);
+    if (founded && newReceptionBCs.length === 1) selectedReceptionBC = founded;
+    setSelectedReceptionBCs(newReceptionBCs);
+    setSelectedReceptionBC(
+      newReceptionBCs.length === 1 ? newReceptionBCs[0] : null,
     );
   };
 
-  const handleSelectBonCommandes = () => {
-    let newBonCommandes =
-      selectedBonCommandes.length === bonCommandes.length
+  const handleSelectReceptionBCs = () => {
+    let newReceptionBCs =
+      selectedReceptionBCs.length === receptionBCs.length
         ? []
-        : [...bonCommandes];
-    setSelectedBonCommandes(newBonCommandes);
-    setSelectedBonCommande(
-      newBonCommandes.length === 1 ? newBonCommandes[0] : null,
+        : [...receptionBCs];
+    setSelectedReceptionBCs(newReceptionBCs);
+    setSelectedReceptionBC(
+      newReceptionBCs.length === 1 ? newReceptionBCs[0] : null,
     );
   };
 
   const handleEdit = () => {
-    history.push(`/boncommandes/${selectedBonCommande._id}`);
+    history.push(`/receptionbcs/${selectedReceptionBC._id}`);
   };
-  const handleAddPaiement = () => {
-    history.push(`/boncommande/paiementbcs/${selectedBonCommande._id}`);
-  };
-  const handleAddReceptionBC = () => {
-    history.push(`/receptionbcs/new/${selectedBonCommande._id}`);
-  };
+
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);
   };
   const handlePageClick = (event) => {
     const newCurrentPage = event.selected + 1;
-    setSelectedBonCommande(null);
-    setSelectedBonCommandes([]);
+    setSelectedReceptionBC(null);
+    setSelectedReceptionBCs([]);
     setCurrentPage(newCurrentPage);
   };
-  const handleSelectedDates = (dates) => {
-    setSelectedDates(dates);
-  };
+
   return (
     <div className="mt-2 flex h-fit w-[100%] min-w-fit flex-col rounded-5px border border-white bg-white ">
       <p className="m-2 mt-2 w-[100%] text-xl font-bold text-[#474a52]">
-        Liste des bons de commandes
+        Liste reception des bons de commandes
       </p>
       <div className="ml-2 flex justify-start">
         <button
           className="no-underlin mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white"
           onClick={() => {
-            history.push("/boncommandes/new");
+            history.push("/receptionbcs/new");
           }}
         >
           <FaShoppingCart className="mr-1" />
-          Nouveau bon de commande
+          Nouvelle reception du bon de commande
         </button>
       </div>
       {loading ? (
@@ -175,25 +161,22 @@ function BonCommandes() {
         </div>
       ) : (
         <div className="m-2">
-          <BonCommandesTable
-            bonCommandes={bonCommandes}
-            selectedItem={selectedBonCommande}
-            selectedItems={selectedBonCommandes}
-            totalItems={bonCommandes.length}
+          <ReceptionBCsTable
+            receptionBCs={receptionBCs}
+            selectedItem={selectedReceptionBC}
+            selectedItems={selectedReceptionBCs}
+            totalItems={receptionBCs.length}
             onSort={handleSort}
             headers={selectedFields}
             fields={fields}
             sortColumn={sortColumn}
-            onItemSelect={handleSelectBonCommande}
-            onItemsSelect={handleSelectBonCommandes}
+            onItemSelect={handleSelectReceptionBC}
+            onItemsSelect={handleSelectReceptionBCs}
             selectedFields={selectedFields}
-            onEdit={selectedBonCommande ? handleEdit : undefined}
-            onAddReceptionBC={
-              selectedBonCommande ? handleAddReceptionBC : undefined
-            }
-            onAddPaiement={selectedBonCommande ? handleAddPaiement : undefined}
+            onEdit={selectedReceptionBC ? handleEdit : undefined}
+            //    selectedBonCommande !== null || selectedBonCommandes.length !== 0
             onDelete={
-              selectedBonCommande !== null || selectedBonCommandes.length !== 0
+              selectedReceptionBC !== null || selectedReceptionBCs.length !== 0
                 ? handleDelete
                 : undefined
             }
@@ -216,4 +199,4 @@ function BonCommandes() {
   );
 }
 
-export default BonCommandes;
+export default ReceptionBCs;

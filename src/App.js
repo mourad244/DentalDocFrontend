@@ -29,6 +29,8 @@ import ArticleForm from "./components/pharmacie/articles/articleForm";
 import Articles from "./components/pharmacie/articles/articles";
 import BonCommandeForm from "./components/pharmacie/bonCommandes/bonCommandeForm";
 import BonCommandes from "./components/pharmacie/bonCommandes/bonCommandes";
+import ReceptionBCForm from "./components/pharmacie/receptionBonCommandes/receptionBCForm";
+import ReceptionBCs from "./components/pharmacie/receptionBonCommandes/receptionBCs";
 
 function App() {
   const [user, setUser] = useState();
@@ -194,6 +196,30 @@ function App() {
               )}
               {user.role === "admin" ? (
                 <Route path="/boncommandes" component={BonCommandes} />
+              ) : (
+                ""
+              )}
+              {/* receptio bon commandes */}
+              {user.role === "admin" ? (
+                <Route
+                  path="/receptionbcs/new/:boncommandeid"
+                  exact
+                  component={ReceptionBCForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" ? (
+                <Route
+                  path="/receptionbcs/:receptionbcid"
+                  exact
+                  component={ReceptionBCForm}
+                />
+              ) : (
+                ""
+              )}
+              {user.role === "admin" ? (
+                <Route path="/receptionbcs" component={ReceptionBCs} />
               ) : (
                 ""
               )}
