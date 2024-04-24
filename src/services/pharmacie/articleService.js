@@ -16,7 +16,7 @@ export function getArticles({
   selectedLots,
 }) {
   return http.get(
-    `${apiEndpoint}${currentPage ? `?currentPage=${currentPage}` : ""}${
+    `${apiEndpoint}?${currentPage ? `&currentPage=${currentPage}` : ""}${
       pageSize ? `&pageSize=${pageSize}` : ""
     }${sortColumn ? `&sortColumn=${sortColumn}` : ""}${
       order ? `&order=${order}` : ""

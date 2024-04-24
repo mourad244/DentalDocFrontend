@@ -77,6 +77,12 @@ class ReceptionBCForm extends Form {
           code: Joi.string().required().label("Code"),
           nom: Joi.string().required().label("Nom"),
           quantiteTotal: Joi.number().required().label("Quantité totale"),
+          isExpiration: Joi.boolean().label("isExpiration"),
+          datePeremption: Joi.date().when("isExpiration", {
+            is: true,
+            then: Joi.date().required(),
+            otherwise: Joi.date().allow("").allow(null),
+          }),
         }),
       )
       .label("Articles"),
@@ -102,6 +108,10 @@ class ReceptionBCForm extends Form {
             nom: item.articleId.nom,
             quantite: 0,
             quantiteTotal: item.quantiteTotal,
+            isExpiration: item.articleId.isExpiration,
+            datePeremption: item.datePeremption
+              ? item.datePeremption.split("T")[0]
+              : "",
           };
         });
         this.setState({
@@ -132,7 +142,13 @@ class ReceptionBCForm extends Form {
           code: item.articleId.code,
           nom: item.articleId.nom,
           quantite: item.quantite,
+          isExpiration: item.articleId.isExpiration,
           quantiteTotal: article.quantiteTotal,
+          // datePeremption: item.datePeremption,
+          // transform the date to like that 2021-09-01
+          datePeremption: item.datePeremption
+            ? item.datePeremption.split("T")[0]
+            : "",
         };
       });
 
@@ -200,7 +216,6 @@ class ReceptionBCForm extends Form {
 
   render() {
     const { loading, data } = this.state;
-    console.log("data", data);
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -267,6 +282,12 @@ class ReceptionBCForm extends Form {
                       >
                         Qte reçu
                       </th>
+                      <th
+                        key={uuidv4()}
+                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
+                      >
+                        Date d'expiration
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -316,6 +337,34 @@ class ReceptionBCForm extends Form {
                                 }
                               }}
                             />
+                          </td>
+                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                            {/* if article.isExpiration add a date input */}
+                            {article.isExpiration ? (
+                              <Input
+                                type="date"
+                                width={120}
+                                fontWeight="medium"
+                                height={35}
+                                disabled={false}
+                                value={article.datePeremption}
+                                onChange={(e) => {
+                                  let articles = [...data.articles];
+                                  const index = articles.findIndex(
+                                    (c) =>
+                                      c.articleId.toString() ===
+                                      article.articleId.toString(),
+                                  );
+                                  articles[index].datePeremption =
+                                    e.target.value;
+                                  this.setState({
+                                    data: { ...data, articles },
+                                  });
+                                }}
+                              />
+                            ) : (
+                              "N/A"
+                            )}
                           </td>
                         </tr>
                       );

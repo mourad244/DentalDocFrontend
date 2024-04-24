@@ -43,7 +43,8 @@ function ReceptionBCsTable({
             case "select":
               return null;
             case "societeRetenuId":
-              if (receptionBC.bonCommandeId.societeRetenuId === undefined)
+              if (!receptionBC.bonCommandeId) return <td key={uuidv4()} />;
+              if (!receptionBC.bonCommandeId.societeRetenuId)
                 return <td key={uuidv4()} />;
               return (
                 <td

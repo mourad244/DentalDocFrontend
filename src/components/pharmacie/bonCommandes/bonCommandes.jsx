@@ -76,7 +76,6 @@ function BonCommandes() {
           statut: selectedFilterItems.statut,
           searchQuery,
         });
-        console.log("data", data);
         setBonCommandes(data);
         setTotalCount(totalCount);
       } catch (error) {

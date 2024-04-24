@@ -13,7 +13,6 @@ import ArticlesTable from "../articles/articlesTable";
 import { searchSociete } from "../../../services/pharmacie/searchSocieteService";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import { getArticlesListWithPagination } from "../../../services/pharmacie/articleListPaginateService";
 import { getArticles } from "../../../services/pharmacie/articleService";
 import SearchBox from "../../../common/searchBox";
 import { v4 as uuidv4 } from "uuid";
@@ -45,7 +44,6 @@ class BonCommandeForm extends Form {
     startSearch: false,
     selecteDSociete: {},
     startSearchSociete: false,
-    totalCount: 0,
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -72,9 +70,7 @@ class BonCommandeForm extends Form {
       { order: 13, name: "stockActuel", label: "Stock Actuel" },
     ],
     sortColumn: { path: "nom", order: "asc" },
-    currentPage: 1,
     searchQuery: "",
-    pageSize: 8,
     errors: {},
     form: "bonCommandes",
     loading: false,
@@ -188,10 +184,8 @@ class BonCommandeForm extends Form {
       let selectedLots = this.state.selecteDLots.map((c) => c._id);
       this.setState({ loadingArticles: true });
       let {
-        data: { data: filteredArticles, totalCount },
+        data: { data: filteredArticles },
       } = await getArticles({
-        currentPage: this.state.currentPage,
-        pageSize: this.state.pageSize,
         sortColumn: this.state.sortColumn.path,
         order: this.state.sortColumn.order,
         searchQuery: this.state.searchQuery,
@@ -200,7 +194,6 @@ class BonCommandeForm extends Form {
       // fetch articles of selected lots
       this.setState({
         filteredArticles,
-        totalCount,
         loadingArticles: false,
         startSearch: false,
       });
@@ -210,17 +203,15 @@ class BonCommandeForm extends Form {
 
       this.setState({ loadingArticles: true });
       let {
-        data: { data: filteredArticles, totalCount },
+        data: { data: filteredArticles },
       } = await getArticles({
-        currentPage: this.state.currentPage,
-        pageSize: this.state.pageSize,
         sortColumn: this.state.sortColumn.path,
         order: this.state.sortColumn.order,
         searchQuery: this.state.searchQuery,
         selectedLots,
       });
       // fetch articles of selected lots
-      this.setState({ filteredArticles, totalCount, loadingArticles: false });
+      this.setState({ filteredArticles, loadingArticles: false });
     }
   }
 
@@ -255,18 +246,20 @@ class BonCommandeForm extends Form {
     this.setState({ selecteDLots: newSelectedLots });
   };
   handleSelectArticle = (article) => {
-    let articles = [...this.state.data.articles];
-    const index = articles.findIndex((c) => c._id === article.articleId);
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex((c) => {
+      return c.articleId === article._id;
+    });
     if (index === -1)
-      articles.push({
+      newArticles.push({
         articleId: article._id,
         code: article.code,
         nom: article.nom,
         prixTTC: article.prixTTC,
         quantiteTotal: 1,
       });
-    else articles.splice(index, 1);
-    this.setState({ data: { ...this.state.data, articles } });
+    else newArticles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
   };
 
   doSubmit = async () => {
@@ -334,9 +327,7 @@ class BonCommandeForm extends Form {
                   onChange={(e) => {
                     this.setState({ searchQuery: e });
                   }}
-                  onSearch={() =>
-                    this.setState({ startSearch: true, currentPage: 1 })
-                  }
+                  onSearch={() => this.setState({ startSearch: true })}
                 />
               </div>
               <div className="mb-2 mr-2 flex  flex-wrap ">
@@ -382,7 +373,7 @@ class BonCommandeForm extends Form {
                   fields={this.state.fields}
                   datas={datas}
                   headers={this.state.selectedFields}
-                  totalItems={this.state.filteredArticles.length}
+                  totalItems={filteredArticles.length}
                   onItemSelect={this.handleSelectArticle}
                   selectedItems={data.articles}
                   displayTableControlPanel={false}
@@ -585,7 +576,6 @@ class BonCommandeForm extends Form {
                     onSearch={() =>
                       this.setState({
                         startSearchSociete: true,
-                        currentPage: 1,
                       })
                     }
                   />

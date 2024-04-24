@@ -7,8 +7,20 @@ function acteDentaireUrl(id) {
   return `${apiEndpoint}/${id}`;
 }
 
-export function getActeDentaires() {
-  return http.get(apiEndpoint);
+export function getActeDentaires(
+  currentPage,
+  pageSize,
+  order,
+  sortColumn,
+  searchQuery,
+) {
+  return http.get(
+    `${apiEndpoint}?${currentPage ? `&currentPage=${currentPage}` : ""}${
+      pageSize ? `&pageSize=${pageSize}` : ""
+    }${sortColumn ? `&sortColumn=${sortColumn}` : ""}${
+      order ? `&order=${order}` : ""
+    }${searchQuery ? `&searchQuery=${searchQuery}` : ""}`,
+  );
 }
 
 export function getActeDentaire(acteDentaireId) {
