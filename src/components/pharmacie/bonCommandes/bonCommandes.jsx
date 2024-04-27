@@ -15,7 +15,6 @@ import { FaShoppingCart } from "react-icons/fa";
 import { getBonCommandesListWithPagination } from "../../../services/pharmacie/bonCommandeListPaginateService";
 
 function BonCommandes() {
-  const [datas, setDatas] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedBonCommande, setSelectedBonCommande] = useState(null);
   const [selectedBonCommandes, setSelectedBonCommandes] = useState([]);

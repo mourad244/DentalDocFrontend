@@ -160,7 +160,15 @@ function ActeDentaires(props) {
   };
   const updateData = () => {
     setDataUpdated(true);
-    setSelectedActeDentaire(null);
+    setSelectedActeDentaire({
+      nom: "",
+      natureId: "",
+      code: "",
+      prix: "",
+      duree: "",
+      moments: [],
+      articles: [],
+    });
     setSelectedActeDentaires([]);
     setDisplayForm(false);
   };
@@ -168,7 +176,15 @@ function ActeDentaires(props) {
     setDisplayForm(true);
   };
   const toggleForm = () => {
-    setSelectedActeDentaire(null);
+    setSelectedActeDentaire({
+      nom: "",
+      natureId: "",
+      code: "",
+      prix: "",
+      duree: "",
+      moments: [],
+      articles: [],
+    });
     setSelectedActeDentaires([]);
     setDisplayForm(!displayForm);
   };

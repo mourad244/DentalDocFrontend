@@ -48,6 +48,29 @@ function DetailCouverturesTable(props) {
         return <label key={item._id}>{item.moments.join(", ")}</label>;
       },
     },
+    // articles
+    {
+      path: "articles",
+      label: "Articles",
+      content: (item) => {
+        return item.articles.map((article) => {
+          return (
+            <div key={article._id}>
+              <label className="text-xs">
+                <span className="text-[#2f2f2f]">
+                  {`- (${article.quantite} ${
+                    article.articleId.uniteMesureId
+                      ? article.articleId.uniteMesureId.nom
+                      : ""
+                  })`}
+                </span>
+                {article.articleId.nom}{" "}
+              </label>
+            </div>
+          );
+        });
+      },
+    },
   ];
 
   const {

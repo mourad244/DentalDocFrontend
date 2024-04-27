@@ -1,14 +1,20 @@
 import React from "react";
 import Joi from "joi-browser";
-import Form from "../../../common/form";
-import { saveActeDentaire } from "../../../services/acteDentaireService";
-import _ from "lodash";
+
 import { getArticles } from "../../../services/pharmacie/articleService";
-import ClipLoader from "react-spinners/ClipLoader";
+import { saveActeDentaire } from "../../../services/acteDentaireService";
+
 import ArticlesTable from "../../pharmacie/articles/articlesTable";
-import { v4 as uuidv4 } from "uuid";
-import SearchBox from "../../../common/searchBox";
+
+import Form from "../../../common/form";
 import Input from "../../../common/input";
+import SearchBox from "../../../common/searchBox";
+import ClipLoader from "react-spinners/ClipLoader";
+
+import _ from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { GoTriangleUp } from "react-icons/go";
+import { GoTriangleDown } from "react-icons/go";
 
 class ActeDentaireForm extends Form {
   state = {
@@ -24,6 +30,7 @@ class ActeDentaireForm extends Form {
 
     formDisplay: false,
     startSearch: false,
+    articleForm: true,
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -92,10 +99,14 @@ class ActeDentaireForm extends Form {
             nom: item.articleId.nom,
           };
         });
-        console.log("acteDentaire", acteDentaire);
+        let articleForm = true;
+        if (acteDentaire.articles.length > 0) {
+          articleForm = false;
+        }
         this.setState({
           data: this.mapToViewModel(acteDentaire),
           selecteDLots,
+          articleForm,
         });
       }
     } catch (ex) {
@@ -109,7 +120,17 @@ class ActeDentaireForm extends Form {
   }
   async componentDidUpdate(prevProps, prevState) {
     if (!this.props.selectedActeDentaire && prevState.data._id) {
-      this.setState({ data: { nom: "" } });
+      this.setState({
+        data: {
+          nom: "",
+          natureId: "",
+          code: "",
+          prix: "",
+          duree: "",
+          moments: [],
+          articles: [],
+        },
+      });
     }
     if (
       this.props.selectedActeDentaire &&
@@ -139,7 +160,10 @@ class ActeDentaireForm extends Form {
     }
     if (prevState.selecteDLots !== this.state.selecteDLots) {
       let selectedLots = this.state.selecteDLots.map((c) => c._id);
-
+      if (selectedLots.length === 0) {
+        this.setState({ filteredArticles: [] });
+        return;
+      }
       this.setState({ loadingArticles: true });
       let {
         data: { data: filteredArticles },
@@ -154,7 +178,6 @@ class ActeDentaireForm extends Form {
     }
   }
   handleSelectLot = (e, lot) => {
-    e.preventDefault();
     let newSelectedLots = [...this.state.selecteDLots];
     const index = newSelectedLots.findIndex((c) => c._id === lot._id);
     if (index === -1) newSelectedLots.push(lot);
@@ -193,10 +216,24 @@ class ActeDentaireForm extends Form {
       articles: acteDentaire.articles,
     };
   }
+  onArticleFormDisplay = () => {
+    this.setState({ articleForm: !this.state.articleForm });
+  };
+
   doSubmit = async () => {
     let { data } = this.state;
     await saveActeDentaire(data);
-    this.setState({ data: { nom: "" } });
+    this.setState({
+      data: {
+        nom: "",
+        natureId: "",
+        code: "",
+        prix: "",
+        duree: "",
+        moments: [],
+        articles: [],
+      },
+    });
     this.props.updateData();
   };
 
@@ -211,10 +248,10 @@ class ActeDentaireForm extends Form {
       fields,
       sortColumn,
     } = this.state;
-    const { datas } = this.props;
+    const { datas, formDisplay } = this.props;
     return (
       <>
-        {this.props.formDisplay ? (
+        {formDisplay ? (
           <div className="mt-1 h-[fit-content] w-full rounded-tr-md border border-white bg-white shadow-md">
             <p className="ml-2 mt-2 w-full text-xl font-bold text-[#474a52]">
               Formulaire acte dentaire
@@ -256,89 +293,14 @@ class ActeDentaireForm extends Form {
                   ["Matin", "Après-midi", "Soir"],
                 )}
               </div>
-              <div className="my-2  flex flex-row items-start">
-                <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
-                  <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
-                    1. Recherche des articles
-                  </p>
-                  <div className="mb-2 flex">
-                    <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
-                      a. chercher l'article
-                    </p>
-                    <SearchBox
-                      value={searchQuery}
-                      onChange={(e) => {
-                        this.setState({ searchQuery: e });
-                      }}
-                      onSearch={() => this.setState({ startSearch: true })}
-                    />
-                  </div>
-                  <div className="mb-2 mr-2 flex  flex-wrap ">
-                    <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
-                      b. Sélectionner les lots des articles
-                    </p>
-                    {datas.lots.map((lot) => {
-                      return (
-                        <div className={"mx-2  flex  w-max"} key={lot._id}>
-                          <input
-                            type="checkbox"
-                            name={lot.nom}
-                            id={lot.nom}
-                            className="mx-1"
-                            checked={
-                              selecteDLots.find((c) => c._id === lot._id)
-                                ? true
-                                : false
-                            }
-                            onChange={(e) => this.handleSelectLot(e, lot)}
-                          />
-                          <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
-                            <label htmlFor="">{lot.nom}</label>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-                  <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                    2. Sélectionner les arcticles à utiliser
-                  </p>
-                  {loadingArticles ? (
-                    <div className="m-auto my-4">
-                      <ClipLoader loading={loadingArticles} size={70} />
-                    </div>
-                  ) : filteredArticles.length > 0 ? (
-                    <ArticlesTable
-                      articles={filteredArticles}
-                      sortColumn={sortColumn}
-                      onSort={this.handleSort}
-                      fields={fields}
-                      datas={datas}
-                      headers={selectedFields}
-                      totalItems={filteredArticles.length}
-                      onItemSelect={this.handleSelectArticle}
-                      selectedItems={data.articles}
-                      displayTableControlPanel={false}
-                      displayItemActions={false}
-                    />
-                  ) : (
-                    <div className="ml-4 ">
-                      <p className="text-center text-sm font-bold text-slate-900">
-                        Aucun article trouvé
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="mr-2 flex min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-                <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                  3. Valider les articles à utiliser
+              <div className="mt-2 flex w-full min-w-[320px] flex-wrap rounded-md ">
+                <p className="m-2 mt-2 w-full text-base font-bold text-[#474a52]">
+                  Articles à utiliser
                 </p>
-                {data.articles.length > 0 ? (
+                {data.articles && data.articles.length > 0 ? (
                   <>
                     <table className="my-0 w-full">
-                      <thead className="h-12 text-[#4f5361]">
+                      <thead className="h-12 text-[#3d4255]">
                         <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
                           <th key={uuidv4()} className="w-8"></th>
                           <th
@@ -367,7 +329,7 @@ class ActeDentaireForm extends Form {
                           return (
                             <tr
                               className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                              key={article.articleId}
+                              key={article.articleId._id}
                             >
                               <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
                                 <input
@@ -439,6 +401,100 @@ class ActeDentaireForm extends Form {
                   </div>
                 )}
               </div>
+              <div className="ml-2 mt-2 flex w-full items-center ">
+                <label className="mr-2 text-xl font-bold text-[#474a52]">
+                  Ajouter des articles à utiliser
+                </label>
+                {!this.state.articleForm ? (
+                  <GoTriangleDown
+                    className="cursor-pointer"
+                    onClick={this.onArticleFormDisplay}
+                  />
+                ) : (
+                  <GoTriangleUp
+                    className="cursor-pointer"
+                    onClick={this.onArticleFormDisplay}
+                  />
+                )}
+              </div>
+              {this.state.articleForm && (
+                <div className="my-2  flex flex-row items-start">
+                  <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
+                    <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
+                      1. Recherche des articles
+                    </p>
+                    <div className="mb-2 flex">
+                      <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
+                        a. chercher l'article
+                      </p>
+                      <SearchBox
+                        value={searchQuery}
+                        onChange={(e) => {
+                          this.setState({ searchQuery: e });
+                        }}
+                        onSearch={() => this.setState({ startSearch: true })}
+                      />
+                    </div>
+                    <div className="mb-2 mr-2 flex  flex-wrap ">
+                      <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
+                        b. Sélectionner les lots des articles
+                      </p>
+                      {datas.lots.map((lot) => {
+                        return (
+                          <div className={"mx-2  flex  w-max"} key={lot._id}>
+                            <input
+                              type="checkbox"
+                              name={lot.nom}
+                              id={lot.nom}
+                              className="mx-1"
+                              checked={
+                                selecteDLots.find((c) => c._id === lot._id)
+                                  ? true
+                                  : false
+                              }
+                              onChange={(e) => this.handleSelectLot(e, lot)}
+                            />
+                            <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
+                              <label htmlFor="">{lot.nom}</label>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
+                    <p className="m-2 mt-2 w-full text-base font-bold text-white">
+                      2. Sélectionner les arcticles à utiliser
+                    </p>
+                    {loadingArticles ? (
+                      <div className="m-auto my-4">
+                        <ClipLoader loading={loadingArticles} size={70} />
+                      </div>
+                    ) : filteredArticles.length > 0 ? (
+                      <ArticlesTable
+                        articles={filteredArticles}
+                        sortColumn={sortColumn}
+                        onSort={this.handleSort}
+                        fields={fields}
+                        datas={datas}
+                        headers={selectedFields}
+                        totalItems={filteredArticles.length}
+                        onItemSelect={this.handleSelectArticle}
+                        selectedItems={data.articles}
+                        displayTableControlPanel={false}
+                        displayItemActions={false}
+                      />
+                    ) : (
+                      <div className="ml-4 ">
+                        <p className="text-center text-sm font-bold text-slate-900">
+                          Aucun article trouvé
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {this.renderButton("Sauvegarder")}
             </form>
           </div>

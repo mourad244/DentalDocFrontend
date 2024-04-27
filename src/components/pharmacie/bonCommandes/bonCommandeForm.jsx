@@ -40,7 +40,6 @@ class BonCommandeForm extends Form {
     },
     filteredArticles: [],
     filteredSocietes: [],
-    selecteDLots: [],
     startSearch: false,
     selecteDSociete: {},
     startSearchSociete: false,
@@ -70,6 +69,7 @@ class BonCommandeForm extends Form {
       { order: 13, name: "stockActuel", label: "Stock Actuel" },
     ],
     sortColumn: { path: "nom", order: "asc" },
+    searchQuerySociete: "",
     searchQuery: "",
     errors: {},
     form: "bonCommandes",
@@ -96,10 +96,13 @@ class BonCommandeForm extends Form {
 
   async populateDatas() {
     this.setState({ loading: true });
-    const { data: lots } = await getLots();
+    let { data: lots } = await getLots();
     const { data: uniteMesures } = await getUniteMesures();
     const { data: uniteReglementaires } = await getUniteReglementaires();
-
+    // add is selected to lots
+    lots = lots.map((lot) => {
+      return { ...lot, isSelected: false };
+    });
     const bonCommandeId = this.props.match.params.id;
     if (bonCommandeId === "new" || bonCommandeId === undefined) {
       return this.setState({
@@ -110,13 +113,14 @@ class BonCommandeForm extends Form {
       const { data: bonCommande } = await getBonCommande(bonCommandeId);
       // get the : filteredSocietes from fetched bonCommande if existe
       /* 1.selecteDLots */
-      let selecteDLots = [];
+      let selectedLots = [];
       bonCommande.articles = bonCommande.articles.map((item) => {
         // item.articleId.lotId
         let lot = lots.find(
           (c) => c._id === (item.articleId && item.articleId.lotId),
         );
-        if (lot) selecteDLots.push(lot);
+        if (lot) selectedLots.push(lot);
+
         //2 .filteredArticles,
         // return item add add
         return {
@@ -131,10 +135,15 @@ class BonCommandeForm extends Form {
       let selecteDSociete = bonCommande.societeRetenuId
         ? bonCommande.societeRetenuId
         : {};
+      // make the selected lots selected
+      lots = lots.map((lot) => {
+        let index = selectedLots.findIndex((c) => c._id === lot._id);
+        if (index !== -1) lot.isSelected = true;
+        return lot;
+      });
       return this.setState({
         data: this.mapToViewModel(bonCommande),
         datas: { lots, uniteMesures, uniteReglementaires },
-        selecteDLots,
         loading: false,
         selecteDSociete,
       });
@@ -181,7 +190,9 @@ class BonCommandeForm extends Form {
       }
     }
     if (prevState.startSearch !== this.state.startSearch) {
-      let selectedLots = this.state.selecteDLots.map((c) => c._id);
+      let selectedLots = this.state.datas.lots.map((lot) => {
+        if (lot.isSelected) return lot._id;
+      });
       this.setState({ loadingArticles: true });
       let {
         data: { data: filteredArticles },
@@ -198,9 +209,16 @@ class BonCommandeForm extends Form {
         startSearch: false,
       });
     }
-    if (prevState.selecteDLots !== this.state.selecteDLots) {
-      let selectedLots = this.state.selecteDLots.map((c) => c._id);
 
+    if (prevState.datas.lots !== this.state.datas.lots) {
+      let selectedLots = [];
+      this.state.datas.lots.map(
+        (lot) => lot.isSelected && selectedLots.push(lot._id),
+      );
+      if (selectedLots.length === 0 && this.state.searchQuery === "") {
+        this.setState({ filteredArticles: [] });
+        return;
+      }
       this.setState({ loadingArticles: true });
       let {
         data: { data: filteredArticles },
@@ -238,12 +256,10 @@ class BonCommandeForm extends Form {
     this.setState({ sortColumn });
   };
   handleSelectLot = (e, lot) => {
-    e.preventDefault();
-    let newSelectedLots = [...this.state.selecteDLots];
-    const index = newSelectedLots.findIndex((c) => c._id === lot._id);
-    if (index === -1) newSelectedLots.push(lot);
-    else newSelectedLots.splice(index, 1);
-    this.setState({ selecteDLots: newSelectedLots });
+    let newLots = [...this.state.datas.lots];
+    const index = newLots.findIndex((c) => c._id === lot._id);
+    newLots[index].isSelected = !newLots[index].isSelected;
+    this.setState({ datas: { ...this.state.datas, lots: newLots } });
   };
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
@@ -278,7 +294,11 @@ class BonCommandeForm extends Form {
       loadingArticles,
       filteredArticles,
       data,
-      selecteDLots,
+      sortColumn,
+      fields,
+      searchQuery,
+      selectedFields,
+      searchQuerySociete,
     } = this.state;
     return loading ? (
       <div className="m-auto my-4">
@@ -323,7 +343,7 @@ class BonCommandeForm extends Form {
                   a. chercher l'article
                 </p>
                 <SearchBox
-                  value={this.state.searchQuery}
+                  value={searchQuery}
                   onChange={(e) => {
                     this.setState({ searchQuery: e });
                   }}
@@ -342,11 +362,7 @@ class BonCommandeForm extends Form {
                         name={lot.nom}
                         id={lot.nom}
                         className="mx-1"
-                        checked={
-                          selecteDLots.find((c) => c._id === lot._id)
-                            ? true
-                            : false
-                        }
+                        checked={lot.isSelected}
                         onChange={(e) => this.handleSelectLot(e, lot)}
                       />
                       <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
@@ -368,11 +384,11 @@ class BonCommandeForm extends Form {
               ) : filteredArticles.length > 0 ? (
                 <ArticlesTable
                   articles={filteredArticles}
-                  sortColumn={this.state.sortColumn}
+                  sortColumn={sortColumn}
                   onSort={this.handleSort}
-                  fields={this.state.fields}
+                  fields={fields}
                   datas={datas}
-                  headers={this.state.selectedFields}
+                  headers={selectedFields}
                   totalItems={filteredArticles.length}
                   onItemSelect={this.handleSelectArticle}
                   selectedItems={data.articles}
@@ -569,7 +585,7 @@ class BonCommandeForm extends Form {
                   </label>
                   <SearchBox
                     width={190}
-                    value={this.state.searchQuerySociete}
+                    value={searchQuerySociete}
                     onChange={(e) => {
                       this.setState({ searchQuerySociete: e });
                     }}

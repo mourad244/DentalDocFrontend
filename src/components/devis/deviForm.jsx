@@ -8,13 +8,14 @@ import { getMedecins } from "../../services/medecinService";
 import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getActeDentaires } from "../../services/acteDentaireService";
+import { v4 as uuidv4 } from "uuid";
 
 import Form from "../../common/form";
 import SearchPatient from "../../common/searchPatient";
 import ActesEffectuesTable from "./actesEffectuesTable";
-
 import Input from "../../common/input";
 import Select from "../../common/select";
+import SearchBox from "../../common/searchBox";
 
 import _ from "lodash";
 import axios from "axios";
@@ -25,6 +26,13 @@ import { jsonToFormData } from "../../utils/jsonToFormData";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
 import PatientForm from "../patients/patientForm";
+import { getUniteMesures } from "../../services/pharmacie/uniteMesureService";
+import { getUniteReglementaires } from "../../services/pharmacie/uniteReglementaireService";
+import { getLots } from "../../services/pharmacie/lotService";
+import { getArticles } from "../../services/pharmacie/articleService";
+import ArticlesTable from "../pharmacie/articles/articlesTable";
+import { GoTriangleUp } from "react-icons/go";
+import { GoTriangleDown } from "react-icons/go";
 
 class DeviForm extends Form {
   state = {
@@ -37,12 +45,46 @@ class DeviForm extends Form {
       acteEffectues: [],
       dateDevi: new Date(),
       imagesDeletedIndex: [],
+      articles: [],
     },
     dents: [],
+    articleForm: true,
+    filteredArticles: [],
     devis: [],
+    datas: {
+      lots: [],
+      uniteMesures: [],
+      uniteReglementaires: [],
+    },
+    fields: [
+      { order: 1, name: "select", label: "Select", isActivated: false },
+      { order: 2, name: "nom", label: "Nom" },
+      { order: 3, name: "code", label: "Code" },
+      { order: 4, name: "lotId", label: "Lot" },
+      { order: 5, name: "stockInitial", label: "Stock Initial" },
+      { order: 6, name: "stockAlerte", label: "Stock Alerte" },
+      { order: 7, name: "uniteMesureId", label: "Unite Mesure" },
+      { order: 8, name: "uniteReglementaireId", label: "Unite Reglementaire" },
+      { order: 9, name: "prixHT", label: "Prix HT" },
+      { order: 10, name: "tauxTVA", label: "Taux TVA" },
+      { order: 11, name: "isExpiration", label: "Expiration" },
+      { order: 12, name: "prixTTC", label: "Prix TTC" },
+      { order: 13, name: "stockActuel", label: "Stock Actuel" },
+    ],
+    selectedFields: [
+      { order: 1, name: "select", label: "Select", isActivated: false },
+      { order: 2, name: "nom", label: "Nom" },
+      { order: 3, name: "code", label: "Code" },
+      { order: 9, name: "uniteMesureId", label: "Unite Mesure" },
+      { order: 10, name: "uniteReglementaireId", label: "Unite Reglementaire" },
+      { order: 11, name: "isExpiration", label: "Expiration" },
+    ],
+    sortColumn: { path: "nom", order: "asc" },
+    loadingArticles: false,
     errors: {},
     medecins: [],
     form: "devis",
+    searchQuery: "",
 
     loading: false,
     loadingPatient: false,
@@ -71,6 +113,7 @@ class DeviForm extends Form {
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
     numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
+    articles: Joi.array().items(Joi.object()).label("Articles"),
   };
   async populateDatas() {
     this.setState({ loading: true, loadingPatient: true });
@@ -79,7 +122,13 @@ class DeviForm extends Form {
     const { data: medecins } = await getMedecins();
     const { data: natureActes } = await getNatureActes();
     const { data: acteDentaires } = await getActeDentaires();
-
+    let { data: lots } = await getLots();
+    const { data: uniteMesures } = await getUniteMesures();
+    const { data: uniteReglementaires } = await getUniteReglementaires();
+    // add is selected to lots
+    lots = lots.map((lot) => {
+      return { ...lot, isSelected: false };
+    });
     const rdvId = this.props.match.params.rdvid;
     const acteId = this.props.match.params.acteid;
     let selectedActeRdv = undefined;
@@ -160,6 +209,7 @@ class DeviForm extends Form {
             },
             devis: [],
             dents,
+
             medecins,
             acteDentaires,
             natureActes,
@@ -174,17 +224,37 @@ class DeviForm extends Form {
           medecins,
           acteDentaires,
           natureActes,
+          datas: {
+            lots,
+            uniteMesures,
+            uniteReglementaires,
+          },
         });
       }
     } else {
       const { data: devi } = await getDevi(deviId);
-
+      let selectedLots = [];
       let selecteDDents = [];
       let selecteDActes = [];
       let nombreDentsPerActe = [];
       let selecteDNatureActes = [];
       let filteredActeDentaires = [];
-
+      devi.articles = devi.articles.map((article) => {
+        let lot = lots.find(
+          (lot) => lot._id === (article.articleId && article.articleId.lotId),
+        );
+        if (lot) selectedLots.push(lot);
+        return {
+          articleId: article.articleId._id,
+          code: article.articleId.code,
+          nom: article.articleId.nom,
+          quantite: article.quantite,
+        };
+      });
+      let articleForm = true;
+      if (devi.articles.length !== 0) {
+        articleForm = false;
+      }
       devi.acteEffectues.map((itemActe, index) => {
         let filteredActeDentaire = {};
         let selecteDNatureActe = {};
@@ -216,15 +286,25 @@ class DeviForm extends Form {
         filteredActeDentaires[index] = filteredActeDentaire;
         return true;
       });
+      lots = lots.map((lot) => {
+        let index = selectedLots.findIndex((e) => e._id === lot._id);
+        if (index !== -1) lot.isSelected = true;
+        return lot;
+      });
       this.setState({
         data: this.mapToViewModel(devi),
         selecteDPatient: devi.patientId,
         dents,
         medecins,
         acteDentaires,
+        articleForm,
         natureActes,
         nombreActes: devi.acteEffectues.length,
-
+        datas: {
+          lots,
+          uniteMesures,
+          uniteReglementaires,
+        },
         filteredActeDentaires,
         selecteDNatureActes,
         selecteDActes,
@@ -316,6 +396,47 @@ class DeviForm extends Form {
       });
       this.setState({ actesEffectues: actes });
     }
+    if (prevState.startSearch !== this.state.startSearch) {
+      let selectedLots = this.state.datas.lots.map((lot) => {
+        if (lot.isSelected) return lot._id;
+      });
+      this.setState({ loadingArticles: true });
+      let {
+        data: { data: filteredArticles },
+      } = await getArticles({
+        sortColumn: this.state.sortColumn.path,
+        order: this.state.sortColumn.order,
+        searchQuery: this.state.searchQuery,
+        selectedLots,
+      });
+      // fetch articles of selected lots
+      this.setState({
+        filteredArticles,
+        loadingArticles: false,
+        startSearch: false,
+      });
+    }
+    if (prevState.datas.lots !== this.state.datas.lots) {
+      let selectedLots = [];
+      this.state.datas.lots.map(
+        (lot) => lot.isSelected && selectedLots.push(lot._id),
+      );
+      if (selectedLots.length === 0 && this.state.searchQuery === "") {
+        this.setState({ filteredArticles: [] });
+        return;
+      }
+      this.setState({ loadingArticles: true });
+      let {
+        data: { data: filteredArticles },
+      } = await getArticles({
+        sortColumn: this.state.sortColumn.path,
+        order: this.state.sortColumn.order,
+        searchQuery: this.state.searchQuery,
+        selectedLots,
+      });
+      // fetch articles of selected lots
+      this.setState({ filteredArticles, loadingArticles: false });
+    }
     if (prevState.nombreActes !== this.state.nombreActes) {
       let selecteDNatureActes = [...this.state.selecteDNatureActes];
       let selecteDActes = [...this.state.selecteDActes];
@@ -372,6 +493,7 @@ class DeviForm extends Form {
       numOrdre: devi.numOrdre,
       images: devi.images ? devi.images : [],
       imagesDeletedIndex: [],
+      articles: devi.articles,
     };
   }
   handleSubmit = async (e) => {
@@ -386,6 +508,10 @@ class DeviForm extends Form {
     if (errors) return;
     this.doSubmit();
   };
+  onArticleFormDisplay = () => {
+    this.setState({ articleForm: !this.state.articleForm });
+  };
+
   fileUploadHandler = async () => {
     let fd = new FormData();
     const form = this.state.form;
@@ -465,7 +591,12 @@ class DeviForm extends Form {
     e.preventDefault();
     this.setState({ nombreActes: e.target.value });
   };
-
+  handleSelectLot = (e, lot) => {
+    let newLots = [...this.state.datas.lots];
+    const index = newLots.findIndex((c) => c._id === lot._id);
+    newLots[index].isSelected = !newLots[index].isSelected;
+    this.setState({ datas: { ...this.state.datas, lots: newLots } });
+  };
   handleSelecteDNature = (e, index) => {
     let data = { ...this.state.data };
     let selecteDNatureActes = [...this.state.selecteDNatureActes];
@@ -550,7 +681,21 @@ class DeviForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-
+  handleSelectArticle = (article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex((c) => {
+      return c.articleId === article._id;
+    });
+    if (index === -1)
+      newArticles.push({
+        articleId: article._id,
+        code: article.code,
+        nom: article.nom,
+        quantite: 1,
+      });
+    else newArticles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
   handleSelecteDDent = (e, indexActe, indexDent) => {
     let selecteDDents = [...this.state.selecteDDents];
     let selecteDDent = { ...selecteDDents[indexActe] };
@@ -574,6 +719,7 @@ class DeviForm extends Form {
   render() {
     const {
       data,
+      datas,
       devis,
       dents,
       colors,
@@ -581,6 +727,12 @@ class DeviForm extends Form {
       medecins,
       natureActes,
       nombreActes,
+      searchQuery,
+      loadingArticles,
+      filteredArticles,
+      sortColumn,
+      fields,
+      selectedFields,
       selecteDDents,
       selecteDActes,
       actesEffectues,
@@ -983,6 +1135,204 @@ class DeviForm extends Form {
                   </table>
                   <SchemaDent className="min-w-fit" dents={colorDents} />
                 </div>
+                <div className="mt-2 flex w-full min-w-[320px] flex-wrap rounded-md ">
+                  <p className="m-2 mt-2 w-full text-base font-bold text-[#474a52]">
+                    Articles à utiliser
+                  </p>
+                  {data.articles && data.articles.length > 0 ? (
+                    <>
+                      <table className="mx-2 my-0 w-full border-2 border-white">
+                        <thead className="h-12 text-[#3d4255]">
+                          <tr className="h-8 w-[100%] bg-[#4F6874] text-center">
+                            <th key={uuidv4()} className="w-8"></th>
+                            <th
+                              key={uuidv4()}
+                              className="px-3 text-xs font-semibold text-white"
+                            >
+                              Code
+                            </th>
+                            <th
+                              key={uuidv4()}
+                              className="px-3 text-xs font-semibold text-white"
+                            >
+                              Désignation
+                            </th>
+
+                            <th
+                              key={uuidv4()}
+                              className="px-3 text-xs font-semibold text-white"
+                            >
+                              Qte à utiliser
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data.articles.map((article) => {
+                            return (
+                              <tr
+                                className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
+                                key={article.articleId}
+                              >
+                                <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={true}
+                                    onChange={() => {
+                                      let articles = [...data.articles];
+                                      const index = articles.findIndex(
+                                        (c) =>
+                                          c.articleId.toString() ===
+                                          article.articleId.toString(),
+                                      );
+                                      articles.splice(index, 1);
+                                      this.setState({
+                                        data: { ...data, articles },
+                                      });
+                                    }}
+                                  />
+                                </td>
+                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                                  {article.code}
+                                </td>
+                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                                  {article.nom}
+                                </td>
+                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                                  <Input
+                                    type="number"
+                                    width={80}
+                                    fontWeight="medium"
+                                    height={35}
+                                    disabled={false}
+                                    value={article.quantite}
+                                    onChange={(e) => {
+                                      let articles = [...data.articles];
+                                      const index = articles.findIndex(
+                                        (c) =>
+                                          c.articleId.toString() ===
+                                          article.articleId.toString(),
+                                      );
+                                      if (e.target.value >= 1) {
+                                        articles[index].quantite =
+                                          e.target.value;
+                                        this.setState({
+                                          data: { ...data, articles },
+                                        });
+                                      } else {
+                                        articles[index].quantite = 1;
+                                        this.setState({
+                                          data: {
+                                            ...data,
+                                            articles,
+                                          },
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </>
+                  ) : (
+                    <div className="ml-4">
+                      <p className=" text-sm font-bold text-slate-900">
+                        Aucun article séléctionné
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="ml-2 mt-2 flex w-full items-center ">
+                  <label className="mr-2 text-xl font-bold text-[#474a52]">
+                    Ajouter des articles à utiliser
+                  </label>
+                  {!this.state.articleForm ? (
+                    <GoTriangleDown
+                      className="cursor-pointer"
+                      onClick={this.onArticleFormDisplay}
+                    />
+                  ) : (
+                    <GoTriangleUp
+                      className="cursor-pointer"
+                      onClick={this.onArticleFormDisplay}
+                    />
+                  )}
+                </div>
+                {this.state.articleForm && (
+                  <div className="my-2  flex flex-row items-start">
+                    <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
+                      <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
+                        1. Recherche des articles
+                      </p>
+                      <div className="mb-2 flex">
+                        <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
+                          a. chercher l'article
+                        </p>
+                        <SearchBox
+                          value={searchQuery}
+                          onChange={(e) => {
+                            this.setState({ searchQuery: e });
+                          }}
+                          onSearch={() => this.setState({ startSearch: true })}
+                        />
+                      </div>
+                      <div className="mb-2 mr-2 flex  flex-wrap ">
+                        <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
+                          b. Sélectionner les lots des articles
+                        </p>
+                        {datas.lots.map((lot) => {
+                          return (
+                            <div className={"mx-2  flex  w-max"} key={lot._id}>
+                              <input
+                                type="checkbox"
+                                name={lot.nom}
+                                id={lot.nom}
+                                className="mx-1"
+                                checked={lot.isSelected}
+                                onChange={(e) => this.handleSelectLot(e, lot)}
+                              />
+                              <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
+                                <label htmlFor="">{lot.nom}</label>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
+                      <p className="m-2 mt-2 w-full text-base font-bold text-white">
+                        2. Sélectionner les arcticles à utiliser
+                      </p>
+                      {loadingArticles ? (
+                        <div className="m-auto my-4">
+                          <ClipLoader loading={loadingArticles} size={70} />
+                        </div>
+                      ) : filteredArticles.length > 0 ? (
+                        <ArticlesTable
+                          articles={filteredArticles}
+                          sortColumn={sortColumn}
+                          onSort={this.handleSort}
+                          fields={fields}
+                          datas={datas}
+                          headers={selectedFields}
+                          totalItems={filteredArticles.length}
+                          onItemSelect={this.handleSelectArticle}
+                          selectedItems={data.articles}
+                          displayTableControlPanel={false}
+                          displayItemActions={false}
+                        />
+                      ) : (
+                        <div className="ml-4 ">
+                          <p className="text-center text-sm font-bold text-slate-900">
+                            Aucun article trouvé
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className=" flex w-full justify-end p-2">
                   <button
                     onClick={this.handleSubmit}
