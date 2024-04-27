@@ -7,10 +7,6 @@ import BonCommandesTable from "./bonCommandesTable";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
-import ButtonType from "../../../assets/buttons/buttonType";
-import { ReactComponent as PrecedentButton } from "../../../assets/icons/precedent-btn.svg";
-import { ReactComponent as SuivantButton } from "../../../assets/icons/suivant-btn.svg";
-import SearchPeriode from "../../../common/searchPeriode";
 import { FaShoppingCart } from "react-icons/fa";
 import { getBonCommandesListWithPagination } from "../../../services/pharmacie/bonCommandeListPaginateService";
 
