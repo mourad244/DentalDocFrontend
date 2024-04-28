@@ -5,34 +5,32 @@ import { getRdv } from "../../services/rdvService";
 import { getDents } from "../../services/dentService";
 import { getPatient } from "../../services/patientService";
 import { getMedecins } from "../../services/medecinService";
+import { getLots } from "../../services/pharmacie/lotService";
 import { saveDevi, getDevi } from "../../services/deviService";
 import { getNatureActes } from "../../services/natureActeService";
 import { getActeDentaires } from "../../services/acteDentaireService";
-import { v4 as uuidv4 } from "uuid";
+import { getUniteMesures } from "../../services/pharmacie/uniteMesureService";
+import { getUniteReglementaires } from "../../services/pharmacie/uniteReglementaireService";
 
 import Form from "../../common/form";
-import SearchPatient from "../../common/searchPatient";
-import ActesEffectuesTable from "./actesEffectuesTable";
 import Input from "../../common/input";
 import Select from "../../common/select";
-import SearchBox from "../../common/searchBox";
+import PatientForm from "../patients/patientForm";
+import SearchPatient from "../../common/searchPatient";
+import ActesEffectuesTable from "./actesEffectuesTable";
+import ArticleSearch from "../pharmacie/articles/articleSearch";
 
 import _ from "lodash";
 import axios from "axios";
 import Joi from "joi-browser";
+import { v4 as uuidv4 } from "uuid";
+import { GoTriangleUp } from "react-icons/go";
+import { GoTriangleDown } from "react-icons/go";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 import { jsonToFormData } from "../../utils/jsonToFormData";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
-import PatientForm from "../patients/patientForm";
-import { getUniteMesures } from "../../services/pharmacie/uniteMesureService";
-import { getUniteReglementaires } from "../../services/pharmacie/uniteReglementaireService";
-import { getLots } from "../../services/pharmacie/lotService";
-import { getArticles } from "../../services/pharmacie/articleService";
-import ArticlesTable from "../pharmacie/articles/articlesTable";
-import { GoTriangleUp } from "react-icons/go";
-import { GoTriangleDown } from "react-icons/go";
 
 class DeviForm extends Form {
   state = {
@@ -49,7 +47,6 @@ class DeviForm extends Form {
     },
     dents: [],
     articleForm: true,
-    filteredArticles: [],
     devis: [],
     datas: {
       lots: [],
@@ -79,7 +76,6 @@ class DeviForm extends Form {
       { order: 10, name: "uniteReglementaireId", label: "Unite Reglementaire" },
       { order: 11, name: "isExpiration", label: "Expiration" },
     ],
-    sortColumn: { path: "nom", order: "asc" },
     loadingArticles: false,
     errors: {},
     medecins: [],
@@ -249,6 +245,7 @@ class DeviForm extends Form {
           code: article.articleId.code,
           nom: article.articleId.nom,
           quantite: article.quantite,
+          lotId: article.articleId.lotId,
         };
       });
       let articleForm = true;
@@ -396,47 +393,7 @@ class DeviForm extends Form {
       });
       this.setState({ actesEffectues: actes });
     }
-    if (prevState.startSearch !== this.state.startSearch) {
-      let selectedLots = this.state.datas.lots.map((lot) => {
-        if (lot.isSelected) return lot._id;
-      });
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      // fetch articles of selected lots
-      this.setState({
-        filteredArticles,
-        loadingArticles: false,
-        startSearch: false,
-      });
-    }
-    if (prevState.datas.lots !== this.state.datas.lots) {
-      let selectedLots = [];
-      this.state.datas.lots.map(
-        (lot) => lot.isSelected && selectedLots.push(lot._id),
-      );
-      if (selectedLots.length === 0 && this.state.searchQuery === "") {
-        this.setState({ filteredArticles: [] });
-        return;
-      }
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      // fetch articles of selected lots
-      this.setState({ filteredArticles, loadingArticles: false });
-    }
+
     if (prevState.nombreActes !== this.state.nombreActes) {
       let selecteDNatureActes = [...this.state.selecteDNatureActes];
       let selecteDActes = [...this.state.selecteDActes];
@@ -591,12 +548,6 @@ class DeviForm extends Form {
     e.preventDefault();
     this.setState({ nombreActes: e.target.value });
   };
-  handleSelectLot = (e, lot) => {
-    let newLots = [...this.state.datas.lots];
-    const index = newLots.findIndex((c) => c._id === lot._id);
-    newLots[index].isSelected = !newLots[index].isSelected;
-    this.setState({ datas: { ...this.state.datas, lots: newLots } });
-  };
   handleSelecteDNature = (e, index) => {
     let data = { ...this.state.data };
     let selecteDNatureActes = [...this.state.selecteDNatureActes];
@@ -692,6 +643,7 @@ class DeviForm extends Form {
         code: article.code,
         nom: article.nom,
         quantite: 1,
+        lotId: article.lotId,
       });
     else newArticles.splice(index, 1);
     this.setState({ data: { ...this.state.data, articles: newArticles } });
@@ -727,12 +679,6 @@ class DeviForm extends Form {
       medecins,
       natureActes,
       nombreActes,
-      searchQuery,
-      loadingArticles,
-      filteredArticles,
-      sortColumn,
-      fields,
-      selectedFields,
       selecteDDents,
       selecteDActes,
       actesEffectues,
@@ -1261,77 +1207,11 @@ class DeviForm extends Form {
                   )}
                 </div>
                 {this.state.articleForm && (
-                  <div className="my-2  flex flex-row items-start">
-                    <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
-                      <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
-                        1. Recherche des articles
-                      </p>
-                      <div className="mb-2 flex">
-                        <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
-                          a. chercher l'article
-                        </p>
-                        <SearchBox
-                          value={searchQuery}
-                          onChange={(e) => {
-                            this.setState({ searchQuery: e });
-                          }}
-                          onSearch={() => this.setState({ startSearch: true })}
-                        />
-                      </div>
-                      <div className="mb-2 mr-2 flex  flex-wrap ">
-                        <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
-                          b. Sélectionner les lots des articles
-                        </p>
-                        {datas.lots.map((lot) => {
-                          return (
-                            <div className={"mx-2  flex  w-max"} key={lot._id}>
-                              <input
-                                type="checkbox"
-                                name={lot.nom}
-                                id={lot.nom}
-                                className="mx-1"
-                                checked={lot.isSelected}
-                                onChange={(e) => this.handleSelectLot(e, lot)}
-                              />
-                              <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
-                                <label htmlFor="">{lot.nom}</label>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-                      <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                        2. Sélectionner les arcticles à utiliser
-                      </p>
-                      {loadingArticles ? (
-                        <div className="m-auto my-4">
-                          <ClipLoader loading={loadingArticles} size={70} />
-                        </div>
-                      ) : filteredArticles.length > 0 ? (
-                        <ArticlesTable
-                          articles={filteredArticles}
-                          sortColumn={sortColumn}
-                          onSort={this.handleSort}
-                          fields={fields}
-                          datas={datas}
-                          headers={selectedFields}
-                          totalItems={filteredArticles.length}
-                          onItemSelect={this.handleSelectArticle}
-                          selectedItems={data.articles}
-                          displayTableControlPanel={false}
-                          displayItemActions={false}
-                        />
-                      ) : (
-                        <div className="ml-4 ">
-                          <p className="text-center text-sm font-bold text-slate-900">
-                            Aucun article trouvé
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <ArticleSearch
+                    datas={datas}
+                    onSelectArticle={this.handleSelectArticle}
+                    selectedArticles={data.articles}
+                  />
                 )}
                 <div className=" flex w-full justify-end p-2">
                   <button

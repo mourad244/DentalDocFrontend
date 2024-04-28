@@ -1,22 +1,23 @@
 import React from "react";
-import Joi from "joi-browser";
-import Form from "../../../common/form";
 
-import { getLots } from "../../../services/pharmacie/lotService";
 import {
   getBonCommande,
   saveBonCommande,
 } from "../../../services/pharmacie/bonCommandeService";
+import { getLots } from "../../../services/pharmacie/lotService";
+import { searchSociete } from "../../../services/pharmacie/searchSocieteService";
 import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
 import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
-import ArticlesTable from "../articles/articlesTable";
-import { searchSociete } from "../../../services/pharmacie/searchSocieteService";
+
+import Form from "../../../common/form";
+import Input from "../../../common/input";
+import SearchBox from "../../../common/searchBox";
+import ArticleSearch from "../articles/articleSearch";
+
+import Joi from "joi-browser";
+import { v4 as uuidv4 } from "uuid";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import { getArticles } from "../../../services/pharmacie/articleService";
-import SearchBox from "../../../common/searchBox";
-import { v4 as uuidv4 } from "uuid";
-import Input from "../../../common/input";
 
 class BonCommandeForm extends Form {
   state = {
@@ -129,6 +130,7 @@ class BonCommandeForm extends Form {
           nom: item.articleId.nom,
           prixTTC: item.articleId.prixTTC,
           quantiteTotal: item.quantiteTotal,
+          lotId: item.articleId.lotId,
         };
       });
       // 3. selecteSociete
@@ -189,48 +191,6 @@ class BonCommandeForm extends Form {
         });
       }
     }
-    if (prevState.startSearch !== this.state.startSearch) {
-      let selectedLots = this.state.datas.lots.map((lot) => {
-        if (lot.isSelected) return lot._id;
-      });
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      // fetch articles of selected lots
-      this.setState({
-        filteredArticles,
-        loadingArticles: false,
-        startSearch: false,
-      });
-    }
-
-    if (prevState.datas.lots !== this.state.datas.lots) {
-      let selectedLots = [];
-      this.state.datas.lots.map(
-        (lot) => lot.isSelected && selectedLots.push(lot._id),
-      );
-      if (selectedLots.length === 0 && this.state.searchQuery === "") {
-        this.setState({ filteredArticles: [] });
-        return;
-      }
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      // fetch articles of selected lots
-      this.setState({ filteredArticles, loadingArticles: false });
-    }
   }
 
   mapToViewModel(bonCommande) {
@@ -255,12 +215,7 @@ class BonCommandeForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-  handleSelectLot = (e, lot) => {
-    let newLots = [...this.state.datas.lots];
-    const index = newLots.findIndex((c) => c._id === lot._id);
-    newLots[index].isSelected = !newLots[index].isSelected;
-    this.setState({ datas: { ...this.state.datas, lots: newLots } });
-  };
+
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex((c) => {
@@ -273,6 +228,7 @@ class BonCommandeForm extends Form {
         nom: article.nom,
         prixTTC: article.prixTTC,
         quantiteTotal: 1,
+        lotId: article.lotId,
       });
     else newArticles.splice(index, 1);
     this.setState({ data: { ...this.state.data, articles: newArticles } });
@@ -288,18 +244,7 @@ class BonCommandeForm extends Form {
   };
 
   render() {
-    const {
-      datas,
-      loading,
-      loadingArticles,
-      filteredArticles,
-      data,
-      sortColumn,
-      fields,
-      searchQuery,
-      selectedFields,
-      searchQuerySociete,
-    } = this.state;
+    const { datas, loading, data, searchQuerySociete } = this.state;
     return loading ? (
       <div className="m-auto my-4">
         <ClipLoader loading={loading} size={70} />
@@ -333,77 +278,12 @@ class BonCommandeForm extends Form {
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-col justify-start"
           onSubmit={this.handleSubmit}
         >
-          <div className="mb-2  flex flex-row items-start">
-            <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
-              <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
-                1. Recherche des articles
-              </p>
-              <div className="mb-2 flex">
-                <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
-                  a. chercher l'article
-                </p>
-                <SearchBox
-                  value={searchQuery}
-                  onChange={(e) => {
-                    this.setState({ searchQuery: e });
-                  }}
-                  onSearch={() => this.setState({ startSearch: true })}
-                />
-              </div>
-              <div className="mb-2 mr-2 flex  flex-wrap ">
-                <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
-                  b. Sélectionner les lots des articles
-                </p>
-                {datas.lots.map((lot) => {
-                  return (
-                    <div className={"mx-2  flex  w-max"} key={lot._id}>
-                      <input
-                        type="checkbox"
-                        name={lot.nom}
-                        id={lot.nom}
-                        className="mx-1"
-                        checked={lot.isSelected}
-                        onChange={(e) => this.handleSelectLot(e, lot)}
-                      />
-                      <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
-                        <label htmlFor="">{lot.nom}</label>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-              <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                2. Sélectionner les arcticles à commander
-              </p>
-              {loadingArticles ? (
-                <div className="m-auto my-4">
-                  <ClipLoader loading={loadingArticles} size={70} />
-                </div>
-              ) : filteredArticles.length > 0 ? (
-                <ArticlesTable
-                  articles={filteredArticles}
-                  sortColumn={sortColumn}
-                  onSort={this.handleSort}
-                  fields={fields}
-                  datas={datas}
-                  headers={selectedFields}
-                  totalItems={filteredArticles.length}
-                  onItemSelect={this.handleSelectArticle}
-                  selectedItems={data.articles}
-                  displayTableControlPanel={false}
-                  displayItemActions={false}
-                />
-              ) : (
-                <div className="ml-4 ">
-                  <p className="text-center text-sm font-bold text-slate-900">
-                    Aucun article trouvé
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <ArticleSearch
+            datas={datas}
+            onSelectArticle={this.handleSelectArticle}
+            selectedArticles={data.articles}
+          />
+
           <div className="mr-2 flex min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
             <p className="m-2 mt-2 w-full text-base font-bold text-white">
               3. Valider les articles à commander

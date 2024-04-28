@@ -15,6 +15,7 @@ import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { GoTriangleUp } from "react-icons/go";
 import { GoTriangleDown } from "react-icons/go";
+import ArticleSearch from "../../pharmacie/articles/articleSearch";
 
 class ActeDentaireForm extends Form {
   state = {
@@ -97,6 +98,7 @@ class ActeDentaireForm extends Form {
             quantite: item.quantite,
             code: item.articleId.code,
             nom: item.articleId.nom,
+            lotId: item.articleId.lotId,
           };
         });
         let articleForm = true;
@@ -141,53 +143,15 @@ class ActeDentaireForm extends Form {
     if (prevProps.formDisplay !== this.props.formDisplay) {
       this.setState({ formDisplay: this.props.formDisplay });
     }
-    if (prevState.startSearch !== this.state.startSearch) {
-      let selectedLots = this.state.selecteDLots.map((c) => c._id);
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      this.setState({
-        filteredArticles,
-        loadingArticles: false,
-        startSearch: false,
-      });
-    }
-    if (prevState.selecteDLots !== this.state.selecteDLots) {
-      let selectedLots = this.state.selecteDLots.map((c) => c._id);
-      if (selectedLots.length === 0) {
-        this.setState({ filteredArticles: [] });
-        return;
-      }
-      this.setState({ loadingArticles: true });
-      let {
-        data: { data: filteredArticles },
-      } = await getArticles({
-        sortColumn: this.state.sortColumn.path,
-        order: this.state.sortColumn.order,
-        searchQuery: this.state.searchQuery,
-        selectedLots,
-      });
-      // fetch articles of selected lots
-      this.setState({ filteredArticles, loadingArticles: false });
-    }
   }
-  handleSelectLot = (e, lot) => {
-    let newSelectedLots = [...this.state.selecteDLots];
-    const index = newSelectedLots.findIndex((c) => c._id === lot._id);
-    if (index === -1) newSelectedLots.push(lot);
-    else newSelectedLots.splice(index, 1);
-    this.setState({ selecteDLots: newSelectedLots });
-  };
+
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex((c) => {
-      return c.articleId === article._id;
+      return (
+        c.articleId === article._id ||
+        (c.articleId && c.articleId._id === article._id)
+      );
     });
     if (index === -1) {
       newArticles.push({
@@ -195,6 +159,7 @@ class ActeDentaireForm extends Form {
         quantite: 1,
         code: article.code,
         nom: article.nom,
+        lotId: article.lotId,
       });
     } else {
       newArticles.splice(index, 1);
@@ -238,16 +203,7 @@ class ActeDentaireForm extends Form {
   };
 
   render() {
-    const {
-      loadingArticles,
-      filteredArticles,
-      data,
-      selecteDLots,
-      searchQuery,
-      selectedFields,
-      fields,
-      sortColumn,
-    } = this.state;
+    const { data } = this.state;
     const { datas, formDisplay } = this.props;
     return (
       <>
@@ -418,81 +374,11 @@ class ActeDentaireForm extends Form {
                 )}
               </div>
               {this.state.articleForm && (
-                <div className="my-2  flex flex-row items-start">
-                  <div className="flex w-[30%] min-w-[320px]  flex-col rounded-md bg-[#F2F2F2]">
-                    <p className="mb-2 rounded-md bg-[#4F6874] p-2 text-base font-bold text-white">
-                      1. Recherche des articles
-                    </p>
-                    <div className="mb-2 flex">
-                      <p className="m-2 mt-2 w-fit text-sm font-bold text-[#151516]">
-                        a. chercher l'article
-                      </p>
-                      <SearchBox
-                        value={searchQuery}
-                        onChange={(e) => {
-                          this.setState({ searchQuery: e });
-                        }}
-                        onSearch={() => this.setState({ startSearch: true })}
-                      />
-                    </div>
-                    <div className="mb-2 mr-2 flex  flex-wrap ">
-                      <p className="m-2 mt-2 w-full text-sm font-bold text-[#151516]">
-                        b. Sélectionner les lots des articles
-                      </p>
-                      {datas.lots.map((lot) => {
-                        return (
-                          <div className={"mx-2  flex  w-max"} key={lot._id}>
-                            <input
-                              type="checkbox"
-                              name={lot.nom}
-                              id={lot.nom}
-                              className="mx-1"
-                              checked={
-                                selecteDLots.find((c) => c._id === lot._id)
-                                  ? true
-                                  : false
-                              }
-                              onChange={(e) => this.handleSelectLot(e, lot)}
-                            />
-                            <div className="items-center text-xs font-bold leading-9 text-[#1f2037]">
-                              <label htmlFor="">{lot.nom}</label>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="mx-2 flex  min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-                    <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                      2. Sélectionner les arcticles à utiliser
-                    </p>
-                    {loadingArticles ? (
-                      <div className="m-auto my-4">
-                        <ClipLoader loading={loadingArticles} size={70} />
-                      </div>
-                    ) : filteredArticles.length > 0 ? (
-                      <ArticlesTable
-                        articles={filteredArticles}
-                        sortColumn={sortColumn}
-                        onSort={this.handleSort}
-                        fields={fields}
-                        datas={datas}
-                        headers={selectedFields}
-                        totalItems={filteredArticles.length}
-                        onItemSelect={this.handleSelectArticle}
-                        selectedItems={data.articles}
-                        displayTableControlPanel={false}
-                        displayItemActions={false}
-                      />
-                    ) : (
-                      <div className="ml-4 ">
-                        <p className="text-center text-sm font-bold text-slate-900">
-                          Aucun article trouvé
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ArticleSearch
+                  datas={datas}
+                  onSelectArticle={this.handleSelectArticle}
+                  selectedArticles={data.articles}
+                />
               )}
 
               {this.renderButton("Sauvegarder")}
