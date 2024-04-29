@@ -1,21 +1,16 @@
 import React from "react";
 import Joi from "joi-browser";
 
-import { getArticles } from "../../../services/pharmacie/articleService";
 import { saveActeDentaire } from "../../../services/acteDentaireService";
-
-import ArticlesTable from "../../pharmacie/articles/articlesTable";
 
 import Form from "../../../common/form";
 import Input from "../../../common/input";
-import SearchBox from "../../../common/searchBox";
-import ClipLoader from "react-spinners/ClipLoader";
+import ArticleSearch from "../../pharmacie/articles/articleSearch";
 
-import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { GoTriangleUp } from "react-icons/go";
 import { GoTriangleDown } from "react-icons/go";
-import ArticleSearch from "../../pharmacie/articles/articleSearch";
+import ArticleSelect from "../../pharmacie/articles/articleSelect";
 
 class ActeDentaireForm extends Form {
   state = {
@@ -93,8 +88,8 @@ class ActeDentaireForm extends Form {
           );
           if (lot) selecteDLots.push(lot);
           return {
-            _id: item._id,
-            articleId: item.articleId,
+            // _id: item._id,
+            articleId: item.articleId._id,
             quantite: item.quantite,
             code: item.articleId.code,
             nom: item.articleId.nom,
@@ -147,11 +142,10 @@ class ActeDentaireForm extends Form {
 
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
+    console.log("newArticles", newArticles);
+    console.log("article", article);
     const index = newArticles.findIndex((c) => {
-      return (
-        c.articleId === article._id ||
-        (c.articleId && c.articleId._id === article._id)
-      );
+      return c.articleId === article._id;
     });
     if (index === -1) {
       newArticles.push({
@@ -183,6 +177,28 @@ class ActeDentaireForm extends Form {
   }
   onArticleFormDisplay = () => {
     this.setState({ articleForm: !this.state.articleForm });
+  };
+
+  handleSelectSelectedArticle = (article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    newArticles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
+  handleQuantityChange = (e, article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    if (e >= 1) {
+      newArticles[index].quantite = e;
+      this.setState({ data: { ...this.state.data, articles: newArticles } });
+    } else {
+      newArticles[index].quantite = 1;
+      this.setState({ data: { ...this.state.data, articles: newArticles } });
+    }
   };
 
   doSubmit = async () => {
@@ -249,114 +265,12 @@ class ActeDentaireForm extends Form {
                   ["Matin", "Après-midi", "Soir"],
                 )}
               </div>
-              <div className="mt-2 flex w-full min-w-[320px] flex-wrap rounded-md ">
-                <p className="m-2 mt-2 w-full text-base font-bold text-[#474a52]">
-                  Articles à utiliser
-                </p>
-                {data.articles && data.articles.length > 0 ? (
-                  <>
-                    <table className="my-0 w-full">
-                      <thead className="h-12 text-[#3d4255]">
-                        <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
-                          <th key={uuidv4()} className="w-8"></th>
-                          <th
-                            key={uuidv4()}
-                            className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                          >
-                            Code
-                          </th>
-                          <th
-                            key={uuidv4()}
-                            className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                          >
-                            Désignation
-                          </th>
+              <ArticleSelect
+                articles={data.articles}
+                handleQuantityChange={this.handleQuantityChange}
+                handleSelectArticle={this.handleSelectSelectedArticle}
+              />
 
-                          <th
-                            key={uuidv4()}
-                            className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                          >
-                            Qte à utiliser
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.articles.map((article) => {
-                          return (
-                            <tr
-                              className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                              key={article.articleId._id}
-                            >
-                              <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={true}
-                                  onChange={() => {
-                                    let articles = [...data.articles];
-                                    const index = articles.findIndex(
-                                      (c) =>
-                                        c.articleId.toString() ===
-                                        article.articleId.toString(),
-                                    );
-                                    articles.splice(index, 1);
-                                    this.setState({
-                                      data: { ...data, articles },
-                                    });
-                                  }}
-                                />
-                              </td>
-                              <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                {article.code}
-                              </td>
-                              <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                {article.nom}
-                              </td>
-                              <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                <Input
-                                  type="number"
-                                  width={80}
-                                  fontWeight="medium"
-                                  height={35}
-                                  disabled={false}
-                                  value={article.quantite}
-                                  onChange={(e) => {
-                                    let articles = [...data.articles];
-                                    const index = articles.findIndex(
-                                      (c) =>
-                                        c.articleId.toString() ===
-                                        article.articleId.toString(),
-                                    );
-                                    if (e.target.value >= 1) {
-                                      articles[index].quantite = e.target.value;
-                                      this.setState({
-                                        data: { ...data, articles },
-                                      });
-                                    } else {
-                                      articles[index].quantite = 1;
-                                      this.setState({
-                                        data: {
-                                          ...data,
-                                          articles,
-                                        },
-                                      });
-                                    }
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </>
-                ) : (
-                  <div className="ml-4">
-                    <p className=" text-sm font-bold text-slate-900">
-                      Aucun article séléctionné
-                    </p>
-                  </div>
-                )}
-              </div>
               <div className="ml-2 mt-2 flex w-full items-center ">
                 <label className="mr-2 text-xl font-bold text-[#474a52]">
                   Ajouter des articles à utiliser

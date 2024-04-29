@@ -3,8 +3,6 @@ import React, { useState, useEffect } from "react";
 import SearchBox from "../../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
 import { getLots } from "../../../services/pharmacie/lotService";
-import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
-import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
 import { getArticles } from "../../../services/pharmacie/articleService";
 import ArticlesTable from "./articlesTable";
 
@@ -13,6 +11,10 @@ function ArticleSearch(props) {
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [lots, setLots] = useState([]);
+  const [selectedArticles, setSelectedArticles] = useState(
+    // get the selected articles from the props
+    props.selectedArticles,
+  );
   const [selectedLots, setSelectedLots] = useState([]);
   const [sortColumn, setSortColumn] = useState({
     path: "nom",
@@ -98,7 +100,7 @@ function ArticleSearch(props) {
       }
     };
     if (dataLoaded) selectingLots();
-  }, [props.selectedArticles, dataLoaded]);
+  }, [/* props.selectedArticles, */ dataLoaded]);
 
   const handleSelectLot = (e, lot) => {
     let newSelectedLots = [...selectedLots];
@@ -117,6 +119,18 @@ function ArticleSearch(props) {
   };
 
   const handleSelectArticle = (article) => {
+    let newSelectedArticles = [...selectedArticles];
+    let isSelected = selectedArticles.some(
+      (selectedArticle) => selectedArticle._id === article._id,
+    );
+    if (isSelected) {
+      newSelectedArticles = newSelectedArticles.filter(
+        (selectedArticle) => selectedArticle._id !== article._id,
+      );
+    } else {
+      newSelectedArticles.push(article);
+    }
+
     props.onSelectArticle(article);
   };
   return loading ? (

@@ -9,12 +9,8 @@ import {
 } from "../../../services/pharmacie/receptionBCService";
 import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
 import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
-import ArticlesTable from "../articles/articlesTable";
-import { searchSociete } from "../../../services/pharmacie/searchSocieteService";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import { getArticles } from "../../../services/pharmacie/articleService";
-import SearchBox from "../../../common/searchBox";
 import { v4 as uuidv4 } from "uuid";
 import Input from "../../../common/input";
 import { getBonCommande } from "../../../services/pharmacie/bonCommandeService";

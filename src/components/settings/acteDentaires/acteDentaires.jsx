@@ -72,6 +72,7 @@ function ActeDentaires(props) {
           searchQuery,
         );
         setActeDentaires(data);
+        console.log("data", data);
         setTotalCount(totalCount);
       } catch (error) {
         console.error("Failed to fetch data:", error);
