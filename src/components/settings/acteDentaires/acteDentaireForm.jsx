@@ -88,8 +88,8 @@ class ActeDentaireForm extends Form {
           );
           if (lot) selecteDLots.push(lot);
           return {
-            // _id: item._id,
-            articleId: item.articleId._id,
+            _id: item.articleId._id,
+            articleId: item.articleId,
             quantite: item.quantite,
             code: item.articleId.code,
             nom: item.articleId.nom,
@@ -142,14 +142,12 @@ class ActeDentaireForm extends Form {
 
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
-    console.log("newArticles", newArticles);
-    console.log("article", article);
     const index = newArticles.findIndex((c) => {
-      return c.articleId === article._id;
+      return c.articleId._id === article._id;
     });
     if (index === -1) {
       newArticles.push({
-        articleId: article._id,
+        articleId: article,
         quantite: 1,
         code: article.code,
         nom: article.nom,

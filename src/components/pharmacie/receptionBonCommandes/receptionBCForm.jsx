@@ -99,7 +99,8 @@ class ReceptionBCForm extends Form {
         const { data: bonCommande } = await getBonCommande(bonCommandeId);
         let articles = bonCommande.articles.map((item) => {
           return {
-            articleId: item.articleId._id,
+            _id: item.articleId._id,
+            articleId: item.articleId,
             code: item.articleId.code,
             nom: item.articleId.nom,
             quantite: 0,
@@ -134,7 +135,8 @@ class ReceptionBCForm extends Form {
           (c) => c.articleId === item.articleId._id,
         );
         return {
-          articleId: item.articleId._id,
+          _id: item.articleId._id,
+          articleId: item.articleId,
           code: item.articleId.code,
           nom: item.articleId.nom,
           quantite: item.quantite,

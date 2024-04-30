@@ -4,21 +4,20 @@ import {
   getActeDentaires,
   deleteActeDentaire,
 } from "../../../services/acteDentaireService";
+import { getLots } from "../../../services/pharmacie/lotService";
 import { getNatureActes } from "../../../services/natureActeService";
+import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
+import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
 
 import ActeDentaireForm from "./acteDentaireForm";
 import ActeDentairesTable from "./acteDentairesTable";
 
-import SearchBox from "../../../common/searchBox";
-
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { BsPersonAdd } from "react-icons/bs";
+import SearchBox from "../../../common/searchBox";
 
 import _ from "lodash";
-import { getLots } from "../../../services/pharmacie/lotService";
-import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService";
-import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
 import ClipLoader from "react-spinners/ClipLoader";
 
 function ActeDentaires(props) {
@@ -48,8 +47,8 @@ function ActeDentaires(props) {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: natureActes } = await getNatureActes();
       const { data: lots } = await getLots();
+      const { data: natureActes } = await getNatureActes();
       const { data: uniteMesures } = await getUniteMesures();
       const { data: uniteReglementaires } = await getUniteReglementaires();
       setDatas({ lots, uniteMesures, uniteReglementaires, natureActes });
@@ -72,7 +71,6 @@ function ActeDentaires(props) {
           searchQuery,
         );
         setActeDentaires(data);
-        console.log("data", data);
         setTotalCount(totalCount);
       } catch (error) {
         console.error("Failed to fetch data:", error);

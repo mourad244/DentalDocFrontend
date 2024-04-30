@@ -125,7 +125,8 @@ class BonCommandeForm extends Form {
         //2 .filteredArticles,
         // return item add add
         return {
-          articleId: item.articleId._id,
+          _id: item.articleId._id,
+          articleId: item.articleId,
           code: item.articleId.code,
           nom: item.articleId.nom,
           prixTTC: item.articleId.prixTTC,
@@ -219,11 +220,11 @@ class BonCommandeForm extends Form {
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex((c) => {
-      return c.articleId === article._id;
+      return c.articleId._id === article._id;
     });
     if (index === -1)
       newArticles.push({
-        articleId: article._id,
+        articleId: article,
         code: article.code,
         nom: article.nom,
         prixTTC: article.prixTTC,
