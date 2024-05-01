@@ -11,9 +11,8 @@ import { getUniteMesures } from "../../../services/pharmacie/uniteMesureService"
 import { getUniteReglementaires } from "../../../services/pharmacie/uniteReglementaireService";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
-import { v4 as uuidv4 } from "uuid";
-import Input from "../../../common/input";
 import { getBonCommande } from "../../../services/pharmacie/bonCommandeService";
+import ArticleSelect from "../articles/articleSelect";
 
 class ReceptionBCForm extends Form {
   state = {
@@ -33,6 +32,25 @@ class ReceptionBCForm extends Form {
       uniteReglementaires: [],
     },
     totalCount: 0,
+    articleFields: [
+      { order: 1, name: "code", label: "Code" },
+      { order: 2, name: "nom", label: "Désignation" },
+      { order: 3, name: "quantiteTotal", label: "Quantité totale" },
+      {
+        order: 4,
+        name: "quantite",
+        label: "Qte reçu",
+        isInput: true,
+        isNumber: true,
+      },
+      {
+        order: 5,
+        name: "datePeremption",
+        label: "Date expiration",
+        isInput: true,
+        isDate: true,
+      },
+    ],
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -67,8 +85,8 @@ class ReceptionBCForm extends Form {
     articles: Joi.array()
       .items(
         Joi.object({
-          articleId: Joi.string().required().label("Article"),
-          // quantite mut be different to 0
+          _id: Joi.string(),
+          articleId: Joi.object().label("Article"),
           quantite: Joi.number().min(1).required().label("Quantité"),
           code: Joi.string().required().label("Code"),
           nom: Joi.string().required().label("Nom"),
@@ -142,8 +160,6 @@ class ReceptionBCForm extends Form {
           quantite: item.quantite,
           isExpiration: item.articleId.isExpiration,
           quantiteTotal: article.quantiteTotal,
-          // datePeremption: item.datePeremption,
-          // transform the date to like that 2021-09-01
           datePeremption: item.datePeremption
             ? item.datePeremption.split("T")[0]
             : "",
@@ -212,6 +228,22 @@ class ReceptionBCForm extends Form {
     else window.location.reload();
   };
 
+  handleSelectSelectedArticle = (article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    newArticles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
+  handleChangeItem = (e, article, field) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    newArticles[index][field] = e;
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
   render() {
     const { loading, data } = this.state;
     return loading ? (
@@ -247,143 +279,14 @@ class ReceptionBCForm extends Form {
           className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-col justify-start"
           onSubmit={this.handleSubmit}
         >
-          <div className="mr-2 flex min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-            <p className="m-2 mt-2 w-full text-base font-bold text-white">
-              liste des articles commandés
-            </p>
-            {data.articles.length > 0 && (
-              <>
-                <table className="my-0 w-full">
-                  <thead className="h-12 text-[#4f5361]">
-                    <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Code
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Désignation
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Quantité totale
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Qte reçu
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Date d'expiration
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.articles.map((article) => {
-                      return (
-                        <tr
-                          className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                          key={article.articleId}
-                        >
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.code}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.nom}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.quantiteTotal}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            <Input
-                              type="number"
-                              width={80}
-                              fontWeight="medium"
-                              height={35}
-                              disabled={false}
-                              value={article.quantite}
-                              onChange={(e) => {
-                                let articles = [...data.articles];
-                                const index = articles.findIndex(
-                                  (c) =>
-                                    c.articleId.toString() ===
-                                    article.articleId.toString(),
-                                );
-                                if (e.target.value >= 1) {
-                                  articles[index].quantite = e.target.value;
-                                  this.setState({
-                                    data: { ...data, articles },
-                                  });
-                                } else {
-                                  articles[index].quantite = 1;
-                                  this.setState({
-                                    data: {
-                                      ...data,
-                                      articles,
-                                    },
-                                  });
-                                }
-                              }}
-                            />
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {/* if article.isExpiration add a date input */}
-                            {article.isExpiration ? (
-                              <Input
-                                type="date"
-                                width={120}
-                                fontWeight="medium"
-                                height={35}
-                                disabled={false}
-                                value={article.datePeremption}
-                                onChange={(e) => {
-                                  let articles = [...data.articles];
-                                  const index = articles.findIndex(
-                                    (c) =>
-                                      c.articleId.toString() ===
-                                      article.articleId.toString(),
-                                  );
-                                  articles[index].datePeremption =
-                                    e.target.value;
-                                  this.setState({
-                                    data: { ...data, articles },
-                                  });
-                                }}
-                              />
-                            ) : (
-                              "N/A"
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <div className=" h-1 w-full bg-[#414040]" />
-                <div className="flex w-full justify-between">
-                  <div className="flex  justify-start">
-                    <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-white">
-                      Total des articles:
-                    </p>
-                    {/* calculer le nombre total des articles */}
-                    <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                      {data.articles.length}
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+          <ArticleSelect
+            articles={data.articles}
+            handleChangeItem={this.handleChangeItem}
+            handleSelectArticle={this.handleSelectSelectedArticle}
+            title="Liste des articles commandés"
+            fields={this.state.articleFields}
+          />
+
           <div className="flex w-[100%] flex-wrap justify-start">
             <div className="mt-3 ">
               {this.renderDate("date", "Date", 190, 35, 95)}

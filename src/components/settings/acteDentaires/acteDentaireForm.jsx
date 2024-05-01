@@ -42,6 +42,22 @@ class ActeDentaireForm extends Form {
       { order: 12, name: "prixTTC", label: "Prix TTC" },
       { order: 13, name: "stockActuel", label: "Stock Actuel" },
     ],
+    articleFields: [
+      // code, designation, qte a utiliser
+      {
+        order: 1,
+        name: "code",
+        label: "Code",
+      },
+      { order: 2, name: "nom", label: "Désignation" },
+      {
+        order: 3,
+        name: "quantite",
+        label: "Qte à utiliser",
+        isNumber: true,
+        isInput: true,
+      },
+    ],
     selectedFields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -73,7 +89,18 @@ class ActeDentaireForm extends Form {
     code: Joi.number().allow(""),
     prix: Joi.number().allow(""),
     duree: Joi.number().allow(""),
-    articles: Joi.array().items(Joi.object()).label("Articles"),
+    articles: Joi.array()
+      .items(
+        Joi.object({
+          _id: Joi.string(),
+          articleId: Joi.object().label("Article"),
+          quantite: Joi.number().min(1).required().label("Quantité"),
+          code: Joi.string().required().label("Code"),
+          nom: Joi.string().required().label("Nom"),
+          lotId: Joi.string().required().label("Lot"),
+        }),
+      )
+      .label("Articles"),
     moments: Joi.array().allow(""),
   };
 
@@ -185,16 +212,16 @@ class ActeDentaireForm extends Form {
     newArticles.splice(index, 1);
     this.setState({ data: { ...this.state.data, articles: newArticles } });
   };
-  handleQuantityChange = (e, article) => {
+  handleChangeItem = (e, article, field) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex(
       (c) => c.articleId === article.articleId,
     );
     if (e >= 1) {
-      newArticles[index].quantite = e;
+      newArticles[index][field] = e;
       this.setState({ data: { ...this.state.data, articles: newArticles } });
     } else {
-      newArticles[index].quantite = 1;
+      newArticles[index][field] = 1;
       this.setState({ data: { ...this.state.data, articles: newArticles } });
     }
   };
@@ -265,8 +292,10 @@ class ActeDentaireForm extends Form {
               </div>
               <ArticleSelect
                 articles={data.articles}
-                handleQuantityChange={this.handleQuantityChange}
+                handleChangeItem={this.handleChangeItem}
                 handleSelectArticle={this.handleSelectSelectedArticle}
+                title="Articles à utiliser"
+                fields={this.state.articleFields}
               />
 
               <div className="ml-2 mt-2 flex w-full items-center ">

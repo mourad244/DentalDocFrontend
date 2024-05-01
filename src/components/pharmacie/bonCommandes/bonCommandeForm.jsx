@@ -18,6 +18,7 @@ import Joi from "joi-browser";
 import { v4 as uuidv4 } from "uuid";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
+import ArticleSelect from "../articles/articleSelect";
 
 class BonCommandeForm extends Form {
   state = {
@@ -44,6 +45,46 @@ class BonCommandeForm extends Form {
     startSearch: false,
     selecteDSociete: {},
     startSearchSociete: false,
+    articleFields: [
+      {
+        order: 1,
+        name: "code",
+        label: "Code",
+      },
+      {
+        order: 2,
+        name: "nom",
+        label: "Désignation",
+      },
+      {
+        order: 3,
+        name: "prixTTC",
+        label: "Prix unitaire",
+        isNumber: true,
+        isPrice: true,
+      },
+      {
+        order: 4,
+        name: "quantiteTotal",
+        label: "Qte à commander",
+        isNumber: true,
+        isInput: true,
+      },
+      {
+        order: 5,
+        name: "prixTotal",
+        label: "Prix Total",
+        content: (article) => {
+          let montant = article.prixTTC * article.quantiteTotal;
+          return montant
+            ? montant.toLocaleString("fr-FR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }) + " Dh"
+            : "0 Dh";
+        },
+      },
+    ],
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -90,7 +131,19 @@ class BonCommandeForm extends Form {
     montantTTC: Joi.number().allow("").allow(null).label("Montant TTC"),
     tva: Joi.number().required().label("TVA"),
     commentaire: Joi.string().allow("").allow(null).label("Commentaire"),
-    articles: Joi.array().items(Joi.object()).label("Articles"),
+    articles: Joi.array()
+      .items(
+        Joi.object({
+          _id: Joi.string(),
+          articleId: Joi.object().label("Article"),
+          code: Joi.string().required().label("Code"),
+          nom: Joi.string().required().label("Nom"),
+          quantiteTotal: Joi.number().min(1).required().label("Quantité"),
+          prixTTC: Joi.number().required().label("Prix TTC"),
+          lotId: Joi.string().required().label("Lot"),
+        }),
+      )
+      .label("Articles"),
     images: Joi.label("Images").optional(),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
   };
@@ -216,7 +269,27 @@ class BonCommandeForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
-
+  handleChangeItem = (e, article, field) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    if (e >= 1) {
+      newArticles[index][field] = e;
+      this.setState({ data: { ...this.state.data, articles: newArticles } });
+    } else {
+      newArticles[index][field] = 1;
+      this.setState({ data: { ...this.state.data, articles: newArticles } });
+    }
+  };
+  handleSelectSelectedArticle = (article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    newArticles.splice(index, 1);
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex((c) => {
@@ -284,174 +357,13 @@ class BonCommandeForm extends Form {
             onSelectArticle={this.handleSelectArticle}
             selectedArticles={data.articles}
           />
-
-          <div className="mr-2 flex min-w-[320px] flex-wrap rounded-md bg-[#4F6874]">
-            <p className="m-2 mt-2 w-full text-base font-bold text-white">
-              3. Valider les articles à commander
-            </p>
-            {data.articles.length > 0 ? (
-              <>
-                <table className="my-0 w-full">
-                  <thead className="h-12 text-[#4f5361]">
-                    <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
-                      <th key={uuidv4()} className="w-8"></th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Code
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Désignation
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Prix unitaire
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Qte à commander
-                      </th>
-                      <th
-                        key={uuidv4()}
-                        className="px-3 text-xs font-semibold text-[#2f2f2f]"
-                      >
-                        Prix Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.articles.map((article) => {
-                      return (
-                        <tr
-                          className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                          key={article.articleId}
-                        >
-                          <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
-                            <input
-                              type="checkbox"
-                              checked={true}
-                              onChange={() => {
-                                let articles = [...data.articles];
-                                const index = articles.findIndex(
-                                  (c) =>
-                                    c.articleId.toString() ===
-                                    article.articleId.toString(),
-                                );
-                                articles.splice(index, 1);
-                                this.setState({
-                                  data: { ...data, articles },
-                                });
-                              }}
-                            />
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.code}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.nom}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {/* {article.prixTTC} */}
-                            {/* faire le prix dans cet format : ex: 123 344,00 Dh, 123,00 Dh */}
-                            {article.prixTTC
-                              ? article.prixTTC.toLocaleString("fr-FR", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }) + " Dh"
-                              : "0 Dh"}
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            <Input
-                              type="number"
-                              width={80}
-                              fontWeight="medium"
-                              height={35}
-                              disabled={false}
-                              value={article.quantiteTotal}
-                              onChange={(e) => {
-                                let articles = [...data.articles];
-                                const index = articles.findIndex(
-                                  (c) =>
-                                    c.articleId.toString() ===
-                                    article.articleId.toString(),
-                                );
-                                if (e.target.value >= 1) {
-                                  articles[index].quantiteTotal =
-                                    e.target.value;
-                                  this.setState({
-                                    data: { ...data, articles },
-                                  });
-                                } else {
-                                  articles[index].quantiteTotal = 1;
-                                  this.setState({
-                                    data: {
-                                      ...data,
-                                      articles,
-                                    },
-                                  });
-                                }
-                              }}
-                            />
-                          </td>
-                          <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                            {article.prixTTC
-                              ? (
-                                  article.prixTTC * article.quantiteTotal
-                                ).toLocaleString("fr-FR", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }) + " Dh"
-                              : "0 Dh"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <div className=" h-1 w-full bg-[#414040]" />
-                <div className="flex w-full justify-between">
-                  <div className="flex  justify-start">
-                    <p className="my-2 mt-2 w-full min-w-max text-base font-bold text-white">
-                      Total des articles:
-                    </p>
-                    {/* calculer le nombre total des articles */}
-                    <p className="m-2 mt-2 w-full text-base font-bold text-white">
-                      {data.articles.length}
-                    </p>
-                  </div>
-                  <div className="flex  justify-end">
-                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-white">
-                      Montant Total:
-                    </p>
-                    {/* calculer le montant total des articles */}
-                    <p className="m-2 mt-2 min-w-fit text-base font-bold text-white">
-                      {data.articles
-                        .reduce((a, b) => a + b.prixTTC * b.quantiteTotal, 0)
-                        .toLocaleString("fr-FR", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }) + " Dh"}
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="ml-4">
-                <p className=" text-sm font-bold text-slate-900">
-                  Aucun article séléctionné
-                </p>
-              </div>
-            )}
-          </div>
-          {/* ajouter une ligne séparant la table du reste de contenu  */}
+          <ArticleSelect
+            title="3. Valider les articles à commander"
+            articles={data.articles}
+            handleChangeItem={this.handleChangeItem}
+            handleSelectArticle={this.handleSelectSelectedArticle}
+            fields={this.state.articleFields}
+          />
 
           {/* search societe */}
           {Object.keys(this.state.selecteDSociete).length === 0 && (
