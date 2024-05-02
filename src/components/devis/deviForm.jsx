@@ -19,11 +19,11 @@ import PatientForm from "../patients/patientForm";
 import SearchPatient from "../../common/searchPatient";
 import ActesEffectuesTable from "./actesEffectuesTable";
 import ArticleSearch from "../pharmacie/articles/articleSearch";
+import ArticleSelect from "../pharmacie/articles/articleSelect";
 
 import _ from "lodash";
 import axios from "axios";
 import Joi from "joi-browser";
-import { v4 as uuidv4 } from "uuid";
 import { GoTriangleUp } from "react-icons/go";
 import { GoTriangleDown } from "react-icons/go";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -53,6 +53,23 @@ class DeviForm extends Form {
       uniteMesures: [],
       uniteReglementaires: [],
     },
+    // /* code, designation,qte,  */}
+    articleFields: [
+      // code, designation, qte a utiliser
+      {
+        order: 1,
+        name: "code",
+        label: "Code",
+      },
+      { order: 2, name: "nom", label: "Désignation" },
+      {
+        order: 3,
+        name: "quantite",
+        label: "Qte à utiliser",
+        isNumber: true,
+        isInput: true,
+      },
+    ],
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
@@ -109,7 +126,18 @@ class DeviForm extends Form {
     acteEffectues: Joi.array().allow([]).label("Acte Effectues"),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
     numOrdre: Joi.number().allow("").allow(null).label("Numéro d'ordre"),
-    articles: Joi.array().items(Joi.object()).label("Articles"),
+    articles: Joi.array()
+      .items(
+        Joi.object({
+          _id: Joi.string(),
+          articleId: Joi.object().label("Article"),
+          quantite: Joi.number().min(1).required().label("Quantité"),
+          code: Joi.string().required().label("Code"),
+          nom: Joi.string().required().label("Nom"),
+          lotId: Joi.string().required().label("Lot"),
+        }),
+      )
+      .label("Articles"),
   };
   async populateDatas() {
     this.setState({ loading: true, loadingPatient: true });
@@ -241,7 +269,8 @@ class DeviForm extends Form {
         );
         if (lot) selectedLots.push(lot);
         return {
-          articleId: article.articleId._id,
+          _id: article.articleId._id,
+          articleId: article.articleId,
           code: article.articleId.code,
           nom: article.articleId.nom,
           quantite: article.quantite,
@@ -632,20 +661,40 @@ class DeviForm extends Form {
   handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
+  handleChangeItem = (e, article, field) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    
+      newArticles[index][field] = e;
+      this.setState({ data: { ...this.state.data, articles: newArticles } });
+    
+  };
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];
     const index = newArticles.findIndex((c) => {
-      return c.articleId === article._id;
+      return c.articleId._id === article._id;
     });
-    if (index === -1)
+    if (index === -1) {
       newArticles.push({
-        articleId: article._id,
+        articleId: article,
+        quantite: 1,
         code: article.code,
         nom: article.nom,
-        quantite: 1,
         lotId: article.lotId,
       });
-    else newArticles.splice(index, 1);
+    } else {
+      newArticles.splice(index, 1);
+    }
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
+  };
+  handleSelectSelectedArticle = (article) => {
+    let newArticles = [...this.state.data.articles];
+    const index = newArticles.findIndex(
+      (c) => c.articleId === article.articleId,
+    );
+    newArticles.splice(index, 1);
     this.setState({ data: { ...this.state.data, articles: newArticles } });
   };
   handleSelecteDDent = (e, indexActe, indexDent) => {
@@ -1081,115 +1130,14 @@ class DeviForm extends Form {
                   </table>
                   <SchemaDent className="min-w-fit" dents={colorDents} />
                 </div>
-                <div className="mt-2 flex w-full min-w-[320px] flex-wrap rounded-md ">
-                  <p className="m-2 mt-2 w-full text-base font-bold text-[#474a52]">
-                    Articles à utiliser
-                  </p>
-                  {data.articles && data.articles.length > 0 ? (
-                    <>
-                      <table className="mx-2 my-0 w-full border-2 border-white">
-                        <thead className="h-12 text-[#3d4255]">
-                          <tr className="h-8 w-[100%] bg-[#4F6874] text-center">
-                            <th key={uuidv4()} className="w-8"></th>
-                            <th
-                              key={uuidv4()}
-                              className="px-3 text-xs font-semibold text-white"
-                            >
-                              Code
-                            </th>
-                            <th
-                              key={uuidv4()}
-                              className="px-3 text-xs font-semibold text-white"
-                            >
-                              Désignation
-                            </th>
+                <ArticleSelect
+                  title=" Articles à utiliser"
+                  articles={data.articles}
+                  handleChangeItem={this.handleChangeItem}
+                  handleSelectArticle={this.handleSelectSelectedArticle}
+                  fields={this.state.articleFields}
+                />
 
-                            <th
-                              key={uuidv4()}
-                              className="px-3 text-xs font-semibold text-white"
-                            >
-                              Qte à utiliser
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.articles.map((article) => {
-                            return (
-                              <tr
-                                className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
-                                key={article.articleId}
-                              >
-                                <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={true}
-                                    onChange={() => {
-                                      let articles = [...data.articles];
-                                      const index = articles.findIndex(
-                                        (c) =>
-                                          c.articleId.toString() ===
-                                          article.articleId.toString(),
-                                      );
-                                      articles.splice(index, 1);
-                                      this.setState({
-                                        data: { ...data, articles },
-                                      });
-                                    }}
-                                  />
-                                </td>
-                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                  {article.code}
-                                </td>
-                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                  {article.nom}
-                                </td>
-                                <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                                  <Input
-                                    type="number"
-                                    width={80}
-                                    fontWeight="medium"
-                                    height={35}
-                                    disabled={false}
-                                    value={article.quantite}
-                                    onChange={(e) => {
-                                      let articles = [...data.articles];
-                                      const index = articles.findIndex(
-                                        (c) =>
-                                          c.articleId.toString() ===
-                                          article.articleId.toString(),
-                                      );
-                                      if (e.target.value >= 1) {
-                                        articles[index].quantite =
-                                          e.target.value;
-                                        this.setState({
-                                          data: { ...data, articles },
-                                        });
-                                      } else {
-                                        articles[index].quantite = 1;
-                                        this.setState({
-                                          data: {
-                                            ...data,
-                                            articles,
-                                          },
-                                        });
-                                      }
-                                    }}
-                                  />
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </>
-                  ) : (
-                    <div className="ml-4">
-                      <p className=" text-sm font-bold text-slate-900">
-                        Aucun article séléctionné
-                      </p>
-                    </div>
-                  )}
-                </div>
                 <div className="ml-2 mt-2 flex w-full items-center ">
                   <label className="mr-2 text-xl font-bold text-[#474a52]">
                     Ajouter des articles à utiliser

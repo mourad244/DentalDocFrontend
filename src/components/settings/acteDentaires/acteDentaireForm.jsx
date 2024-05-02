@@ -217,13 +217,9 @@ class ActeDentaireForm extends Form {
     const index = newArticles.findIndex(
       (c) => c.articleId === article.articleId,
     );
-    if (e >= 1) {
-      newArticles[index][field] = e;
-      this.setState({ data: { ...this.state.data, articles: newArticles } });
-    } else {
-      newArticles[index][field] = 1;
-      this.setState({ data: { ...this.state.data, articles: newArticles } });
-    }
+
+    newArticles[index][field] = e;
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
   };
 
   doSubmit = async () => {
