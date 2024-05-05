@@ -33,7 +33,13 @@ export function getArticles({
 export function getArticle(articleId) {
   return http.get(articleUrl(articleId));
 }
-
+// getLowStockItems
+export function getLowStockItems() {
+  return http.get(`${apiEndpoint}/lowstock`);
+}
+export function getCountLowStockItems() {
+  return http.get(`${apiEndpoint}/lowstock/count`);
+}
 export async function saveArticle(article) {
   if (article._id) {
     if (getArticle(article._id)) {
