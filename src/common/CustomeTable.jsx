@@ -40,7 +40,9 @@ const CustomeTable = ({
         >
           <input
             type="checkbox"
-            checked={totalItems === selectedItems.length}
+            checked={
+              selectedItems && totalItems && totalItems === selectedItems.length
+            }
             onChange={onItemsSelect}
           />
         </th>

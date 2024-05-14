@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.15e25442.css",
-    "main.js": "/static/js/main.103fa264.js",
+    "main.css": "/static/css/main.13aef53e.css",
+    "main.js": "/static/js/main.66484b17.js",
     "static/media/icon-dental.png": "/static/media/icon-dental.bc4ba4dce2d20450ea73.png",
     "static/media/roboto-latin-900italic.woff": "/static/media/roboto-latin-900italic.c20d916c1a1b094c1cec.woff",
     "static/media/roboto-latin-300italic.woff": "/static/media/roboto-latin-300italic.bd5b7a13f2c52b531a2a.woff",
@@ -27,10 +27,16 @@
     "static/media/roboto-latin-300.woff2": "/static/media/roboto-latin-300.37a7069dc30fc663c878.woff2",
     "static/media/roboto-latin-400.woff2": "/static/media/roboto-latin-400.176f8f5bd5f02b3abfcf.woff2",
     "static/media/roboto-latin-900.woff2": "/static/media/roboto-latin-900.870c8c1486f76054301a.woff2",
+    "static/media/commande-active.svg": "/static/media/commande-active.4a38850c527271eab5ddb66f70473b21.svg",
+    "static/media/commande.svg": "/static/media/commande.9c8107752daac2a73a68313c64af0690.svg",
     "static/media/paiement-active.svg": "/static/media/paiement-active.b9e74eab3ea1272a6605d55d417f52cb.svg",
     "static/media/paiement.svg": "/static/media/paiement.b1817bc1f93252401648cc063fe4ceaf.svg",
     "static/media/settings-active.svg": "/static/media/settings-active.2ac73d36b3ca32832496114798c708f3.svg",
     "static/media/settings.svg": "/static/media/settings.569ee4ee399861f2fb49b6bb8bc8426d.svg",
+    "static/media/article-active.svg": "/static/media/article-active.9e9a579b5f773ee48f7fa3bfdb84e721.svg",
+    "static/media/article.svg": "/static/media/article.17dc5c2913bfd1fe39a599be3bd48e3d.svg",
+    "static/media/livraison-active.svg": "/static/media/livraison-active.31985d796d9c3061b613fb59e8eeeca9.svg",
+    "static/media/livraison.svg": "/static/media/livraison.719b699b76f5f4874c3d03d60bfc527e.svg",
     "static/media/patient-active.svg": "/static/media/patient-active.8c5c64841ae460d2b1566965d0b466a1.svg",
     "static/media/patient.svg": "/static/media/patient.5212a953924e65776baea237b94d1156.svg",
     "static/media/accueil-active.svg": "/static/media/accueil-active.a1db53d8df3369e8b370a5d19e9e7ff0.svg",
@@ -42,11 +48,11 @@
     "index.html": "/index.html",
     "static/media/precedent-btn.svg": "/static/media/precedent-btn.0af0347189689b646dac7e52f0e33343.svg",
     "static/media/suivant-btn.svg": "/static/media/suivant-btn.0f1c22a734a32e254adc1ae30ddfab9a.svg",
-    "main.15e25442.css.map": "/static/css/main.15e25442.css.map",
-    "main.103fa264.js.map": "/static/js/main.103fa264.js.map"
+    "main.13aef53e.css.map": "/static/css/main.13aef53e.css.map",
+    "main.66484b17.js.map": "/static/js/main.66484b17.js.map"
   },
   "entrypoints": [
-    "static/css/main.15e25442.css",
-    "static/js/main.103fa264.js"
+    "static/css/main.13aef53e.css",
+    "static/js/main.66484b17.js"
   ]
 }
