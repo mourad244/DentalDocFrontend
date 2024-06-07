@@ -40,7 +40,14 @@ class Form extends Component {
 
     return errors;
   };
+  validateProperty = ({ name, value }) => {
+    const obj = { [name]: value };
+    const schema = { [name]: this.schema[name] };
+    const { error } = Joi.validate(obj, schema);
 
+    return error ? error.details[0].message : null;
+  };
+  // ------------input handling-------------------
   handleChangeList = ({ currentTarget: input }, index) => {
     const errors = { ...this.state.errors };
     const errorMessage = this.validateProperty(input);
@@ -57,7 +64,6 @@ class Form extends Component {
     data[name] = value;
     this.setState({ data });
   };
-
   handleChange = ({ currentTarget: input }) => {
     const errorMessage = this.validateProperty(input);
     const errors = { ...this.state.errors };
@@ -70,12 +76,45 @@ class Form extends Component {
     data[input.name] = input.value;
     this.setState({ data, errors });
   };
-
-  handleDeleteItem = (e, array, i) => {
-    e.preventDefault();
-
+  handleChangeObjectDateDebutFin = (
+    { currentTarget: input },
+    name,
+    isDateDebut,
+    index,
+  ) => {
     const data = { ...this.state.data };
-    data[array].splice(i, 1);
+    isDateDebut
+      ? (data[name][index].dateDebut = input.value)
+      : (data[name][index].dateFin = input.value);
+    if (data[name][index]) {
+      let isDateCorrect = true;
+      data[name].map((item, index1) => {
+        if (index1 !== index) {
+          if (
+            item.dateFin &&
+            data[name][index].dateDebut &&
+            new Date(item.dateFin) >= new Date(data[name][index].dateDebut)
+          ) {
+            isDateCorrect = false;
+            return true;
+          }
+        }
+        return false;
+      });
+      if (!isDateCorrect) {
+        data[name][index].dateDebut = "";
+        data[name][index].dateFin = "";
+      }
+    }
+    // 2. si la date de fin est inférieur à la date de début alors set dateFin to "";
+    if (
+      data[name][index].dateDebut &&
+      data[name][index].dateFin &&
+      new Date(data[name][index].dateDebut) >
+        new Date(data[name][index].dateFin)
+    )
+      data[name][index].dateFin = "";
+
     this.setState({ data });
   };
   handleCheckboxChange = (name, value, isChecked) => {
@@ -89,6 +128,81 @@ class Form extends Component {
     }
     this.setState({ data });
   };
+  handleChangeObjectList = ({ currentTarget: input }, name) => {
+    // const errorMessage = this.validateProperty(input);
+    // const errors = { ...this.state.errors };
+
+    // if (errorMessage) errors[input.name] = errorMessage;
+    // else delete errors[input.name];
+
+    const data = { ...this.state[name] };
+    data[input.name] = input.value;
+    this.setState({ [name]: data /*  errors */ });
+  };
+  handleChangeObject = ({ currentTarget: input }, name) => {
+    // const errorMessage = this.validateProperty(input);
+    // const errors = { ...this.state.errors };
+
+    // if (errorMessage) errors[input.name] = errorMessage;
+    // else delete errors[input.name];
+
+    const data = { ...this.state.data };
+
+    data[name][input.name] = input.value;
+    this.setState({ data /* , errors  */ });
+  };
+  handleChangeObjectSelect = ({ currentTarget: input }, name, element) => {
+    const data = { ...this.state.data };
+    data[name][element] = input.value;
+    this.setState({ data /* , errors  */ });
+  };
+  // ----------
+  updateInputItem = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+  addItem = (e, inputItem) => {
+    e.preventDefault();
+    const errors = { ...this.state.errors };
+
+    // if (typeof inputItem !== "object") {
+    //   const errorMessage = this.validateProperty(e.currentTarget);
+
+    //   if (errorMessage) errors[e.currentTarget.name] = errorMessage;
+    //   else delete errors[e.currentTarget.name];
+    // }
+
+    const data = { ...this.state.data };
+    /* data[e.currentTarget.name]
+      ? data[e.currentTarget.name].push(inputItem)
+      :  */ data[e.currentTarget.name + "s"].push(inputItem);
+    this.setState({ data, errors });
+    switch (typeof inputItem) {
+      case "string":
+        this.setState({ [e.target.name]: "" });
+        break;
+      case "object":
+        let emptyObject = {};
+        for (const key in inputItem) {
+          emptyObject[key] = "";
+          // inputItem[key] = "";
+        }
+
+        this.setState({ [e.target.name]: emptyObject });
+        break;
+
+      default:
+        break;
+    }
+  };
+  handleDeleteItem = (e, array, i) => {
+    e.preventDefault();
+
+    const data = { ...this.state.data };
+    data[array].splice(i, 1);
+    this.setState({ data });
+  };
+
+  //------------ file handling------------
   filePathset = (e, destination) => {
     // e.stopPropagation();
     e.preventDefault();
@@ -121,72 +235,6 @@ class Form extends Component {
     };
     reader.readAsBinaryString(file);
   };
-
-  convertToJson = (csv) => {
-    var liste = csv.split("\n");
-    var headers = liste[0].split(",");
-    // console.log(headers);
-
-    // var obj = {};
-    let result = [];
-
-    // for (var i = 1; i < liste.length; i++) {
-    liste.map((item, index1) => {
-      if (index1 !== 0 && item !== "") {
-        // var currentline = liste[i].split(",");
-        const arrayItem = item.split(",");
-        // for (var j = 0; j < headers.length; j++) {
-        const obj = {};
-        headers.map((title, index2) => {
-          // console.log(title);
-          // console.log(arrayItem, index2);
-
-          //   obj[headers[j]] = currentline[j];
-          obj[title] = arrayItem[index2];
-          return true;
-          // }
-        });
-        result.push(obj);
-      }
-      return true;
-    });
-
-    return result; //JavaScript object
-    // return JSON.stringify(result); //JSON
-  };
-  exportCsv = (csvData, fileName) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-    const exportToCsv = (e, csvData, fileName) => {
-      e.preventDefault();
-      csvData.map((e) => delete e["_id"]);
-      const ws = XLSX.utils.json_to_sheet(csvData);
-      const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const data = new Blob([excelBuffer], { type: fileType });
-      FileSaver.saveAs(data, fileName + fileExtension);
-    };
-    return (
-      <button onClick={(e) => exportToCsv(e, csvData, fileName)}>
-        Télécharger Excel
-      </button>
-    );
-  };
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const errors = this.validate();
-
-    this.setState({ errors: errors || {} });
-    const sendFile = this.state.sendFile;
-    if (sendFile) {
-      return this.fileUploadHandler();
-    }
-    if (errors) return;
-    this.doSubmit();
-  };
-
   fileUploadHandler = async () => {
     let fd = new FormData();
     const form = this.state.form;
@@ -231,7 +279,6 @@ class Form extends Component {
       window.location.reload();
     }
   };
-
   fileSelectedHandler = (event) => {
     let fileObj = [];
     let fileArray = [];
@@ -253,7 +300,96 @@ class Form extends Component {
       this.setState({ sendFile: true });
     }
   };
+  exportCsv = (csvData, fileName) => {
+    const fileType =
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+    const fileExtension = ".xlsx";
+    const exportToCsv = (e, csvData, fileName) => {
+      e.preventDefault();
+      csvData.map((e) => delete e["_id"]);
+      const ws = XLSX.utils.json_to_sheet(csvData);
+      const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const data = new Blob([excelBuffer], { type: fileType });
+      FileSaver.saveAs(data, fileName + fileExtension);
+    };
+    return (
+      <button onClick={(e) => exportToCsv(e, csvData, fileName)}>
+        Télécharger Excel
+      </button>
+    );
+  };
+  convertToJson = (csv) => {
+    var liste = csv.split("\n");
+    var headers = liste[0].split(",");
+    // console.log(headers);
 
+    // var obj = {};
+    let result = [];
+
+    // for (var i = 1; i < liste.length; i++) {
+    liste.map((item, index1) => {
+      if (index1 !== 0 && item !== "") {
+        // var currentline = liste[i].split(",");
+        const arrayItem = item.split(",");
+        // for (var j = 0; j < headers.length; j++) {
+        const obj = {};
+        headers.map((title, index2) => {
+          // console.log(title);
+          // console.log(arrayItem, index2);
+
+          //   obj[headers[j]] = currentline[j];
+          obj[title] = arrayItem[index2];
+          return true;
+          // }
+        });
+        result.push(obj);
+      }
+      return true;
+    });
+
+    return result; //JavaScript object
+    // return JSON.stringify(result); //JSON
+  };
+  uploadExcel(name, destination, label) {
+    return (
+      <div className="form-file">
+        <div className="upload-file">
+          <label className="upload-file-label">{label}</label>
+          <input
+            type="file"
+            name={name}
+            onChange={(e) => this.filePathset(e, destination)}
+          />
+        </div>
+      </div>
+    );
+  }
+  //------------
+  handleDeleteImage = (name, e, index) => {
+    e.preventDefault();
+    const { data } = this.state;
+    // console.log(data);
+    // add index to deletedImages if not existed
+    data[`${name}DeletedIndex`].indexOf(index) === -1 &&
+      data[`${name}DeletedIndex`].push(index);
+    // delete image from array
+    this.setState({ data });
+  };
+  // ----------------------------------------------
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const errors = this.validate();
+
+    this.setState({ errors: errors || {} });
+    const sendFile = this.state.sendFile;
+    if (sendFile) {
+      return this.fileUploadHandler();
+    }
+    if (errors) return;
+    this.doSubmit();
+  };
   renderUpload(
     name,
     label,
@@ -277,16 +413,6 @@ class Form extends Component {
       />
     );
   }
-  handleDeleteImage = (name, e, index) => {
-    e.preventDefault();
-    const { data } = this.state;
-    // console.log(data);
-    // add index to deletedImages if not existed
-    data[`${name}DeletedIndex`].indexOf(index) === -1 &&
-      data[`${name}DeletedIndex`].push(index);
-    // delete image from array
-    this.setState({ data });
-  };
   renderImage(name, label, width = 170, height = 200, widthLabel = 96) {
     const { data /* errors */ } = this.state;
     return (
@@ -301,7 +427,6 @@ class Form extends Component {
       />
     );
   }
-
   renderButton(label) {
     return (
       <div className="mr-6 mt-3 flex w-full justify-end">
@@ -314,21 +439,6 @@ class Form extends Component {
         >
           {label}
         </button>
-      </div>
-    );
-  }
-
-  uploadExcel(name, destination, label) {
-    return (
-      <div className="form-file">
-        <div className="upload-file">
-          <label className="upload-file-label">{label}</label>
-          <input
-            type="file"
-            name={name}
-            onChange={(e) => this.filePathset(e, destination)}
-          />
-        </div>
       </div>
     );
   }
@@ -370,7 +480,6 @@ class Form extends Component {
       />
     );
   }
-
   renderBoolean(
     name,
     label,
@@ -396,7 +505,6 @@ class Form extends Component {
       />
     );
   }
-
   renderInput(
     name,
     label,
@@ -420,7 +528,6 @@ class Form extends Component {
       />
     );
   }
-
   renderDate(name, label, width = 170, height = 35, widthLabel = 96) {
     const { data, errors } = this.state;
 
@@ -462,53 +569,6 @@ class Form extends Component {
       </div>
     );
   }
-
-  addItem = (e, inputItem) => {
-    e.preventDefault();
-    const errors = { ...this.state.errors };
-
-    // if (typeof inputItem !== "object") {
-    //   const errorMessage = this.validateProperty(e.currentTarget);
-
-    //   if (errorMessage) errors[e.currentTarget.name] = errorMessage;
-    //   else delete errors[e.currentTarget.name];
-    // }
-
-    const data = { ...this.state.data };
-    /* data[e.currentTarget.name]
-      ? data[e.currentTarget.name].push(inputItem)
-      :  */ data[e.currentTarget.name + "s"].push(inputItem);
-    this.setState({ data, errors });
-    switch (typeof inputItem) {
-      case "string":
-        this.setState({ [e.target.name]: "" });
-        break;
-      case "object":
-        let emptyObject = {};
-        for (const key in inputItem) {
-          emptyObject[key] = "";
-          // inputItem[key] = "";
-        }
-
-        this.setState({ [e.target.name]: emptyObject });
-        break;
-
-      default:
-        break;
-    }
-  };
-  validateProperty = ({ name, value }) => {
-    const obj = { [name]: value };
-    const schema = { [name]: this.schema[name] };
-    const { error } = Joi.validate(obj, schema);
-
-    return error ? error.details[0].message : null;
-  };
-
-  updateInputItem = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
-
   renderInputList(
     name,
     label,
@@ -545,7 +605,6 @@ class Form extends Component {
       </div>
     );
   }
-
   renderList(name, label, width = 170, height = 35, widthLabel = 96) {
     const { data /* , errors  */ /* , inputItem  */ } = this.state;
     return (
@@ -578,7 +637,6 @@ class Form extends Component {
       </div>
     );
   }
-
   renderObjectInputList(name, label, width = 30, type = "text") {
     const { [name]: inputItem } = this.state;
     let array = [];
@@ -612,38 +670,6 @@ class Form extends Component {
       </div>
     );
   }
-
-  handleChangeObjectList = ({ currentTarget: input }, name) => {
-    // const errorMessage = this.validateProperty(input);
-    // const errors = { ...this.state.errors };
-
-    // if (errorMessage) errors[input.name] = errorMessage;
-    // else delete errors[input.name];
-
-    const data = { ...this.state[name] };
-    data[input.name] = input.value;
-    this.setState({ [name]: data /*  errors */ });
-  };
-
-  handleChangeObject = ({ currentTarget: input }, name) => {
-    // const errorMessage = this.validateProperty(input);
-    // const errors = { ...this.state.errors };
-
-    // if (errorMessage) errors[input.name] = errorMessage;
-    // else delete errors[input.name];
-
-    const data = { ...this.state.data };
-
-    data[name][input.name] = input.value;
-    this.setState({ data /* , errors  */ });
-  };
-
-  handleChangeObjectSelect = ({ currentTarget: input }, name, element) => {
-    const data = { ...this.state.data };
-    data[name][element] = input.value;
-    this.setState({ data /* , errors  */ });
-  };
-
   renderObject(
     name,
     label,
@@ -765,47 +791,6 @@ class Form extends Component {
       </div>
     );
   }
-  handleChangeObjectDateDebutFin = (
-    { currentTarget: input },
-    name,
-    isDateDebut,
-    index,
-  ) => {
-    const data = { ...this.state.data };
-    isDateDebut
-      ? (data[name][index].dateDebut = input.value)
-      : (data[name][index].dateFin = input.value);
-    if (data[name][index]) {
-      let isDateCorrect = true;
-      data[name].map((item, index1) => {
-        if (index1 !== index) {
-          if (
-            item.dateFin &&
-            data[name][index].dateDebut &&
-            new Date(item.dateFin) >= new Date(data[name][index].dateDebut)
-          ) {
-            isDateCorrect = false;
-            return true;
-          }
-        }
-        return false;
-      });
-      if (!isDateCorrect) {
-        data[name][index].dateDebut = "";
-        data[name][index].dateFin = "";
-      }
-    }
-    // 2. si la date de fin est inférieur à la date de début alors set dateFin to "";
-    if (
-      data[name][index].dateDebut &&
-      data[name][index].dateFin &&
-      new Date(data[name][index].dateDebut) >
-        new Date(data[name][index].dateFin)
-    )
-      data[name][index].dateFin = "";
-
-    this.setState({ data });
-  };
   renderObjectInputDateDebutFinTable(
     name,
     labelTable = "",
@@ -1041,7 +1026,6 @@ class Form extends Component {
       </div>
     );
   }
-
   renderObjectInputDateDebutFin(
     objectName,
     label,

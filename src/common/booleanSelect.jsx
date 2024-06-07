@@ -14,9 +14,10 @@ const BooleanSelect = ({
   error,
   ...rest
 }) => {
-  const handleChangeBoolean = (x) => {
-    changeBoolean(x);
+  const handleChangeBoolean = (n, newValue) => {
+    changeBoolean(n, newValue);
   };
+
   if (value === "" || value === undefined || value === null)
     return (
       <div className="flex w-max flex-wrap">

@@ -17,7 +17,7 @@ import Accueil from "./components/accueil/accueil";
 import Patients from "./components/patients/patients";
 import Settings from "./components/settings/settings";
 import Paiements from "./components/paiements/paiements";
-import PatientForm from "./components/patients/patientForm";
+import PatientForm2 from "./components/patients/patientForm2";
 import PaiementForm from "./components/paiements/paiementForm";
 import Articles from "./components/pharmacie/articles/articles";
 import ArticleForm from "./components/pharmacie/articles/articleForm";
@@ -267,7 +267,7 @@ function App() {
               )}
               {/* patients */}
               {user.role === "admin" || user.role === "assistante" ? (
-                <Route path="/patients/:id" exact component={PatientForm} />
+                <Route path="/patients/:id" exact component={PatientForm2} />
               ) : (
                 ""
               )}
