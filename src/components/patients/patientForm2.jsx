@@ -19,7 +19,6 @@ function PatientForm2({ match }) {
   const [provinces, setProvinces] = useState([]);
   const [filteredProvinces, setFilteredProvinces] = useState([]);
 
-  const [image, setImage] = useState([]);
   const history = useHistory();
   const params = useParams();
 
@@ -71,6 +70,7 @@ function PatientForm2({ match }) {
     filePreviews,
     handleChange,
     loading,
+    fileData,
     changeBoolean,
     cleanupFileUrls,
     handleSubmit,
@@ -95,7 +95,8 @@ function PatientForm2({ match }) {
   useEffect(() => {
     return () => cleanupFileUrls(); // Cleanup on unmount
   }, [cleanupFileUrls]);
-
+  console.log("filePreviews", filePreviews);
+  console.log("fileData", fileData);
   useEffect(() => {
     const getDatas = async () => {
       const { data: regions } = await getRegions();

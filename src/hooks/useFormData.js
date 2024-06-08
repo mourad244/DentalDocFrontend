@@ -7,7 +7,6 @@ function useFormData(initialValues, schema, onSubmit) {
   const [fileData, setFileData] = useState({}); // To store actual file objects for submission
   const [filePreviews, setFilePreviews] = useState({}); // To store URLs for previewing files
   const [loading, setLoading] = useState(false);
-
   const updateData = (newData) => {
     setData((prevData) => ({ ...prevData, ...newData }));
   };
@@ -26,20 +25,39 @@ function useFormData(initialValues, schema, onSubmit) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    setErrors(validationErrors || {});
+    const formData = new FormData();
 
-    if (validationErrors) return;
+    // Append text and other non-file data fields
+    Object.keys(data).forEach((key) => {
+      if (data[key] && !(data[key] instanceof FileList)) {
+        // Ensure we are not trying to append FileList directly
+        formData.append(key, data[key]);
+        console.log("Appending key:", key, "Value:", data[key]); // Debug log
+      }
+    });
+
+    // Append file data
+    Object.keys(fileData).forEach((key) => {
+      Array.from(fileData[key]).forEach((file) => {
+        formData.append(key, file, file.name);
+        console.log("Appending file under key:", key, "File name:", file.name); // Debug log
+      });
+    });
+
+    // Log FormData to verify contents before sending
+    for (let [key, value] of formData.entries()) {
+      console.log(`FormData content - ${key}:`, value);
+    }
 
     setLoading(true);
     try {
-      await onSubmit(data);
+      await onSubmit(formData); // Make sure onSubmit is prepared to handle FormData
     } catch (error) {
       console.error("Error submitting form:", error);
-      // Handle additional error logic here if needed
     }
     setLoading(false);
   };
+
   const validateProperty = (name, value) => {
     const obj = { [name]: value };
     const fieldSchema = Joi.object({
@@ -48,6 +66,7 @@ function useFormData(initialValues, schema, onSubmit) {
     const result = fieldSchema.validate(obj);
     return result.error ? result.error.details[0].message : null;
   };
+
   const handleChange = (event) => {
     const { name, value, type, checked, files } = event.target;
     const actualValue =

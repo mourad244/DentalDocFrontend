@@ -242,18 +242,7 @@ class Form extends Component {
     delete data._id;
     delete data.images;
     fd = jsonToFormData(data);
-    // for (const item in data) {
-    //   if (Array.isArray(data[item])) {
-    //     data[item].map((i, index) => fd.append(item + `[${index}]`, i));
-    //   } else if (typeof data[item] === "object") {
-    //     for (let key in data[item]) {
-    //       console.log(data[item], data[item][key]);
-    //       fd.append(key, data[item][key]);
-    //     }
-    //   } else {
-    //     fd.append(item, data[item]);
-    //   }
-    // }
+
     for (const item in this.state) {
       if (item.includes("selected")) {
         let filename = item.replace("selected", "");
