@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 const DateInput = ({
   name,
@@ -27,7 +28,7 @@ const DateInput = ({
           id={name}
           type="date"
           placeholder="YYYY-MM-DD"
-          value={value || ""}
+          value={value ? moment(value).format("YYYY-MM-DD") : ""}
           onChange={onChange}
         />
       </div>

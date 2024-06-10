@@ -1,129 +1,183 @@
-import React from "react";
-import Joi from "joi-browser";
-import Form from "../../common/form";
+import React, { useState, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
 import { getRegions } from "../../services/regionService";
+import { savePatient, getPatient } from "../../services/patientService";
 import { getProvinces } from "../../services/provinceService";
-import { getPatient, savePatient } from "../../services/patientService";
-// import FichePatient from "../../documents/fichePatient";
 
+import Input from "../../common/input";
+import Select from "../../common/select";
+import DateInput from "../../common/dateInput";
+import useFormData from "../../hooks/useFormData";
+import UploadImage from "../../common/uploadImage";
+import DisplayImage from "../../common/displayImage";
+import BooleanSelect from "../../common/booleanSelect";
+
+import Joi from "joi-browser";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 
-class PatientForm extends Form {
-  state = {
-    data: {
-      cin: "",
-      historiqueMedecins: [],
-      nom: "",
-      prenom: "",
-      isMasculin: "",
-      profession: "",
-      dateNaissance: "",
-      telephone: "",
-      ville: "",
-      images: [],
-      imagesDeletedIndex: [],
-    },
-    regions: [],
-    filteredProvinces: [],
-    provinces: [],
-    errors: {},
-    form: "patients",
-    loading: false,
-  };
-  schema = {
-    _id: Joi.string(),
+function PatientForm({
+  match,
+  isRdvForm,
+  selectedPatient,
+  onPatientChange,
+  dataIsValid,
+}) {
+  const [regions, setRegions] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [filteredProvinces, setFilteredProvinces] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const history = useHistory();
+  const params = useParams();
+  const form = "patients";
+
+  const schema = {
     cin: Joi.string().allow("").allow(null).label("CIN"),
     nom: Joi.string().required().label("Nom"),
     prenom: Joi.string().required().label("Prenom"),
-    isMasculin: Joi.boolean()
-      .required() /* .allow(null) */
-      .label("Genre"),
-    dateNaissance: Joi.date().allow("").allow(null).label("Date Naissance"),
     telephone: Joi.string()
       .required() /* .allow("") */
       .label("telephone"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
+    profession: Joi.string().allow("").label("profession"),
+    isMasculin: Joi.boolean()
+      .required() /* .allow(null) */
+      .label("Genre"),
+    dateNaissance: Joi.date()
+      .iso()
+      .allow("")
+      .allow(null)
+      .label("Date Naissance"),
+
+    _id: Joi.string(),
     provinceId: Joi.string().allow("").allow(null).label("Province"),
     regionId: Joi.string().allow("").allow(null).label("Region"),
     // dateDerniereVisite: Joi.date().allow("").label("Date dernière visite"),
     historiqueMedecins: Joi.array().allow([]).label("Medecins"),
     images: Joi.label("Images").optional(),
+    image: Joi.label("Image").optional(),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
-    profession: Joi.string().allow("").label("profession"),
   };
-
-  async populateDatas() {
-    const { data: provinces } = await getProvinces();
-    const { data: regions } = await getRegions();
-    this.setState({ provinces, regions });
-  }
-  async populatePatients() {
-    try {
-      const patientId =
-        this.props.match &&
-        this.props.match.params &&
-        this.props.match.params.id;
-      const selectedPatient = this.props.selectedPatient;
-      if (selectedPatient) {
-        return this.setState({ data: this.mapToViewModel(selectedPatient) });
+  const {
+    data,
+    updateData,
+    errors,
+    filePreviews,
+    handleChange,
+    validate,
+    isFileToSend,
+    changeBoolean,
+    cleanupFileUrls,
+    handleUpload,
+    handleSubmit,
+    saveFile,
+    handleDeleteImage,
+  } = useFormData(
+    {
+      _id: undefined,
+      cin: "",
+      nom: "",
+      prenom: "",
+      telephone: "",
+      ville: "",
+      profession: "",
+      isMasculin: "",
+      dateNaissance: "",
+      regionId: "",
+      provinceId: "",
+      images: [],
+    },
+    schema,
+    async (formData) => {
+      try {
+        if (isFileToSend) {
+          await saveFile(params.id, form);
+        } else await savePatient(formData);
+        if (match && match.params.id) {
+          history.push("/patients");
+        } else {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
       }
-      if (patientId === "new" || patientId === undefined) return;
-      const { data: patient } = await getPatient(patientId);
+    },
+  );
+  useEffect(() => {
+    return () => cleanupFileUrls(); // Cleanup on unmount
+  }, [cleanupFileUrls]);
 
-      this.setState({ data: this.mapToViewModel(patient) });
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        this.props.history.replace(":not-found");
-    }
-  }
+  useEffect(() => {
+    // let isActive = true;
+    const getDatas = async () => {
+      setLoadingData(true);
+      const { data: regions } = await getRegions();
+      const { data: provinces } = await getProvinces();
+      setRegions(regions);
+      setProvinces(provinces);
+      setLoadingData(false);
+    };
+    getDatas();
+    // return () => {
+    //   isActive = false; // Set flag to false to ignore any pending updates when the component unmounts
+    // };
+  }, []);
 
-  async componentDidMount() {
-    this.setState({ loading: true });
-    await this.populateDatas();
-    await this.populatePatients();
-    this.setState({ loading: false });
-    this.props &&
-      this.props.dataIsValid &&
-      this.props.dataIsValid(this.validate() ? false : true);
-  }
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevProps.formDisplay !== this.props.formDisplay) {
-      this.setState({ formDisplay: this.props.formDisplay });
+  useEffect(() => {
+    if (data.regionId) {
+      const newFilteredProvinces = provinces.filter(
+        (province) => province.regionId._id === data.regionId,
+      );
+      setFilteredProvinces(newFilteredProvinces);
+    } else {
+      setFilteredProvinces([]);
     }
-    if (prevState.data.regionId !== this.state.data.regionId) {
-      this.setState({
-        filteredProvinces: this.state.provinces.filter(
-          (province) => province.regionId._id === this.state.data.regionId,
-        ),
-      });
+  }, [data.regionId, provinces]);
+
+  useEffect(() => {
+    if (onPatientChange) {
+      onPatientChange(data);
+      dataIsValid(validate() ? false : true);
     }
-    // when updating the patient
+  }, [data]);
+
+  useEffect(() => {
+    async function populatePatients() {
+      try {
+        setLoadingData(true);
+        let patientId = undefined;
+        // check the url if has a string "patients"
+        if (history.location.pathname.includes("patients")) {
+          patientId = params.id;
+          if (patientId !== "new" && patientId !== undefined) {
+            const { data: patient } = await getPatient(patientId);
+            updateData(mapToViewModel(patient));
+          }
+        }
+
+        setLoadingData(false);
+      } catch (ex) {
+        if (ex.response && ex.response.status === 404) {
+          history.replace("/not-found");
+        }
+      }
+    }
+
+    populatePatients();
+  }, [params.id, history]);
+
+  useEffect(() => {
     if (
-      prevState.data !== this.state.data &&
-      this.props.onPatientChange
-      /*
-      &&
-      this.state.data._id 
-       &&
-      prevState.data._id */
+      selectedPatient &&
+      selectedPatient._id &&
+      selectedPatient._id !== data._id
     ) {
-      const { data } = this.state;
-      this.props.onPatientChange(data);
-      this.props.dataIsValid(this.validate() ? false : true);
+      updateData(mapToViewModel(selectedPatient));
     }
-    // if selectedPatient is updated
-    if (
-      prevProps.selectedPatient &&
-      this.props.selectedPatient &&
-      prevProps.selectedPatient._id !== this.props.selectedPatient._id
-    ) {
-      this.setState({ data: this.mapToViewModel(this.props.selectedPatient) });
-    }
-  }
+  }, [selectedPatient]);
 
-  mapToViewModel(patient) {
+  function mapToViewModel(patient) {
     return {
       _id: patient._id,
       cin: patient.cin,
@@ -135,115 +189,222 @@ class PatientForm extends Form {
       dateNaissance: patient.dateNaissance,
       telephone: patient.telephone,
       ville: patient.ville,
-      provinceId: patient.provinceId ? patient.provinceId : "",
-      regionId: patient.regionId ? patient.regionId : "",
-      images: patient.images ? patient.images : [],
+      provinceId: patient.provinceId || "",
+      regionId: patient.regionId || "",
+      images: patient.images || [],
       imagesDeletedIndex: [],
-      // dateDerniereVisite: patient.dateDerniereVisite,
     };
   }
 
-  doSubmit = async () => {
-    let result = { ...this.state.data };
-    this.setState({ loading: true });
-    await savePatient(result);
-    this.setState({ loading: false });
-    if (this.props.match) this.props.history.push("/patients");
-    else window.location.reload();
-  };
-
-  render() {
-    const { regions, filteredProvinces, loading, data } = this.state;
-    const { isRdvForm } = this.props;
-    return loading ? (
-      <div className="m-auto my-4">
-        <ClipLoader loading={loading} size={70} />
-      </div>
-    ) : (
-      <div
-        className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
-          !isRdvForm && "border border-white bg-white"
-        }`}
-      >
-        {(!this.props ||
-          (this.props && !this.props.selectedPatient) ||
-          (this.props.selectedPatient && !this.props.selectedPatient._id)) && (
-          <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-            Formulaire du patient
-          </p>
-        )}
-        {!isRdvForm && (
-          <div className="ml-2  flex justify-start">
-            <button
-              className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
-              onClick={() => {
-                this.props.history.push("/patients");
-              }}
-            >
-              <IoChevronBackCircleSharp className="mr-1 " />
-              Retour à la Liste
-            </button>
-          </div>
-        )}
-        <form
-          className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
-          onSubmit={this.handleSubmit}
-        >
-          <div className="mt-3">{this.renderInput("cin", "CIN")}</div>
-          <div className="mt-3">{this.renderInput("nom", "Nom")}</div>
-          <div className="mt-3">{this.renderInput("prenom", "Prenom")}</div>
-          <div className="mt-3">
-            {this.renderBoolean("isMasculin", "Genre", "Masculin", "Féminin")}
-          </div>
-          {!isRdvForm && (
-            <div className="mt-3">
-              {this.renderDate("dateNaissance", "Date naissance")}
-            </div>
-          )}
-          <div className="mt-3">
-            {this.renderInput("telephone", "Telephone")}
-          </div>
-          {!isRdvForm && (
-            <div className="mt-3">{this.renderInput("ville", "Ville")}</div>
-          )}
-          {!isRdvForm && (
-            <div className="mt-3">
-              {this.renderInput("profession", "Profession")}
-            </div>
-          )}
-          <div className="mt-3">
-            {this.renderSelect("regionId", "Region", regions)}
-          </div>
-          <div className="mt-3">
-            {this.renderSelect("provinceId", "Province", filteredProvinces)}
-          </div>
-          {/* {this.renderInput("commentaire", "Commentaire", 360, 70)} */}
-          {!isRdvForm && (
-            <div className="mt-3 w-full  ">
-              {this.renderUpload("image", "Photo")}
-            </div>
-          )}
-          {!isRdvForm && (
-            <div className="  mt-3 flex w-full flex-wrap">
-              {data.images.length !== 0 &&
-                this.renderImage("images", "Images", 200)}
-            </div>
-          )}
-          {!isRdvForm && this.renderButton("Sauvegarder")}
-        </form>
-        {/* {patientId ? (
-          <FichePatient
-            data={{
-              ...this.state.data,
+  return loadingData ? (
+    <div className="m-auto my-4">
+      <ClipLoader loading={loadingData} size={70} />
+    </div>
+  ) : (
+    <div
+      className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
+        !isRdvForm && "border border-white bg-white"
+      }`}
+    >
+      {(selectedPatient || (selectedPatient && selectedPatient._id)) && (
+        <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+          Formulaire du patient
+        </p>
+      )}
+      {!isRdvForm && (
+        <div className="ml-2  flex justify-start">
+          <button
+            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+            onClick={() => {
+              history.push("/patients");
             }}
-            document={<FichePatient />}
+          >
+            <IoChevronBackCircleSharp className="mr-1 " />
+            Retour à la Liste
+          </button>
+        </div>
+      )}
+      <form
+        className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
+        onSubmit={handleSubmit}
+      >
+        <div className="mt-3">
+          <Input
+            name="cin"
+            label="CIN"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.cin || ""}
+            onChange={handleChange}
+            error={errors.cin}
           />
-        ) : (
-          ""
-        )} */}
-      </div>
-    );
-  }
+        </div>
+        <div className="mt-3">
+          <Input
+            name="nom"
+            label="Nom"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.nom || ""}
+            onChange={handleChange}
+            error={errors.nom}
+          />
+        </div>
+        <div className="mt-3">
+          <Input
+            name="prenom"
+            label="Prénom"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.prenom || ""}
+            onChange={handleChange}
+            error={errors.prenom}
+          />
+        </div>
+        <div className="mt-3">
+          <BooleanSelect
+            name="isMasculin"
+            value={data.isMasculin}
+            label="Genre"
+            label1="Masculin"
+            label2="Féminin"
+            changeBoolean={(value) => {
+              return changeBoolean("isMasculin", value);
+            }}
+            width={85}
+            height={35}
+            widthLabel={96}
+          />
+        </div>
+        {!isRdvForm && (
+          <div className="mt-3">
+            <DateInput
+              name="dateNaissance"
+              label="Date naissance"
+              value={data.dateNaissance}
+              onChange={handleChange}
+              error={errors.dateNaissance}
+            />
+          </div>
+        )}
+        <div className="mt-3">
+          <Input
+            name="telephone"
+            label="Téléphone"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.telephone || ""}
+            onChange={handleChange}
+            error={errors.telephone}
+          />
+        </div>
+        {!isRdvForm && (
+          <>
+            <div className="mt-3">
+              <Input
+                name="ville"
+                label="Ville"
+                width={170}
+                height={35}
+                widthLabel={96}
+                type="text"
+                value={data.ville || ""}
+                onChange={handleChange}
+                error={errors.ville}
+              />
+            </div>
+            <div className="mt-3">
+              <Input
+                name="profession"
+                label="Profession"
+                width={170}
+                height={35}
+                widthLabel={96}
+                type="text"
+                value={data.profession || ""}
+                onChange={handleChange}
+                error={errors.profession}
+              />
+            </div>
+          </>
+        )}
+        <div className="mt-3">
+          <Select
+            name="regionId"
+            label="Region"
+            options={regions}
+            widthLabel={96}
+            width={170}
+            height={35}
+            value={data.regionId}
+            onChange={handleChange}
+            error={errors.regionId}
+          />
+        </div>
+        <div className="mt-3">
+          <Select
+            name="provinceId"
+            label="Province"
+            options={filteredProvinces}
+            widthLabel={96}
+            width={170}
+            height={35}
+            value={data.provinceId}
+            onChange={handleChange}
+            error={errors.provinceId}
+          />
+        </div>
+        {!isRdvForm && (
+          <>
+            <div className="mt-3 w-full">
+              <UploadImage
+                name="image"
+                label="Photo"
+                image={filePreviews.image}
+                width={170}
+                height={35}
+                widthLabel={96}
+                type="file"
+                onChange={handleUpload}
+              />
+            </div>
+            <div className="mt-3 w-full">
+              <DisplayImage
+                name="images"
+                widthLabel={96}
+                images={data.images}
+                label="Images"
+                width={200}
+                height={35}
+                deleteImage={handleDeleteImage}
+              />
+            </div>
+
+            <div className="mr-6 mt-3 flex w-full justify-end">
+              <button
+                type="submit"
+                className={
+                  !validate()
+                    ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
+                    : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
+                }
+              >
+                Sauvegrader
+              </button>
+            </div>
+          </>
+        )}
+      </form>
+    </div>
+  );
 }
 
 export default PatientForm;

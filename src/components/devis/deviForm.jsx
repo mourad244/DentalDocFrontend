@@ -666,10 +666,9 @@ class DeviForm extends Form {
     const index = newArticles.findIndex(
       (c) => c.articleId === article.articleId,
     );
-    
-      newArticles[index][field] = e;
-      this.setState({ data: { ...this.state.data, articles: newArticles } });
-    
+
+    newArticles[index][field] = e;
+    this.setState({ data: { ...this.state.data, articles: newArticles } });
   };
   handleSelectArticle = (article) => {
     let newArticles = [...this.state.data.articles];

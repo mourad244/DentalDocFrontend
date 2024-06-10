@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import Joi from "joi-browser";
+import axios from "axios";
+import { jsonToFormData } from "../utils/jsonToFormData";
 
 function useFormData(initialValues, schema, onSubmit) {
   const [data, setData] = useState(initialValues);
@@ -7,6 +9,7 @@ function useFormData(initialValues, schema, onSubmit) {
   const [fileData, setFileData] = useState({}); // To store actual file objects for submission
   const [filePreviews, setFilePreviews] = useState({}); // To store URLs for previewing files
   const [loading, setLoading] = useState(false);
+  const [isFileToSend, setIsFileToSend] = useState(false);
   const updateData = (newData) => {
     setData((prevData) => ({ ...prevData, ...newData }));
   };
@@ -25,33 +28,10 @@ function useFormData(initialValues, schema, onSubmit) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
-    // Append text and other non-file data fields
-    Object.keys(data).forEach((key) => {
-      if (data[key] && !(data[key] instanceof FileList)) {
-        // Ensure we are not trying to append FileList directly
-        formData.append(key, data[key]);
-        console.log("Appending key:", key, "Value:", data[key]); // Debug log
-      }
-    });
-
-    // Append file data
-    Object.keys(fileData).forEach((key) => {
-      Array.from(fileData[key]).forEach((file) => {
-        formData.append(key, file, file.name);
-        console.log("Appending file under key:", key, "File name:", file.name); // Debug log
-      });
-    });
-
-    // Log FormData to verify contents before sending
-    for (let [key, value] of formData.entries()) {
-      console.log(`FormData content - ${key}:`, value);
-    }
 
     setLoading(true);
     try {
-      await onSubmit(formData); // Make sure onSubmit is prepared to handle FormData
+      await onSubmit(data); // Make sure onSubmit is prepared to handle FormData
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -67,27 +47,32 @@ function useFormData(initialValues, schema, onSubmit) {
     return result.error ? result.error.details[0].message : null;
   };
 
+  const handleDeleteImage = (name, e, index) => {
+    e.preventDefault();
+    const imagesDeletedIndex = [...data.imagesDeletedIndex];
+    imagesDeletedIndex.push(index);
+    setData({ ...data, imagesDeletedIndex });
+  };
+  const handleUpload = (event) => {
+    const { name, files } = event.target;
+    const fileList = Array.from(files);
+    const fileUrls = fileList.map((file) => URL.createObjectURL(file));
+    setFilePreviews((prev) => ({ ...prev, [name]: fileUrls }));
+    setFileData((prev) => ({ ...prev, [name]: files }));
+    setIsFileToSend(true);
+  };
   const handleChange = (event) => {
-    const { name, value, type, checked, files } = event.target;
-    const actualValue =
-      type === "checkbox" ? checked : type === "file" ? files : value;
+    const { name, value, type, checked } = event.target;
+    const actualValue = type === "checkbox" ? checked : value;
     const errorMessage = validateProperty(name, actualValue);
-
-    // Handle files specifically
-    if (type === "file" && files.length > 0) {
-      const fileList = Array.from(files);
-      const fileUrls = fileList.map((file) => URL.createObjectURL(file));
-      setFilePreviews((prev) => ({ ...prev, [name]: fileUrls }));
-      setFileData((prev) => ({ ...prev, [name]: files }));
-    }
 
     const newErrors = { ...errors, [name]: errorMessage };
     if (!errorMessage) delete newErrors[name];
 
     const newData = {
       ...data,
-      [name]: type === "file" ? undefined : actualValue,
-    }; // Do not store file in data state
+      [name]: actualValue,
+    };
     setData(newData);
     setErrors(newErrors);
   };
@@ -112,18 +97,57 @@ function useFormData(initialValues, schema, onSubmit) {
     );
   }, [filePreviews]);
 
+  const saveFile = async (id, form) => {
+    let selectedId = undefined;
+    if (id !== undefined && id !== "new") {
+      selectedId = id;
+    }
+    let fd = new FormData();
+    let newData = { ...data };
+    delete newData._id;
+    delete newData.images;
+
+    fd = jsonToFormData(newData);
+
+    filePreviews.image.forEach((file, index) => {
+      fd.append("image", fileData.image[index]);
+    });
+
+    if (selectedId) {
+      await axios({
+        url: `${process.env.REACT_APP_API_URL}/${form}/${selectedId}`,
+        data: fd,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        method: "put",
+      });
+    } else
+      await axios({
+        url: `${process.env.REACT_APP_API_URL}/${form}`,
+        data: fd,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        method: "post",
+      });
+  };
   return {
     data,
     errors,
     validate,
     fileData,
+    saveFile,
+    isFileToSend,
     updateData,
     loading,
     filePreviews,
     cleanupFileUrls,
+    handleDeleteImage,
     handleChange,
     changeBoolean,
     handleSubmit,
+    handleUpload,
   };
 }
 

@@ -19,6 +19,7 @@ const DisplayImage = ({
 
     deleteImage(name, e, index);
   };
+  if (!images || images.length === 0) return null;
   return (
     <div className={` flex flex-wrap `}>
       <label
