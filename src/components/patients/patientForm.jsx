@@ -61,17 +61,17 @@ function PatientForm({
   };
   const {
     data,
-    updateData,
     errors,
+    validate,
+    saveFile,
+    updateData,
     filePreviews,
     handleChange,
-    validate,
     isFileToSend,
-    changeBoolean,
-    cleanupFileUrls,
     handleUpload,
     handleSubmit,
-    saveFile,
+    changeBoolean,
+    cleanupFileUrls,
     handleDeleteImage,
   } = useFormData(
     {
