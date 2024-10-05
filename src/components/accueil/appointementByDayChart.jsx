@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-
+//
 function AppointementChartByDays() {
   // i want to create a chart with the number of appointements scheduled, canceled and missed,
   // each bar will be a day of the month, and the height of the bar will be the number of appointements
