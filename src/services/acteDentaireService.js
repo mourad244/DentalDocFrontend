@@ -6,7 +6,7 @@ const apiEndpoint = apiUrl + "/actedentaires";
 function acteDentaireUrl(id) {
   return `${apiEndpoint}/${id}`;
 }
-
+//
 export function getActeDentaires(
   currentPage,
   pageSize,
