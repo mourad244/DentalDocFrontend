@@ -157,13 +157,13 @@ function App() {
               {/* login */}
               <Route path="/login" exact component={LoginForm} />
               {/* Accueil */}
-              {user.role === "autorite" || user.role === "admin" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/accueil" exact component={Accueil} />
               ) : (
                 ""
               )}
               {/* Devis */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/devis/:deviid/:patientid/:rdvid/:acteid"
                   exact
@@ -172,7 +172,7 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/devis/:deviid/:patientid/:rdvid"
                   exact
@@ -181,29 +181,29 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/devis/:deviid" exact component={DeviForm} />
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/devis" exact component={Devis} />
               ) : (
                 ""
               )}
               {/* articles */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/articles/:id" exact component={ArticleForm} />
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/articles" exact component={Articles} />
               ) : (
                 ""
               )}
               {/* paiements */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/paiements/new/:patientid"
                   exact
@@ -212,7 +212,7 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/paiements/:paiementid"
                   exact
@@ -221,13 +221,13 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/paiements" exact component={Paiements} />
               ) : (
                 ""
               )}
               {/* bon commandes */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/boncommandes/:id"
                   exact
@@ -236,13 +236,13 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/boncommandes" component={BonCommandes} />
               ) : (
                 ""
               )}
               {/* receptio bon commandes */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/receptionbcs/new/:boncommandeid"
                   exact
@@ -251,7 +251,7 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route
                   path="/receptionbcs/:receptionbcid"
                   exact
@@ -260,34 +260,34 @@ function App() {
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/receptionbcs" component={ReceptionBCs} />
               ) : (
                 ""
               )}
               {/* patients */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/patients/:id" exact component={patientForm} />
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/patients" component={Patients} />
               ) : (
                 ""
               )}
               {/* rdvs */}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/rdvs/postpone/:id" exact component={RdvForm} />
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/rdvs/:id" exact component={RdvForm} />
               ) : (
                 ""
               )}
-              {user.role === "admin" || user.role === "assistance médicale" ? (
+              {user.role === "admin" || user.role === "assistante médicale" ? (
                 <Route path="/rdvs" exact component={Rdvs} />
               ) : (
                 ""
