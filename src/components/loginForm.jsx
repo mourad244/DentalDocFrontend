@@ -8,17 +8,17 @@ import auth from "../services/authService";
 
 class LoginForm extends Form {
   state = {
-    data: { email: "", password: "" },
+    data: { nom: "", password: "" },
     errors: {},
   };
 
   schema = {
-    email: Joi.string()
+    nom: Joi.string()
       .required()
       .error((errors) => {
         errors.forEach((err) => {
           if (err.type === "any.empty") {
-            err.message = "Le champ email est requis.";
+            err.message = "Le champ nom est requis.";
           }
         });
         return errors;
@@ -37,8 +37,8 @@ class LoginForm extends Form {
 
   doSubmit = async () => {
     try {
-      const { email, password } = this.state.data;
-      await auth.login(email, password);
+      const { nom, password } = this.state.data;
+      await auth.login(nom, password);
 
       this.props.isLogged(true);
       // const { state } = this.props.location;
@@ -58,7 +58,7 @@ class LoginForm extends Form {
       return <Redirect to="/accueil" />;
     }
     return (
-      <div className="bg-login-background rounded-login shadow-login m-auto  mt-10 flex h-96 w-[400px] min-w-fit flex-col items-center">
+      <div className="m-auto mt-10 flex h-96  w-[400px] min-w-fit flex-col items-center rounded-login bg-login-background shadow-login">
         <img className="m-5 h-20 w-fit" src={icondental} alt="" />
         <p className="  text-center text-5xl font-bold text-[#424746]">
           Dental Doc
@@ -69,21 +69,21 @@ class LoginForm extends Form {
           <div className="mt-2 flex w-fit flex-col ">
             <input
               className={
-                "shadow-login-button-inselectd focus:shadow-login-button-selected rounded-full border-0 bg-[#F8F7F1] pl-3 pr-3 text-xs font-bold text-[#1f2037] transition-all duration-300 ease-in-out focus:outline-none"
+                "rounded-full border-0 bg-[#F8F7F1] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-login-button-inselectd transition-all duration-300 ease-in-out focus:shadow-login-button-selected focus:outline-none"
               }
-              name={"email"}
-              id={"email"}
+              name={"nom"}
+              id={"nom"}
               type={"text"}
-              value={this.state.data.email}
+              value={this.state.data.nom}
               onChange={this.handleChange}
               style={{ width: 176, height: 35 }}
-              placeholder="Email"
+              placeholder="Nom"
             />
-            {this.state.errors.email && (
+            {this.state.errors.nom && (
               <div
                 className={`mt-2 flex font-bold w-[${176}]px text-xs text-red-500`}
               >
-                {this.state.errors.email}
+                {this.state.errors.nom}
               </div>
             )}
           </div>
@@ -94,7 +94,7 @@ class LoginForm extends Form {
             */}
             <input
               className={
-                "shadow-login-button-inselectd focus:shadow-login-button-selected rounded-full border-0 bg-[#F8F7F1] pl-3 pr-3 text-xs font-bold text-[#1f2037] transition-all duration-300 ease-in-out focus:outline-none"
+                "rounded-full border-0 bg-[#F8F7F1] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-login-button-inselectd transition-all duration-300 ease-in-out focus:shadow-login-button-selected focus:outline-none"
               }
               name={"password"}
               id={"password"}
@@ -115,8 +115,8 @@ class LoginForm extends Form {
           <button
             className={
               !this.validate()
-                ? "bg-authenfier-button shadow-login-button rounded-login my-2 h-10  w-44  cursor-pointer border-0  text-xs font-medium leading-7 text-white "
-                : "rounded-login shadow-login-button pointer-events-none my-4 h-10 w-44 cursor-not-allowed bg-grey-ea  text-xs leading-7 text-grey-c0 focus:outline-none"
+                ? "my-2 h-10 w-44 cursor-pointer rounded-login  border-0  bg-authenfier-button text-xs  font-medium leading-7 text-white shadow-login-button "
+                : "pointer-events-none my-4 h-10 w-44 cursor-not-allowed rounded-login bg-grey-ea text-xs  leading-7 text-grey-c0 shadow-login-button focus:outline-none"
             }
           >
             S'Authentifier
