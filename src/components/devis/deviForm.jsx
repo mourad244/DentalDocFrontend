@@ -779,7 +779,9 @@ class DeviForm extends Form {
                     selecteDPatient.nom && selecteDPatient.nom.toUpperCase()
                   } ${
                     selecteDPatient.prenom &&
-                    selecteDPatient.prenom.toUpperCase()
+                    // first letter in uppercase
+                    selecteDPatient.prenom.charAt(0).toUpperCase() +
+                      selecteDPatient.prenom.slice(1).toLowerCase()
                   }`}
                 </p>
               </div>

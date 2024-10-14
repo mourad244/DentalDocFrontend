@@ -28,6 +28,7 @@ function PatientForm({
   const [provinces, setProvinces] = useState([]);
   const [filteredProvinces, setFilteredProvinces] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [telephone, setTelephone] = useState("");
   const history = useHistory();
   const params = useParams();
   const form = "patients";
@@ -39,7 +40,11 @@ function PatientForm({
     telephone: Joi.string()
       .required() /* .allow("") */
       .label("telephone"),
+    mutuelle: Joi.string().allow("").allow(null).label("Mutuelle"),
+    numMutuelle: Joi.string().allow("").allow(null).label("N° Mutuelle"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
+    observations: Joi.string().allow("").allow(null).label("Observations"),
+    telephones: Joi.array().allow([]).label("Telephones"),
     profession: Joi.string().allow("").label("profession"),
     isMasculin: Joi.boolean()
       .required() /* .allow(null) */
@@ -80,8 +85,12 @@ function PatientForm({
       nom: "",
       prenom: "",
       telephone: "",
+      mutuelle: "",
+      numMutuelle: "",
       ville: "",
       profession: "",
+      observations: "",
+      telephones: [],
       isMasculin: "",
       dateNaissance: "",
       regionId: "",
@@ -184,9 +193,13 @@ function PatientForm({
       historiqueMedecins: patient.historiqueMedecins,
       nom: patient.nom,
       prenom: patient.prenom,
+      mutuelle: patient.mutuelle,
+      numMutuelle: patient.numMutuelle,
       isMasculin: patient.isMasculin,
       profession: patient.profession,
       dateNaissance: patient.dateNaissance,
+      observations: patient.observations,
+      telephones: patient.telephones,
       telephone: patient.telephone,
       ville: patient.ville,
       provinceId: patient.provinceId || "",
@@ -293,7 +306,8 @@ function PatientForm({
             />
           </div>
         )}
-        <div className="mt-3">
+
+        {/* <div className="mt-3">
           <Input
             name="telephone"
             label="Téléphone"
@@ -304,6 +318,32 @@ function PatientForm({
             value={data.telephone || ""}
             onChange={handleChange}
             error={errors.telephone}
+          />
+        </div> */}
+        <div className="mt-3">
+          <Input
+            name="mutuelle"
+            label="Mutuelle"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.mutuelle || ""}
+            onChange={handleChange}
+            error={errors.mutuelle}
+          />
+        </div>
+        <div className="mt-3">
+          <Input
+            name="numMutuelle"
+            label="N° Mutuelle"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.numMutuelle || ""}
+            onChange={handleChange}
+            error={errors.numMutuelle}
           />
         </div>
         {!isRdvForm && (
@@ -337,6 +377,19 @@ function PatientForm({
           </>
         )}
         <div className="mt-3">
+          <Input
+            name="observations"
+            label="Observations"
+            width={170}
+            height={35}
+            widthLabel={96}
+            type="text"
+            value={data.observations || ""}
+            onChange={handleChange}
+            error={errors.observations}
+          />
+        </div>
+        <div className="mt-3">
           <Select
             name="regionId"
             label="Region"
@@ -361,6 +414,69 @@ function PatientForm({
             onChange={handleChange}
             error={errors.provinceId}
           />
+        </div>
+        {/* input and button to add telephone */}
+        <div className="my-2 flex w-full flex-row rounded-sm bg-slate-200 ">
+          <div className="mt-3 flex flex-row">
+            <Input
+              name="telephone"
+              label="Téléphone"
+              width={145}
+              height={35}
+              widthLabel={96}
+              type="text"
+              value={telephone || ""}
+              onChange={(e) => setTelephone(e.currentTarget.value)}
+              error={errors.telephone}
+            />
+            <button
+              className="ml-2 h-fit rounded-md bg-blue-500 p-1 font-bold text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                if (telephone) {
+                  const newTelephones = [...data.telephones];
+                  newTelephones.push(telephone);
+                  updateData({ telephones: newTelephones });
+                  setTelephone("");
+                }
+              }}
+            >
+              +
+            </button>
+          </div>
+          {/* liste of telephones like inputs, alawys one empty to let the user add  */}
+          <div className="flex flex-col">
+            {data.telephones.map((telephone, index) => (
+              <div key={index} className="mt-3 flex flex-row">
+                <Input
+                  name="telephones"
+                  width={145}
+                  height={35}
+                  widthLabel={96}
+                  label={`Téléphone ${index + 1}`}
+                  type="text"
+                  value={telephone || ""}
+                  onChange={(e) => {
+                    const newTelephones = [...data.telephones];
+                    newTelephones[index] = e.currentTarget.value;
+                    updateData({ telephones: newTelephones });
+                  }}
+                  error={errors.telephones}
+                />
+                {/* button to delete the item */}
+                <button
+                  className="m-auto ml-1  rounded-md bg-red-500 p-2 font-bold text-white"
+                  onClick={() => {
+                    const newTelephones = [...data.telephones];
+                    newTelephones.splice(index, 1);
+                    updateData({ telephones: newTelephones });
+                  }}
+                >
+                  x
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
         {!isRdvForm && (
           <>

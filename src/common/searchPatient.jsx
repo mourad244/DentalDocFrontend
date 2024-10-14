@@ -50,7 +50,11 @@ const SearchPatient = ({ onPatientSelect }) => {
                     }}
                   >
                     <p className=" mb-1 w-max rounded-md bg-[#4F6874] p-2 text-xs font-bold leading-4 text-white">
-                      {`${item.nom} ${item.prenom}`}
+                      {`${item.nom && item.nom.toUpperCase()} ${
+                        item.prenom &&
+                        item.prenom[0].toUpperCase() +
+                          item.prenom.slice(1).toLowerCase()
+                      }`}
                     </p>
                   </div>
                 ))

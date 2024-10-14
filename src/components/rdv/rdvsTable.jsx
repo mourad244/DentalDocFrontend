@@ -55,8 +55,14 @@ function RdvsTable(props) {
       content: (rdv) => {
         return (
           <label key={rdv._id}>
-            {rdv.patientId && rdv.patientId.nom}{" "}
-            {rdv.patientId && rdv.patientId.prenom}
+            {rdv.patientId &&
+              rdv.patientId.nom &&
+              rdv.patientId.nom.toUpperCase()}{" "}
+            {rdv.patientId &&
+              rdv.patientId.prenom &&
+              //first letter of the prenom in uppercase
+              rdv.patientId.prenom.charAt(0).toUpperCase() +
+                rdv.patientId.prenom.slice(1).toLowerCase()}
           </label>
         );
       },
@@ -77,8 +83,21 @@ function RdvsTable(props) {
       },
     },
     {
-      path: "patientId.telephone",
+      path: "patientId.telephones",
       label: "Télephone",
+      content: (rdv) => {
+        // list of telephones
+
+        return (
+          <label key={rdv._id}>
+            {rdv.patientId &&
+              rdv.patientId.telephones &&
+              rdv.patientId.telephones.map((tel) => (
+                <div key={tel}>- {tel}</div>
+              ))}
+          </label>
+        );
+      },
     },
     {
       path: "isHonnore",

@@ -295,7 +295,10 @@ class PaiementForm extends Form {
                 <p className="text-center text-base font-bold text-white">{`${
                   selectedPatient.nom && selectedPatient.nom.toUpperCase()
                 } ${
-                  selectedPatient.prenom && selectedPatient.prenom.toUpperCase()
+                  //first letter in uppercase
+                  selectedPatient.prenom &&
+                  selectedPatient.prenom[0].toUpperCase() +
+                    selectedPatient.prenom.slice(1).toLowerCase()
                 }`}</p>
               </div>
               {(paiementId === "new" || patientId) && (

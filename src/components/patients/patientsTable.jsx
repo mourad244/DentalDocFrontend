@@ -80,6 +80,27 @@ function PatientsTable({
           switch (key) {
             case "select":
               return null;
+            // case of nom, with Capitale letter
+            case "nom":
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {patient.nom.toUpperCase()}
+                </td>
+              );
+            // case of prenom, with Capital letter first letter
+            case "prenom":
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {patient.prenom.charAt(0).toUpperCase() +
+                    patient.prenom.slice(1).toLowerCase()}
+                </td>
+              );
             case "age":
               if (patient.dateNaissance !== undefined) {
                 var today = new Date();
