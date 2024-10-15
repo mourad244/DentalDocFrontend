@@ -54,7 +54,7 @@ function RdvsTable(props) {
       label: "Patient",
       content: (rdv) => {
         return (
-          <label key={rdv._id}>
+          <div key={rdv._id}>
             {rdv.patientId &&
               rdv.patientId.nom &&
               rdv.patientId.nom.toUpperCase()}{" "}
@@ -63,7 +63,7 @@ function RdvsTable(props) {
               //first letter of the prenom in uppercase
               rdv.patientId.prenom.charAt(0).toUpperCase() +
                 rdv.patientId.prenom.slice(1).toLowerCase()}
-          </label>
+          </div>
         );
       },
     },

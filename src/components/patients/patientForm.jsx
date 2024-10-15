@@ -37,9 +37,7 @@ function PatientForm({
     cin: Joi.string().allow("").allow(null).label("CIN"),
     nom: Joi.string().required().label("Nom"),
     prenom: Joi.string().required().label("Prenom"),
-    telephone: Joi.string()
-      .required() /* .allow("") */
-      .label("telephone"),
+
     mutuelle: Joi.string().allow("").allow(null).label("Mutuelle"),
     numMutuelle: Joi.string().allow("").allow(null).label("N° Mutuelle"),
     ville: Joi.string().allow("").allow(null).label("Ville"),
@@ -84,7 +82,6 @@ function PatientForm({
       cin: "",
       nom: "",
       prenom: "",
-      telephone: "",
       mutuelle: "",
       numMutuelle: "",
       ville: "",
@@ -200,7 +197,6 @@ function PatientForm({
       dateNaissance: patient.dateNaissance,
       observations: patient.observations,
       telephones: patient.telephones,
-      telephone: patient.telephone,
       ville: patient.ville,
       provinceId: patient.provinceId || "",
       regionId: patient.regionId || "",
@@ -503,7 +499,7 @@ function PatientForm({
                 deleteImage={handleDeleteImage}
               />
             </div>
-
+            {console.log("validate", validate())}
             <div className="mr-6 mt-3 flex w-full justify-end">
               <button
                 type="submit"
