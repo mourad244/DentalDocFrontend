@@ -54,7 +54,14 @@ function RdvsTable(props) {
       label: "Patient",
       content: (rdv) => {
         return (
-          <div key={rdv._id}>
+          <div
+            key={rdv._id}
+            className={`rounded-md p-1 ${
+              rdv.patientId && rdv.patientId.isMasculin
+                ? "bg-[#7ea7e9]"
+                : "bg-[#d6579d]"
+            }`}
+          >
             {rdv.patientId &&
               rdv.patientId.nom &&
               rdv.patientId.nom.toUpperCase()}{" "}
