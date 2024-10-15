@@ -852,6 +852,7 @@ class DeviForm extends Form {
                       label="Nombre des actes"
                       onChange={this.defineActeLines}
                       width={170}
+                      onWheel={(e) => e.target.blur()} // Disable scroll
                       height={35}
                       widthLabel={140}
                     />

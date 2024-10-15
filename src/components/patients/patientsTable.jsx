@@ -60,12 +60,20 @@ function PatientsTable({
   };
 
   const tableRows = patients.map((patient) => {
+    console.log("patient", patient);
+    /* 
+     rdv.patientId && rdv.patientId.isMasculin
+                ? "bg-[#7ea7e9]"
+                : "bg-[#d6579d]"
+    */
     return (
       <tr
-        className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center"
+        className={`h-12 border-y-2 text-center ${
+          patient.isMasculin ? "bg-[#94b9f5]" : "bg-[#f78bc6]"
+        }`}
         key={uuidv4()}
       >
-        <td className="h-12 border-y-2 border-y-gray-300 bg-[#D6E1E3] text-center">
+        <td className="h-12 border-y-2   text-center">
           <input
             type="checkbox"
             checked={
@@ -324,7 +332,6 @@ function PatientsTable({
       />
     </div>
   );
-
   return (
     <CustomeTable
       headers={headers}

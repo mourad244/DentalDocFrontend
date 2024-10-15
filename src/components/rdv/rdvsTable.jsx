@@ -58,8 +58,8 @@ function RdvsTable(props) {
             key={rdv._id}
             className={`rounded-md p-1 ${
               rdv.patientId && rdv.patientId.isMasculin
-                ? "bg-[#7ea7e9]"
-                : "bg-[#d6579d]"
+                ? "bg-[#94b9f5]"
+                : "bg-[#f78bc6]"
             }`}
           >
             {rdv.patientId &&
