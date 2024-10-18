@@ -5,9 +5,13 @@ import { jsonToFormData } from "../utils/jsonToFormData";
 
 function useFormData(initialValues, schema, onSubmit) {
   const [data, setData] = useState(initialValues);
+
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [isDocPicked, setIsDocPicked] = useState(false);
+
   const [errors, setErrors] = useState({});
   const [fileData, setFileData] = useState({}); // To store actual file objects for submission
-  const [filePreviews, setFilePreviews] = useState({}); // To store URLs for previewing files
+  const [filePreviews, setFilePreviews] = useState(null); // To store URLs for previewing files
   const [loading, setLoading] = useState(false);
   const [isFileToSend, setIsFileToSend] = useState(false);
   const updateData = (newData) => {
@@ -53,6 +57,11 @@ function useFormData(initialValues, schema, onSubmit) {
     imagesDeletedIndex.push(index);
     setData({ ...data, imagesDeletedIndex });
   };
+  const handleUploadDoc = (event) => {
+    setSelectedDoc(event.target.files[0]);
+    setIsFileToSend(true);
+    setIsDocPicked(true);
+  };
   const handleUpload = (event) => {
     const { name, files } = event.target;
     const fileList = Array.from(files);
@@ -92,6 +101,7 @@ function useFormData(initialValues, schema, onSubmit) {
 
   // Cleanup function for file URLs to avoid memory leaks
   const cleanupFileUrls = useCallback(() => {
+    if (!filePreviews) return;
     Object.values(filePreviews).forEach((urls) =>
       urls.forEach(URL.revokeObjectURL),
     );
@@ -108,10 +118,11 @@ function useFormData(initialValues, schema, onSubmit) {
     delete newData.images;
 
     fd = jsonToFormData(newData);
-
-    filePreviews.image.forEach((file, index) => {
-      fd.append("image", fileData.image[index]);
-    });
+    fd.append("document", selectedDoc);
+    filePreviews &&
+      filePreviews.image.forEach((file, index) => {
+        fd.append("image", fileData.image[index]);
+      });
 
     if (selectedId) {
       await axios({
@@ -142,9 +153,12 @@ function useFormData(initialValues, schema, onSubmit) {
     updateData,
     loading,
     filePreviews,
+    selectedDoc,
+    isDocPicked,
     cleanupFileUrls,
     handleDeleteImage,
     handleChange,
+    handleUploadDoc,
     changeBoolean,
     handleSubmit,
     handleUpload,

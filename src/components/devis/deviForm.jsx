@@ -523,6 +523,8 @@ class DeviForm extends Form {
       telephone: newPatient.telephone,
       regionId: newPatient.regionId ? newPatient.regionId : undefined,
       provinceId: newPatient.provinceId ? newPatient.provinceId : undefined,
+      mutuelle: newPatient.mutuelle,
+      numMutuelle: newPatient.numMutuelle,
     };
     fd = jsonToFormData(data);
     for (const item in this.state) {

@@ -60,12 +60,6 @@ function PatientsTable({
   };
 
   const tableRows = patients.map((patient) => {
-    console.log("patient", patient);
-    /* 
-     rdv.patientId && rdv.patientId.isMasculin
-                ? "bg-[#7ea7e9]"
-                : "bg-[#d6579d]"
-    */
     return (
       <tr
         className={`h-12 border-y-2 text-center ${

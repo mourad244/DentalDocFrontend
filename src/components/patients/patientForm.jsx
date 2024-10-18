@@ -60,7 +60,9 @@ function PatientForm({
     historiqueMedecins: Joi.array().allow([]).label("Medecins"),
     images: Joi.label("Images").optional(),
     image: Joi.label("Image").optional(),
+    documents: Joi.label("Documents").optional(),
     imagesDeletedIndex: Joi.label("imagesDeletedIndex").optional(),
+    documentsDeletedIndex: Joi.label("documentsDeletedIndex").optional(),
   };
   const {
     data,
@@ -72,10 +74,14 @@ function PatientForm({
     handleChange,
     isFileToSend,
     handleUpload,
+    selectedDoc,
+    isDocPicked,
+    handleUploadDoc,
     handleSubmit,
     changeBoolean,
     cleanupFileUrls,
     handleDeleteImage,
+    handleDeleteDoc,
   } = useFormData(
     {
       _id: undefined,
@@ -93,6 +99,7 @@ function PatientForm({
       regionId: "",
       provinceId: "",
       images: [],
+      documents: [],
     },
     schema,
     async (formData) => {
@@ -201,7 +208,9 @@ function PatientForm({
       provinceId: patient.provinceId || "",
       regionId: patient.regionId || "",
       images: patient.images || [],
+      documents: patient.documents || [],
       imagesDeletedIndex: [],
+      documentsDeletedIndex: [],
     };
   }
 
@@ -480,7 +489,7 @@ function PatientForm({
               <UploadImage
                 name="image"
                 label="Photo"
-                image={filePreviews.image}
+                image={filePreviews && filePreviews.image}
                 width={170}
                 height={35}
                 widthLabel={96}
@@ -499,7 +508,21 @@ function PatientForm({
                 deleteImage={handleDeleteImage}
               />
             </div>
-            {console.log("validate", validate())}
+            {/*  <div className="mt-3 w-full">
+              <input type="file" name="Documents" onChange={handleUploadDoc} />
+              {isDocPicked && (
+                <div>
+                  <p>Filename: {selectedDoc.name}</p>
+                  <p>Filetype: {selectedDoc.type}</p>
+                  <p>Size in bytes: {selectedDoc.size}</p>
+                  <p>
+                    lastModifiedDate:{" "}
+                    {selectedDoc.lastModifiedDate.toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </div>
+            {console.log("documents", data.documents)} */}
             <div className="mr-6 mt-3 flex w-full justify-end">
               <button
                 type="submit"
