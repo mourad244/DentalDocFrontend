@@ -12,10 +12,12 @@ import useFormData from "../../hooks/useFormData";
 import UploadImage from "../../common/uploadImage";
 import DisplayImage from "../../common/displayImage";
 import BooleanSelect from "../../common/booleanSelect";
-
+import pdfIcon from "../../assets/icons/pdf-icon.png";
+import wordIcon from "../../assets/icons/word-icon.jpg";
 import Joi from "joi-browser";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
+import DisplayDocument from "../../common/displayDocument";
 
 function PatientForm({
   match,
@@ -29,6 +31,7 @@ function PatientForm({
   const [filteredProvinces, setFilteredProvinces] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [telephone, setTelephone] = useState("");
+
   const history = useHistory();
   const params = useParams();
   const form = "patients";
@@ -74,7 +77,7 @@ function PatientForm({
     handleChange,
     isFileToSend,
     handleUpload,
-    selectedDoc,
+    selectedDocs,
     isDocPicked,
     handleUploadDoc,
     handleSubmit,
@@ -154,7 +157,6 @@ function PatientForm({
       dataIsValid(validate() ? false : true);
     }
   }, [data]);
-
   useEffect(() => {
     async function populatePatients() {
       try {
@@ -508,21 +510,143 @@ function PatientForm({
                 deleteImage={handleDeleteImage}
               />
             </div>
-            {/*  <div className="mt-3 w-full">
-              <input type="file" name="Documents" onChange={handleUploadDoc} />
-              {isDocPicked && (
+            <div className="mt-3 w-full">
+              <div className="flex flex-row">
+                <label
+                  className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
+                  style={{ width: 96 }}
+                >
+                  Document
+                </label>
+                <input
+                  type="file"
+                  name="documents"
+                  /* style={{
+                    width: 86,
+                    height: 35,
+                    fontSize: "0.75rem",
+                  }} */
+                  multiple
+                  onChange={handleUploadDoc}
+                />
+              </div>
+              {/* {isDocPicked && (
                 <div>
                   <p>Filename: {selectedDoc.name}</p>
-                  <p>Filetype: {selectedDoc.type}</p>
-                  <p>Size in bytes: {selectedDoc.size}</p>
-                  <p>
-                    lastModifiedDate:{" "}
-                    {selectedDoc.lastModifiedDate.toLocaleString()}
-                  </p>
+                  {selectedDoc.size > 1000000
+                    ? `Size: ${Math.round(selectedDoc.size / 1000000)} MB`
+                    : `Size: ${
+                        Math.round ? selectedDoc.size / 1000 : selectedDoc.size
+                      } KB`}
                 </div>
-              )}
+              )} */}
             </div>
-            {console.log("documents", data.documents)} */}
+            {/* <div className="mt-3 w-full">
+              <div className={` flex  `}>
+                <label
+                  className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
+                  style={{ width: 96 }}
+                >
+                  Documents
+                </label>
+                <div>
+                  {data.documents.map((doc, index) => {
+                    let i = data.documentsDeletedIndex.findIndex(
+                      (i) => i === index,
+                    );
+
+                    // if (i !== -1) return null;
+                    const docName = doc.split("/")[1].split("-")[0];
+                    const docType = doc.split("/")[1].split("-")[1];
+                    const docDate = doc.split("/")[1].split("-")[2];
+
+                    if (i !== -1) {
+                      return (
+                        <div key={index} className="mt-3 flex  flex-row">
+                          <div className="flex">
+                            <label
+                              htmlFor=""
+                              className="m-auto ml-1 text-[11px] text-slate-500 line-through"
+                            >
+                              {`${docName}.${docType}`}
+                            </label>
+                            <label
+                              htmlFor=""
+                              className="m-auto ml-1 text-[11px] text-slate-500 line-through"
+                            >
+                              {`${new Date(parseInt(docDate)).getDate()}-${
+                                new Date(parseInt(docDate)).getMonth() + 1
+                              }-${new Date(parseInt(docDate)).getFullYear()}`}
+                            </label>
+                            <button
+                              className="m-auto   ml-1 h-7 w-6 rounded-md bg-green-500 font-bold text-white"
+                              onClick={(e) => {
+                                handleDeleteDoc(doc, e, index);
+                              }}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={index} className="mt-3 flex  flex-row">
+                        <div className="flex">
+                          <a
+                            href={
+                              process.env.REACT_APP_API_IMAGE_URL + "/" + doc
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="flex"
+                          >
+                            <img
+                              src={docType === "pdf" ? pdfIcon : wordIcon}
+                              alt="file"
+                              className="h-10 w-10"
+                            />
+                            <label
+                              htmlFor=""
+                              className="m-auto ml-1 cursor-pointer"
+                            >
+                              {`${docName}.${docType}`}
+                            </label>
+                          </a>
+
+                          <label
+                            htmlFor=""
+                            className="m-auto ml-1 text-[11px] text-slate-500"
+                          >
+                            {`${new Date(parseInt(docDate)).getDate()}-${
+                              new Date(parseInt(docDate)).getMonth() + 1
+                            }-${new Date(parseInt(docDate)).getFullYear()}`}
+                          </label>
+                          <button
+                            className="m-auto   ml-1 h-7 w-6 rounded-md bg-red-500 font-bold text-white"
+                            onClick={(e) => {
+                              handleDeleteDoc(doc, e, index);
+                            }}
+                          >
+                            x
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div> */}
+            <DisplayDocument
+              name="documents"
+              widthLabel={96}
+              documents={data.documents}
+              label="Documents"
+              width={200}
+              height={35}
+              deleteDocument={handleDeleteDoc}
+            />
             <div className="mr-6 mt-3 flex w-full justify-end">
               <button
                 type="submit"

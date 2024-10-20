@@ -6,7 +6,7 @@ import { jsonToFormData } from "../utils/jsonToFormData";
 function useFormData(initialValues, schema, onSubmit) {
   const [data, setData] = useState(initialValues);
 
-  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [selectedDocs, setSelectedDocs] = useState(null);
   const [isDocPicked, setIsDocPicked] = useState(false);
 
   const [errors, setErrors] = useState({});
@@ -57,18 +57,80 @@ function useFormData(initialValues, schema, onSubmit) {
     imagesDeletedIndex.push(index);
     setData({ ...data, imagesDeletedIndex });
   };
+
+  const handleDeleteDoc = (name, e, index) => {
+    e.preventDefault();
+    const documentsDeletedIndex = [...data.documentsDeletedIndex];
+    documentsDeletedIndex.push(index);
+    setData({ ...data, documentsDeletedIndex });
+  };
   const handleUploadDoc = (event) => {
-    setSelectedDoc(event.target.files[0]);
+    const files = event.target.files;
+    const maxSize = 1024 * 1024 * 5; // 5MB
+    // allowed typed are word , pdf and excel
+    const allowedTypes = ["pdf", "word", "excel"];
+    let isFileValid = true;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > maxSize) {
+        alert("File size is too large. Please upload a file less than 5MB.");
+        isFileValid = false;
+        return;
+      }
+      const fileType = files[i].type;
+      const isTypeAllowed = allowedTypes.some((type) =>
+        fileType.includes(type),
+      );
+      if (!isTypeAllowed) {
+        alert(
+          "File type is not allowed. Please upload a file with the following types: pdf, word, excel.",
+        );
+        isFileValid = false;
+        return;
+      }
+    }
+    if (!isFileValid) return;
+    setSelectedDocs(files);
     setIsFileToSend(true);
+
+    setFileData((prev) => ({ ...prev, document: files }));
     setIsDocPicked(true);
   };
   const handleUpload = (event) => {
     const { name, files } = event.target;
+    const maxSize = 5 * 1024 * 1024; // Set max size (5MB in this case)
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"]; // Allowed MIME types
+
     const fileList = Array.from(files);
-    const fileUrls = fileList.map((file) => URL.createObjectURL(file));
-    setFilePreviews((prev) => ({ ...prev, [name]: fileUrls }));
-    setFileData((prev) => ({ ...prev, [name]: files }));
-    setIsFileToSend(true);
+    const validFiles = []; // To store valid files
+
+    const fileUrls = [];
+
+    fileList.forEach((file) => {
+      // Check if file type is allowed
+      if (!allowedTypes.includes(file.type)) {
+        alert(
+          `${file.name} is not a valid type. Please upload PNG, JPEG, or JPG.`,
+        );
+        return;
+      }
+
+      // Check if file size is within the allowed limit
+      if (file.size > maxSize) {
+        alert(`${file.name} exceeds the maximum size of 5MB.`);
+        return;
+      }
+
+      // If valid, add the file to the valid files array and create a preview URL
+      validFiles.push(file);
+      fileUrls.push(URL.createObjectURL(file));
+    });
+
+    // If there are valid files, update state
+    if (validFiles.length > 0) {
+      setFilePreviews((prev) => ({ ...prev, [name]: fileUrls }));
+      setFileData((prev) => ({ ...prev, [name]: validFiles }));
+      setIsFileToSend(true);
+    }
   };
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -116,13 +178,21 @@ function useFormData(initialValues, schema, onSubmit) {
     let newData = { ...data };
     delete newData._id;
     delete newData.images;
-
+    delete newData.documents;
     fd = jsonToFormData(newData);
-    fd.append("document", selectedDoc);
+
+    // logic to add documents to the form data
+
     filePreviews &&
       filePreviews.image.forEach((file, index) => {
         fd.append("image", fileData.image[index]);
       });
+
+    if (fileData.document) {
+      for (let i = 0; i < fileData.document.length; i++) {
+        fd.append("document", fileData.document[i]);
+      }
+    }
 
     if (selectedId) {
       await axios({
@@ -153,10 +223,11 @@ function useFormData(initialValues, schema, onSubmit) {
     updateData,
     loading,
     filePreviews,
-    selectedDoc,
+    selectedDocs,
     isDocPicked,
     cleanupFileUrls,
     handleDeleteImage,
+    handleDeleteDoc,
     handleChange,
     handleUploadDoc,
     changeBoolean,
