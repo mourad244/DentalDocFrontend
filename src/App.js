@@ -187,7 +187,11 @@ function App() {
                 ""
               )}
               {user.role === "admin" || user.role === "assistante médicale" ? (
-                <Route path="/devis" exact component={Devis} />
+                <Route
+                  path="/devis"
+                  exact
+                  render={(props) => <Devis {...props} user={user} />}
+                />
               ) : (
                 ""
               )}
@@ -222,7 +226,11 @@ function App() {
                 ""
               )}
               {user.role === "admin" || user.role === "assistante médicale" ? (
-                <Route path="/paiements" exact component={Paiements} />
+                <Route
+                  path="/paiements"
+                  exact
+                  render={(props) => <Paiements {...props} user={user} />}
+                />
               ) : (
                 ""
               )}
@@ -272,7 +280,11 @@ function App() {
                 ""
               )}
               {user.role === "admin" || user.role === "assistante médicale" ? (
-                <Route path="/patients" component={Patients} />
+                <Route
+                  path="/patients"
+                  user={user}
+                  render={(props) => <Patients {...props} user={user} />}
+                />
               ) : (
                 ""
               )}

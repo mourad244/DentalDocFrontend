@@ -12,8 +12,6 @@ import useFormData from "../../hooks/useFormData";
 import UploadImage from "../../common/uploadImage";
 import DisplayImage from "../../common/displayImage";
 import BooleanSelect from "../../common/booleanSelect";
-import pdfIcon from "../../assets/icons/pdf-icon.png";
-import wordIcon from "../../assets/icons/word-icon.jpg";
 import Joi from "joi-browser";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";

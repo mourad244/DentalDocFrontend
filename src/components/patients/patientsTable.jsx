@@ -24,6 +24,7 @@ function PatientsTable({
   onItemsSelect,
   selectedItems,
   onValueChange,
+  user,
   onFieldSelect,
   selectedFilterItems,
 }) {
@@ -67,7 +68,7 @@ function PatientsTable({
         }`}
         key={uuidv4()}
       >
-        <td className="h-12 border-y-2   text-center">
+        <td className="h-12 border-y-2 text-center">
           <input
             type="checkbox"
             checked={
@@ -306,16 +307,19 @@ function PatientsTable({
         className="  h-6 w-7 cursor-pointer rounded-md  "
         onClick={onViewDetails}
       /> */}
-      <AiFillDelete
-        className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
-          onDelete === undefined ? "pointer-events-none opacity-50 " : ""
-        }`}
-        onClick={() => {
-          window.confirm("Confirmer la suppression") && onDelete(selectedItems);
-        }}
-        color="#FF4D4D"
-        title="Supprimer"
-      />
+      {user === "admin" && (
+        <AiFillDelete
+          className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
+            onDelete === undefined ? "pointer-events-none opacity-50 " : ""
+          }`}
+          onClick={() => {
+            window.confirm("Confirmer la suppression") &&
+              onDelete(selectedItems);
+          }}
+          color="#FF4D4D"
+          title="Supprimer"
+        />
+      )}
       <FaPrint
         className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
           onPrint === undefined ? "pointer-events-none opacity-50" : ""

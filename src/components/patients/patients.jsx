@@ -14,7 +14,7 @@ import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
 import { getPatientsListWithPagination } from "../../services/patientListPaginateService";
 
-function Patients() {
+function Patients({ user }) {
   const [datas, setDatas] = useState({
     regions: [],
     provinces: [],
@@ -248,6 +248,7 @@ function Patients() {
             headers={selectedFields}
             onFieldSelect={handleSelectField}
             totalItems={patients.length}
+            user={user.role}
             onItemSelect={handleSelectPatient}
             onItemsSelect={handleSelectPatients}
             selectedItems={selectedPatients}

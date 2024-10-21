@@ -12,6 +12,7 @@ import { TbReportMoney } from "react-icons/tb";
 function DevisTable({
   devis,
   datas,
+  user,
   onSort,
   onEdit,
   onPrint,
@@ -183,6 +184,7 @@ function DevisTable({
       {collapseFunction(selectedCollapse)}
     </div>
   ); */
+
   const itemActions = (
     <div className=" my-2 flex h-7 w-full items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
       <TbReportMoney
@@ -206,16 +208,19 @@ function DevisTable({
         className="  h-6 w-7 cursor-pointer rounded-md  "
         onClick={onViewDetails}
       /> */}
-      <AiFillDelete
-        className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
-          onDelete === undefined ? "pointer-events-none opacity-50 " : ""
-        }`}
-        color="#FF4D4D"
-        onClick={() => {
-          window.confirm("Confirmer la suppression") && onDelete(selectedItems);
-        }}
-        title="Supprimer"
-      />
+      {user === "admin" && (
+        <AiFillDelete
+          className={`h-6 w-7 cursor-pointer rounded-md   p-1 shadow-md  ${
+            onDelete === undefined ? "pointer-events-none opacity-50 " : ""
+          }`}
+          color="#FF4D4D"
+          onClick={() => {
+            window.confirm("Confirmer la suppression") &&
+              onDelete(selectedItems);
+          }}
+          title="Supprimer"
+        />
+      )}
       <FaPrint
         className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
           onPrint === undefined ? "pointer-events-none opacity-50" : ""

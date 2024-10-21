@@ -12,7 +12,7 @@ import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
 
-function Paiements() {
+function Paiements({ user }) {
   const date = new Date();
   const [times, setTimes] = useState([
     { nom: "journee", active: true },
@@ -285,6 +285,7 @@ function Paiements() {
       ) : (
         <div className="m-2">
           <PaiementsTable
+            user={user.role}
             paiements={paiements}
             sortColumn={sortColumn}
             onSort={handleSort}

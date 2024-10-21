@@ -14,7 +14,7 @@ import ButtonType from "../../assets/buttons/buttonType";
 import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
 import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
 
-function Devis() {
+function Devis({ user }) {
   const date = new Date();
   const [times, setTimes] = useState([
     { nom: "journee", active: true },
@@ -314,6 +314,7 @@ function Devis() {
             sortColumn={sortColumn}
             onSort={handleSort}
             datas={datas}
+            user={user.role}
             // selectedFilterItems={selectedFilterItems}
             // onValueChange={onFilterChange}
             headers={fields}

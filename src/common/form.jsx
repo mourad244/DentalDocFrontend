@@ -269,11 +269,23 @@ class Form extends Component {
     }
   };
   fileSelectedHandler = (event) => {
+    const { name, files } = event.target;
+    const maxSize = 1024 * 1024 * 2;
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"]; // Allowed MIME types
+
     let fileObj = [];
     let fileArray = [];
-    if (event.target.files && event.target.files[0]) {
-      fileObj.push(event.target.files);
+    if (files && files[0]) {
+      fileObj.push(files);
       for (let i = 0; i < fileObj[0].length; i++) {
+        if (fileObj[0][i].size > maxSize) {
+          alert("File is too big!");
+          return;
+        }
+        if (!allowedTypes.includes(fileObj[0][i].type)) {
+          alert("File type not allowed!");
+          return;
+        }
         fileArray.push(URL.createObjectURL(fileObj[0][i]));
       }
       // for (let item in fileObj[0]) {
@@ -281,10 +293,10 @@ class Form extends Component {
       //   // fileArray.push(URL.createObjectURL(fileObj[0][item]));
       // }
       this.setState({
-        ["selected" + event.target.name]: fileObj,
+        ["selected" + name]: fileObj,
       });
       this.setState({
-        [event.target.name]: fileArray,
+        [name]: fileArray,
       });
       this.setState({ sendFile: true });
     }
