@@ -202,6 +202,15 @@ function PatientForm({
     }
   }, [data.age]);
 
+  // update age depending on dateNaissance
+  useEffect(() => {
+    if (data.dateNaissance) {
+      const age =
+        new Date().getFullYear() - new Date(data.dateNaissance).getFullYear();
+      updateData({ age });
+    }
+  }, [data.dateNaissance]);
+
   function mapToViewModel(patient) {
     return {
       _id: patient._id,
@@ -484,7 +493,6 @@ function PatientForm({
           </div>
           {/* liste of telephones like inputs, alawys one empty to let the user add  */}
           <div className="flex flex-col">
-            {console.log("data", data.telephones)}
             {data.telephones &&
               data.telephones.map((telephone, index) => (
                 <div key={index} className="mt-3 flex flex-row">
