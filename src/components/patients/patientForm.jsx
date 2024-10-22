@@ -45,6 +45,7 @@ function PatientForm({
     observations: Joi.string().allow("").allow(null).label("Observations"),
     telephones: Joi.array().allow([]).label("Telephones"),
     profession: Joi.string().allow("").label("profession"),
+    age: Joi.number().allow(null).allow("").label("Age"),
     isMasculin: Joi.boolean()
       .required() /* .allow(null) */
       .label("Genre"),
@@ -97,6 +98,7 @@ function PatientForm({
       telephones: [],
       isMasculin: "",
       dateNaissance: "",
+      age: "",
       regionId: "",
       provinceId: "",
       images: [],
@@ -105,6 +107,7 @@ function PatientForm({
     schema,
     async (formData) => {
       try {
+        delete formData.age;
         if (isFileToSend) {
           await saveFile(params.id, form);
         } else await savePatient(formData);
@@ -190,6 +193,15 @@ function PatientForm({
     }
   }, [selectedPatient]);
 
+  // change dateNaissance depending on age
+  useEffect(() => {
+    if (data.age) {
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - data.age, 0, 1);
+      updateData({ dateNaissance: date.toISOString() });
+    }
+  }, [data.age]);
+
   function mapToViewModel(patient) {
     return {
       _id: patient._id,
@@ -207,6 +219,11 @@ function PatientForm({
       ville: patient.ville,
       provinceId: patient.provinceId || "",
       regionId: patient.regionId || "",
+      // calculate age from date of birth
+      age: patient.dateNaissance
+        ? new Date().getFullYear() -
+          new Date(patient.dateNaissance).getFullYear()
+        : "",
       images: patient.images || [],
       documents: patient.documents || [],
       imagesDeletedIndex: [],
@@ -300,6 +317,22 @@ function PatientForm({
             widthLabel={96}
           />
         </div>
+        {!isRdvForm && (
+          <div className="mt-3">
+            <Input
+              name="age"
+              label="Age"
+              width={170}
+              height={35}
+              widthLabel={96}
+              min={1}
+              type="number"
+              value={data.age || ""}
+              onChange={handleChange}
+              error={errors.age}
+            />
+          </div>
+        )}
         {!isRdvForm && (
           <div className="mt-3">
             <DateInput
