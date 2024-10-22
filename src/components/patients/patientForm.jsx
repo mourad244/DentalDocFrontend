@@ -203,7 +203,7 @@ function PatientForm({
       profession: patient.profession,
       dateNaissance: patient.dateNaissance,
       observations: patient.observations,
-      telephones: patient.telephones,
+      telephones: patient.telephones || [],
       ville: patient.ville,
       provinceId: patient.provinceId || "",
       regionId: patient.regionId || "",
@@ -451,36 +451,38 @@ function PatientForm({
           </div>
           {/* liste of telephones like inputs, alawys one empty to let the user add  */}
           <div className="flex flex-col">
-            {data.telephones.map((telephone, index) => (
-              <div key={index} className="mt-3 flex flex-row">
-                <Input
-                  name="telephones"
-                  width={145}
-                  height={35}
-                  widthLabel={96}
-                  label={`Téléphone ${index + 1}`}
-                  type="text"
-                  value={telephone || ""}
-                  onChange={(e) => {
-                    const newTelephones = [...data.telephones];
-                    newTelephones[index] = e.currentTarget.value;
-                    updateData({ telephones: newTelephones });
-                  }}
-                  error={errors.telephones}
-                />
-                {/* button to delete the item */}
-                <button
-                  className="m-auto ml-1  rounded-md bg-red-500 p-2 font-bold text-white"
-                  onClick={() => {
-                    const newTelephones = [...data.telephones];
-                    newTelephones.splice(index, 1);
-                    updateData({ telephones: newTelephones });
-                  }}
-                >
-                  x
-                </button>
-              </div>
-            ))}
+            {console.log("data", data.telephones)}
+            {data.telephones &&
+              data.telephones.map((telephone, index) => (
+                <div key={index} className="mt-3 flex flex-row">
+                  <Input
+                    name="telephones"
+                    width={145}
+                    height={35}
+                    widthLabel={96}
+                    label={`Téléphone ${index + 1}`}
+                    type="text"
+                    value={telephone || ""}
+                    onChange={(e) => {
+                      const newTelephones = [...data.telephones];
+                      newTelephones[index] = e.currentTarget.value;
+                      updateData({ telephones: newTelephones });
+                    }}
+                    error={errors.telephones}
+                  />
+                  {/* button to delete the item */}
+                  <button
+                    className="m-auto ml-1  rounded-md bg-red-500 p-2 font-bold text-white"
+                    onClick={() => {
+                      const newTelephones = [...data.telephones];
+                      newTelephones.splice(index, 1);
+                      updateData({ telephones: newTelephones });
+                    }}
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
           </div>
         </div>
         {!isRdvForm && (
