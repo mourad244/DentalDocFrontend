@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 import { getRegions } from "../../services/regionService";
 import { getProvinces } from "../../services/provinceService";
@@ -9,7 +10,6 @@ import PatientsTable from "./patientsTable";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { BsPersonAdd } from "react-icons/bs";
-import { useHistory } from "react-router-dom";
 import SearchBox from "../../common/searchBox";
 import ClipLoader from "react-spinners/ClipLoader";
 import { getPatientsListWithPagination } from "../../services/patientListPaginateService";

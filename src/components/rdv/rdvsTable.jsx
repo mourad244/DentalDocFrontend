@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import TableHeader from "../../common/tableHeader";
 import RdvTableBody from "./rdvTableBody";
@@ -16,6 +17,8 @@ const formatTime = (hour, minute) => {
   return minuteStr === "00" ? `${hourStr}h` : `${hourStr}:${minuteStr}`;
 };
 function RdvsTable(props) {
+  const history = useHistory();
+
   const columns = [
     {
       path: "select",
@@ -56,11 +59,14 @@ function RdvsTable(props) {
         return (
           <div
             key={rdv._id}
-            className={`rounded-md p-1 ${
+            className={`cursor-pointer rounded-md p-1 ${
               rdv.patientId && rdv.patientId.isMasculin
                 ? "bg-[#94b9f5]"
                 : "bg-[#f78bc6]"
             }`}
+            onClick={() => {
+              history.push(`/patients/${rdv.patientId._id}`);
+            }}
           >
             {rdv.patientId &&
               rdv.patientId.nom &&

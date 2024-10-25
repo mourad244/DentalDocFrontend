@@ -16,7 +16,9 @@ export function getRdvs(date) {
 export function getRdv(rdvId) {
   return http.get(rdvUrl(rdvId));
 }
-
+export function getPatientRdvs(patientId) {
+  return http.get(apiEndpoint + "/patient/" + patientId);
+}
 export async function saveRdv(rdv) {
   if (rdv._id) {
     if (getRdv(rdv._id)) {

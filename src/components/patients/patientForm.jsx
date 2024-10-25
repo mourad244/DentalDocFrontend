@@ -3,6 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { getRegions } from "../../services/regionService";
 import { savePatient, getPatient } from "../../services/patientService";
+import { getPatientRdvs } from "../../services/rdvService";
 import { getProvinces } from "../../services/provinceService";
 
 import Input from "../../common/input";
@@ -29,6 +30,7 @@ function PatientForm({
   const [filteredProvinces, setFilteredProvinces] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [telephone, setTelephone] = useState("");
+  const [patientRdvs, setPatientRdvs] = useState([]);
 
   const history = useHistory();
   const params = useParams();
@@ -192,7 +194,15 @@ function PatientForm({
       updateData(mapToViewModel(selectedPatient));
     }
   }, [selectedPatient]);
-
+  useEffect(() => {
+    const getRdvs = async () => {
+      const { data: rdvs } = await getPatientRdvs(data._id);
+      setPatientRdvs(rdvs);
+    };
+    if (data._id) {
+      getRdvs();
+    }
+  }, [data._id]);
   // change dateNaissance depending on age
   useEffect(() => {
     if (data.age) {
@@ -239,122 +249,122 @@ function PatientForm({
       documentsDeletedIndex: [],
     };
   }
-
   return loadingData ? (
     <div className="m-auto my-4">
       <ClipLoader loading={loadingData} size={70} />
     </div>
   ) : (
-    <div
-      className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
-        !isRdvForm && "border border-white bg-white"
-      }`}
-    >
-      {(selectedPatient || (selectedPatient && selectedPatient._id)) && (
-        <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
-          Formulaire du patient
-        </p>
-      )}
-      {!isRdvForm && (
-        <div className="ml-2  flex justify-start">
-          <button
-            className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
-            onClick={() => {
-              history.push("/patients");
-            }}
-          >
-            <IoChevronBackCircleSharp className="mr-1 " />
-            Retour à la Liste
-          </button>
-        </div>
-      )}
-      <form
-        className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
-        onSubmit={handleSubmit}
+    <>
+      <div
+        className={`mt-1 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
+          !isRdvForm && "border border-white bg-white"
+        }`}
       >
-        <div className="mt-3">
-          <Input
-            name="cin"
-            label="CIN"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.cin || ""}
-            onChange={handleChange}
-            error={errors.cin}
-          />
-        </div>
-        <div className="mt-3">
-          <Input
-            name="nom"
-            label="Nom"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.nom || ""}
-            onChange={handleChange}
-            error={errors.nom}
-          />
-        </div>
-        <div className="mt-3">
-          <Input
-            name="prenom"
-            label="Prénom"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.prenom || ""}
-            onChange={handleChange}
-            error={errors.prenom}
-          />
-        </div>
-        <div className="mt-3">
-          <BooleanSelect
-            name="isMasculin"
-            value={data.isMasculin}
-            label="Genre"
-            label1="Masculin"
-            label2="Féminin"
-            changeBoolean={(value) => {
-              return changeBoolean("isMasculin", value);
-            }}
-            width={85}
-            height={35}
-            widthLabel={96}
-          />
-        </div>
+        {(selectedPatient || (selectedPatient && selectedPatient._id)) && (
+          <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+            Formulaire du patient
+          </p>
+        )}
         {!isRdvForm && (
+          <div className="ml-2  flex justify-start">
+            <button
+              className="mr-2 flex h-6 min-w-fit cursor-pointer list-none rounded-lg bg-[#4F6874] pl-2 pr-2 pt-1 text-center text-xs font-bold text-white no-underline"
+              onClick={() => {
+                history.push("/patients");
+              }}
+            >
+              <IoChevronBackCircleSharp className="mr-1 " />
+              Retour à la Liste
+            </button>
+          </div>
+        )}
+        <form
+          className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
+          onSubmit={handleSubmit}
+        >
           <div className="mt-3">
             <Input
-              name="age"
-              label="Age"
+              name="cin"
+              label="CIN"
               width={170}
               height={35}
               widthLabel={96}
-              min={1}
-              type="number"
-              value={data.age || ""}
+              type="text"
+              value={data.cin || ""}
               onChange={handleChange}
-              error={errors.age}
+              error={errors.cin}
             />
           </div>
-        )}
-        {!isRdvForm && (
           <div className="mt-3">
-            <DateInput
-              name="dateNaissance"
-              label="Date naissance"
-              value={data.dateNaissance}
+            <Input
+              name="nom"
+              label="Nom"
+              width={170}
+              height={35}
+              widthLabel={96}
+              type="text"
+              value={data.nom || ""}
               onChange={handleChange}
-              error={errors.dateNaissance}
+              error={errors.nom}
             />
           </div>
-        )}
+          <div className="mt-3">
+            <Input
+              name="prenom"
+              label="Prénom"
+              width={170}
+              height={35}
+              widthLabel={96}
+              type="text"
+              value={data.prenom || ""}
+              onChange={handleChange}
+              error={errors.prenom}
+            />
+          </div>
+          <div className="mt-3">
+            <BooleanSelect
+              name="isMasculin"
+              value={data.isMasculin}
+              label="Genre"
+              label1="Masculin"
+              label2="Féminin"
+              changeBoolean={(value) => {
+                return changeBoolean("isMasculin", value);
+              }}
+              width={85}
+              height={35}
+              widthLabel={96}
+            />
+          </div>
+          {!isRdvForm && (
+            <div className="mt-3">
+              <Input
+                name="age"
+                label="Age"
+                width={170}
+                height={35}
+                widthLabel={96}
+                min={1}
+                type="number"
+                value={data.age || ""}
+                onChange={handleChange}
+                error={errors.age}
+              />
+            </div>
+          )}
+          {!isRdvForm && (
+            <div className="mt-3">
+              <DateInput
+                name="dateNaissance"
+                label="Date naissance"
+                value={data.dateNaissance}
+                onChange={handleChange}
+                error={errors.dateNaissance}
+              />
+            </div>
+          )}
 
-        {/* <div className="mt-3">
+          {/* <div className="mt-3">
           <Input
             name="telephone"
             label="Téléphone"
@@ -367,211 +377,211 @@ function PatientForm({
             error={errors.telephone}
           />
         </div> */}
-        <div className="mt-3">
-          <Input
-            name="mutuelle"
-            label="Mutuelle"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.mutuelle || ""}
-            onChange={handleChange}
-            error={errors.mutuelle}
-          />
-        </div>
-        <div className="mt-3">
-          <Input
-            name="numMutuelle"
-            label="N° Mutuelle"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.numMutuelle || ""}
-            onChange={handleChange}
-            error={errors.numMutuelle}
-          />
-        </div>
-        {!isRdvForm && (
-          <>
-            <div className="mt-3">
-              <Input
-                name="ville"
-                label="Ville"
-                width={170}
-                height={35}
-                widthLabel={96}
-                type="text"
-                value={data.ville || ""}
-                onChange={handleChange}
-                error={errors.ville}
-              />
-            </div>
-            <div className="mt-3">
-              <Input
-                name="profession"
-                label="Profession"
-                width={170}
-                height={35}
-                widthLabel={96}
-                type="text"
-                value={data.profession || ""}
-                onChange={handleChange}
-                error={errors.profession}
-              />
-            </div>
-          </>
-        )}
-        <div className="mt-3">
-          <Input
-            name="observations"
-            label="Observations"
-            width={170}
-            height={35}
-            widthLabel={96}
-            type="text"
-            value={data.observations || ""}
-            onChange={handleChange}
-            error={errors.observations}
-          />
-        </div>
-        <div className="mt-3">
-          <Select
-            name="regionId"
-            label="Region"
-            options={regions}
-            widthLabel={96}
-            width={170}
-            height={35}
-            value={data.regionId}
-            onChange={handleChange}
-            error={errors.regionId}
-          />
-        </div>
-        <div className="mt-3">
-          <Select
-            name="provinceId"
-            label="Province"
-            options={filteredProvinces}
-            widthLabel={96}
-            width={170}
-            height={35}
-            value={data.provinceId}
-            onChange={handleChange}
-            error={errors.provinceId}
-          />
-        </div>
-        {/* input and button to add telephone */}
-        <div className="my-2 flex w-full flex-row rounded-sm bg-slate-200 ">
-          <div className="mt-3 flex flex-row">
+          <div className="mt-3">
             <Input
-              name="telephone"
-              label="Téléphone"
-              width={145}
+              name="mutuelle"
+              label="Mutuelle"
+              width={170}
               height={35}
               widthLabel={96}
               type="text"
-              value={telephone || ""}
-              onChange={(e) => setTelephone(e.currentTarget.value)}
-              error={errors.telephone}
+              value={data.mutuelle || ""}
+              onChange={handleChange}
+              error={errors.mutuelle}
             />
-            <button
-              className="ml-2 h-fit rounded-md bg-blue-500 p-1 font-bold text-white"
-              onClick={(e) => {
-                e.preventDefault();
-                if (telephone) {
-                  const newTelephones = [...data.telephones];
-                  newTelephones.push(telephone);
-                  updateData({ telephones: newTelephones });
-                  setTelephone("");
-                }
-              }}
-            >
-              +
-            </button>
           </div>
-          {/* liste of telephones like inputs, alawys one empty to let the user add  */}
-          <div className="flex flex-col">
-            {data.telephones &&
-              data.telephones.map((telephone, index) => (
-                <div key={index} className="mt-3 flex flex-row">
-                  <Input
-                    name="telephones"
-                    width={145}
-                    height={35}
-                    widthLabel={96}
-                    label={`Téléphone ${index + 1}`}
-                    type="text"
-                    value={telephone || ""}
-                    onChange={(e) => {
-                      const newTelephones = [...data.telephones];
-                      newTelephones[index] = e.currentTarget.value;
-                      updateData({ telephones: newTelephones });
-                    }}
-                    error={errors.telephones}
-                  />
-                  {/* button to delete the item */}
-                  <button
-                    className="m-auto ml-1  rounded-md bg-red-500 p-2 font-bold text-white"
-                    onClick={() => {
-                      const newTelephones = [...data.telephones];
-                      newTelephones.splice(index, 1);
-                      updateData({ telephones: newTelephones });
-                    }}
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
+          <div className="mt-3">
+            <Input
+              name="numMutuelle"
+              label="N° Mutuelle"
+              width={170}
+              height={35}
+              widthLabel={96}
+              type="text"
+              value={data.numMutuelle || ""}
+              onChange={handleChange}
+              error={errors.numMutuelle}
+            />
           </div>
-        </div>
-        {!isRdvForm && (
-          <>
-            <div className="mt-3 w-full">
-              <UploadImage
-                name="image"
-                label="Photo"
-                image={filePreviews && filePreviews.image}
-                width={170}
+          {!isRdvForm && (
+            <>
+              <div className="mt-3">
+                <Input
+                  name="ville"
+                  label="Ville"
+                  width={170}
+                  height={35}
+                  widthLabel={96}
+                  type="text"
+                  value={data.ville || ""}
+                  onChange={handleChange}
+                  error={errors.ville}
+                />
+              </div>
+              <div className="mt-3">
+                <Input
+                  name="profession"
+                  label="Profession"
+                  width={170}
+                  height={35}
+                  widthLabel={96}
+                  type="text"
+                  value={data.profession || ""}
+                  onChange={handleChange}
+                  error={errors.profession}
+                />
+              </div>
+            </>
+          )}
+          <div className="mt-3">
+            <Input
+              name="observations"
+              label="Observations"
+              width={170}
+              height={35}
+              widthLabel={96}
+              type="text"
+              value={data.observations || ""}
+              onChange={handleChange}
+              error={errors.observations}
+            />
+          </div>
+          <div className="mt-3">
+            <Select
+              name="regionId"
+              label="Region"
+              options={regions}
+              widthLabel={96}
+              width={170}
+              height={35}
+              value={data.regionId}
+              onChange={handleChange}
+              error={errors.regionId}
+            />
+          </div>
+          <div className="mt-3">
+            <Select
+              name="provinceId"
+              label="Province"
+              options={filteredProvinces}
+              widthLabel={96}
+              width={170}
+              height={35}
+              value={data.provinceId}
+              onChange={handleChange}
+              error={errors.provinceId}
+            />
+          </div>
+          {/* input and button to add telephone */}
+          <div className="my-2 flex w-full flex-row rounded-sm bg-slate-200 ">
+            <div className="mt-3 flex flex-row">
+              <Input
+                name="telephone"
+                label="Téléphone"
+                width={145}
                 height={35}
                 widthLabel={96}
-                type="file"
-                onChange={handleUpload}
+                type="text"
+                value={telephone || ""}
+                onChange={(e) => setTelephone(e.currentTarget.value)}
+                error={errors.telephone}
               />
+              <button
+                className="ml-2 h-fit rounded-md bg-blue-500 p-1 font-bold text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (telephone) {
+                    const newTelephones = [...data.telephones];
+                    newTelephones.push(telephone);
+                    updateData({ telephones: newTelephones });
+                    setTelephone("");
+                  }
+                }}
+              >
+                +
+              </button>
             </div>
-            <div className="mt-3 w-full">
-              <DisplayImage
-                name="images"
-                widthLabel={96}
-                images={data.images}
-                label="Images"
-                width={200}
-                height={35}
-                deleteImage={handleDeleteImage}
-              />
+            {/* liste of telephones like inputs, alawys one empty to let the user add  */}
+            <div className="flex flex-col">
+              {data.telephones &&
+                data.telephones.map((telephone, index) => (
+                  <div key={index} className="mt-3 flex flex-row">
+                    <Input
+                      name="telephones"
+                      width={145}
+                      height={35}
+                      widthLabel={96}
+                      label={`Téléphone ${index + 1}`}
+                      type="text"
+                      value={telephone || ""}
+                      onChange={(e) => {
+                        const newTelephones = [...data.telephones];
+                        newTelephones[index] = e.currentTarget.value;
+                        updateData({ telephones: newTelephones });
+                      }}
+                      error={errors.telephones}
+                    />
+                    {/* button to delete the item */}
+                    <button
+                      className="m-auto ml-1  rounded-md bg-red-500 p-2 font-bold text-white"
+                      onClick={() => {
+                        const newTelephones = [...data.telephones];
+                        newTelephones.splice(index, 1);
+                        updateData({ telephones: newTelephones });
+                      }}
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
             </div>
-            <div className="mt-3 w-full">
-              <div className="flex flex-row">
-                <label
-                  className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
-                  style={{ width: 96 }}
-                >
-                  Document
-                </label>
-                <input
+          </div>
+          {!isRdvForm && (
+            <>
+              <div className="mt-3 w-full">
+                <UploadImage
+                  name="image"
+                  label="Photo"
+                  image={filePreviews && filePreviews.image}
+                  width={170}
+                  height={35}
+                  widthLabel={96}
                   type="file"
-                  name="documents"
-                  /* style={{
+                  onChange={handleUpload}
+                />
+              </div>
+              <div className="mt-3 w-full">
+                <DisplayImage
+                  name="images"
+                  widthLabel={96}
+                  images={data.images}
+                  label="Images"
+                  width={200}
+                  height={35}
+                  deleteImage={handleDeleteImage}
+                />
+              </div>
+              <div className="mt-3 w-full">
+                <div className="flex flex-row">
+                  <label
+                    className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
+                    style={{ width: 96 }}
+                  >
+                    Document
+                  </label>
+                  <input
+                    type="file"
+                    name="documents"
+                    /* style={{
                     width: 86,
                     height: 35,
                     fontSize: "0.75rem",
                   }} */
-                  multiple
-                  onChange={handleUploadDoc}
-                />
-              </div>
-              {/* {isDocPicked && (
+                    multiple
+                    onChange={handleUploadDoc}
+                  />
+                </div>
+                {/* {isDocPicked && (
                 <div>
                   <p>Filename: {selectedDoc.name}</p>
                   {selectedDoc.size > 1000000
@@ -581,8 +591,8 @@ function PatientForm({
                       } KB`}
                 </div>
               )} */}
-            </div>
-            {/* <div className="mt-3 w-full">
+              </div>
+              {/* <div className="mt-3 w-full">
               <div className={` flex  `}>
                 <label
                   className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
@@ -679,31 +689,112 @@ function PatientForm({
                 </div>
               </div>
             </div> */}
-            <DisplayDocument
-              name="documents"
-              widthLabel={96}
-              documents={data.documents}
-              label="Documents"
-              width={200}
-              height={35}
-              deleteDocument={handleDeleteDoc}
-            />
-            <div className="mr-6 mt-3 flex w-full justify-end">
-              <button
-                type="submit"
-                className={
-                  !validate()
-                    ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
-                    : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
-                }
-              >
-                Sauvegrader
-              </button>
+              <DisplayDocument
+                name="documents"
+                widthLabel={96}
+                documents={data.documents}
+                label="Documents"
+                width={200}
+                height={35}
+                deleteDocument={handleDeleteDoc}
+              />
+              <div className="mr-6 mt-3 flex w-full justify-end">
+                <button
+                  type="submit"
+                  className={
+                    !validate()
+                      ? "cursor-pointer rounded-5px border-0   bg-custom-blue pl-3 pr-3 text-xs font-medium leading-7 text-white shadow-custom "
+                      : "pointer-events-none cursor-not-allowed rounded-5px   border border-blue-40 bg-grey-ea pl-3 pr-3 text-xs leading-7 text-grey-c0"
+                  }
+                >
+                  Sauvegrader
+                </button>
+              </div>
+            </>
+          )}
+        </form>
+      </div>
+      {data._id && (
+        <div
+          className={`mt-3 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
+            !isRdvForm && "border border-white bg-white"
+          }`}
+        >
+          <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
+            Liste des RDVS
+          </p>
+          {patientRdvs.length !== 0 ? (
+            <table className="  m-auto ml-2 mr-2 h-fit">
+              <thead className="h-12  text-[#4f5361]">
+                <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
+                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                    Date
+                  </th>
+                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                    Heure début
+                  </th>
+                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                    Acte
+                  </th>
+                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                    Etat
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {patientRdvs.map((rdv) => (
+                  <tr key={rdv._id} className={`h-12 border-2 text-center`}>
+                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">{`${new Date(
+                      rdv.datePrevu,
+                    ).getDate()}/${new Date(
+                      rdv.datePrevu,
+                    ).getMonth()}/${new Date(
+                      rdv.datePrevu,
+                    ).getFullYear()}`}</td>
+                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                      {rdv.heureDebut.heure}:{rdv.heureDebut.minute} {" -> "}
+                      {rdv.heureFin.heure}:{rdv.heureFin.minute}
+                    </td>
+                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                      {rdv.acteId && rdv.acteId.nom}
+                    </td>
+                    <td
+                      className={` text-[#2f2f2f]" px-1 text-xs font-medium ${
+                        rdv.isHonnore
+                          ? "bg-[#1ca83b]"
+                          : rdv.isAnnule
+                          ? "bg-[#ff8c8c]"
+                          : rdv.isReporte
+                          ? "bg-[#e49012]"
+                          : new Date(rdv.date) < new Date()
+                          ? "bg-[#ad1e31]"
+                          : ""
+                      } `}
+                    >
+                      {rdv.isHonnore
+                        ? "Honnoré"
+                        : rdv.isReporte
+                        ? "Reporté"
+                        : rdv.isAnnule
+                        ? "Annulé"
+                        : new Date(rdv.date) < new Date()
+                        ? "Non honoré"
+                        : "En attente"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            /* afficher text aucun rds*/
+
+            <div className="m-auto my-4 ml-2">
+              <p className=" font-bold text-[#474a52]">Aucun RDV</p>
             </div>
-          </>
-        )}
-      </form>
-    </div>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
