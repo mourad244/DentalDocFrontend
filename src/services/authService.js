@@ -4,22 +4,27 @@ import http from "./httpService";
 // import { apiUrl } from "../config.json";
 const apiUrl = process.env.REACT_APP_API_URL;
 const apiEndpoint = apiUrl + "/auth";
-const tokenKey = "token";
+const tokenKey = "unsecureKey";
 
-setTimeout(() => {
-  http.setJwt(getJwt());
-}, 2000);
+const jwt = getJwt();
+if (jwt) {
+  http.setJwt(jwt);
+}
+
 export async function login(nom, password) {
   const { data: jwt } = await http.post(apiEndpoint, { nom, password });
   sessionStorage.setItem(tokenKey, jwt);
+  http.setJwt(jwt); // Set the JWT token after login
 }
 
 export function loginWithJwt(jwt) {
   sessionStorage.setItem(tokenKey, jwt);
+  http.setJwt(jwt); // Set the JWT token after login with JWT
 }
 
 export function logout() {
   sessionStorage.removeItem(tokenKey);
+  http.setJwt(null); // Remove the JWT token from http service
 }
 
 export function getCurrentUser() {
@@ -32,6 +37,7 @@ export function getCurrentUser() {
 }
 
 export function getJwt() {
+  console.log("getJwt", sessionStorage.getItem(tokenKey));
   return sessionStorage.getItem(tokenKey);
 }
 
