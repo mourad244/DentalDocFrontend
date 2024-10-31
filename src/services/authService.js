@@ -4,12 +4,11 @@ import http from "./httpService";
 // import { apiUrl } from "../config.json";
 const apiUrl = process.env.REACT_APP_API_URL;
 const apiEndpoint = apiUrl + "/auth";
-const tokenKey = "unsecureKey";
+const tokenKey = "token";
 
-const jwt = getJwt();
-if (jwt) {
-  http.setJwt(jwt);
-}
+setTimeout(() => {
+  http.setJwt(getJwt());
+}, 2000);
 export async function login(nom, password) {
   const { data: jwt } = await http.post(apiEndpoint, { nom, password });
   sessionStorage.setItem(tokenKey, jwt);
@@ -33,7 +32,6 @@ export function getCurrentUser() {
 }
 
 export function getJwt() {
-  console.log("getJwt", sessionStorage.getItem(tokenKey));
   return sessionStorage.getItem(tokenKey);
 }
 
