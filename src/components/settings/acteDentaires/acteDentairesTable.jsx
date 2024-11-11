@@ -22,6 +22,10 @@ function DetailCouverturesTable(props) {
       label: "Nom",
     },
     {
+      path: "abreviation",
+      label: "Abreviation",
+    },
+    {
       path: "natureId.nom",
       label: "Nature Acte",
     },

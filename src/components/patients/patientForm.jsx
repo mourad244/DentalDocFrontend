@@ -24,6 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PDFDocument, rgb } from "pdf-lib";
 
 import { FaPrint } from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa6";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 
@@ -1458,7 +1459,7 @@ function PatientForm({
       </div>
       {data._id && (
         <div
-          className={`mt-3 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
+          className={`mt-3 h-[fit-content] w-[100%] min-w-fit rounded-md ${
             !isRdvForm ? "border border-white bg-white" : "m-2 bg-white p-2 "
           }`}
         >
@@ -1536,104 +1537,112 @@ function PatientForm({
       )}
       {data._id && (
         <div
-          className={`mt-3 h-[fit-content] w-[100%] min-w-fit rounded-tr-md ${
-            !isRdvForm && "border border-white bg-white"
+          className={`mt-3 h-[fit-content] w-[100%] min-w-fit rounded-md ${
+            !isRdvForm ? "border border-white bg-white" : "m-2 bg-white p-2 "
           }`}
         >
           <p className="m-2 mt-2 w-full text-xl font-bold text-[#474a52]">
             Liste des devis
           </p>
-          <div className=" m-2 flex h-7 items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
-            <FaPrint
-              className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
-                selectedDevis.length === 0
-                  ? "pointer-events-none opacity-50"
-                  : ""
-              }`}
-              title="Imprimer"
-              color="#474a52"
-              onClick={displayPopup}
-            />
-          </div>
-          {devis.length !== 0 && (
-            <table className="  m-auto mb-2 ml-2 mr-2 h-fit">
-              <thead className="h-12  text-[#4f5361]">
-                <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
-                  <th
-                    key={uuidv4()}
-                    className="w-8"
-                    //   onClick={() => {
-                    //     return onSort(headers[index].name);
-                    //   }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={
-                        selectedDevis &&
-                        totalDevis &&
-                        totalDevis === selectedDevis.length
-                      }
-                      onChange={handleSelectDevis}
-                    />
-                  </th>
 
-                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                    Date
-                  </th>
-                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                    Acte Dentaire
-                  </th>
-                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                    Prix
-                  </th>
-                  <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
-                    Mutuelle
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {devis.map((devi) => (
-                  <tr key={devi._id} className={`h-12 border-2 text-center`}>
-                    <td className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center">
+          {devis.length !== 0 ? (
+            <>
+              <div className=" m-2 flex h-7 items-center gap-2 rounded-md  border-slate-300 bg-[#D6E1E3] shadow-md ">
+                <FaFilePdf
+                  className={`$ h-6 w-7 cursor-pointer rounded-md p-1 shadow-md ${
+                    selectedDevis.length === 0
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }`}
+                  title="Imprimer mutuelle"
+                  color="#474a52"
+                  onClick={displayPopup}
+                />
+              </div>
+              <table className="  m-auto mb-2 ml-2 mr-2 h-fit">
+                <thead className="h-12  text-[#4f5361]">
+                  <tr className="h-8 w-[100%] bg-[#83BCCD] text-center">
+                    <th
+                      key={uuidv4()}
+                      className="w-8"
+                      //   onClick={() => {
+                      //     return onSort(headers[index].name);
+                      //   }}
+                    >
                       <input
                         type="checkbox"
                         checked={
-                          selectedDevis.findIndex((c) => c._id === devi._id) !==
-                          -1
+                          selectedDevis &&
+                          totalDevis &&
+                          totalDevis === selectedDevis.length
                         }
-                        onChange={() => handleSelectDevi(devi)}
+                        onChange={handleSelectDevis}
                       />
-                    </td>
+                    </th>
 
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {devi.deviId && devi.deviId.dateDevi
-                        ? `${new Date(devi.deviId.dateDevi).getDate()}/${new Date(
-                            devi.deviId.dateDevi,
-                          ).getMonth()}/${new Date(
-                            devi.deviId.dateDevi,
-                          ).getFullYear()}`
-                        : ""}
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {/* deviId.acteEffectues[{acteId.nom}] */}
-                      {devi.deviId &&
-                        devi.deviId.acteEffectues.map((acte) => (
-                          <div key={acte.acteId._id}>- {acte.acteId.nom}</div>
-                        ))}
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      <div className="w-max">{`${devi.montant} Dh`}</div>
-                    </td>
-                    <td className="px-1 text-xs font-medium text-[#2f2f2f]">
-                      {/* {devi.deviId &&
+                    <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                      Date
+                    </th>
+                    <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                      Acte Dentaire
+                    </th>
+                    <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                      Prix
+                    </th>
+                    <th className="px-3 text-xs font-semibold text-[#2f2f2f]">
+                      Mutuelle
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {devis.map((devi) => (
+                    <tr key={devi._id} className={`h-12 border-2 text-center`}>
+                      <td className=" h-12  border-y-2 border-y-gray-300 bg-[#D6E1E3]  text-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            selectedDevis.findIndex(
+                              (c) => c._id === devi._id,
+                            ) !== -1
+                          }
+                          onChange={() => handleSelectDevi(devi)}
+                        />
+                      </td>
+
+                      <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                        {devi.deviId && devi.deviId.dateDevi
+                          ? `${new Date(devi.deviId.dateDevi).getDate()}/${new Date(
+                              devi.deviId.dateDevi,
+                            ).getMonth()}/${new Date(
+                              devi.deviId.dateDevi,
+                            ).getFullYear()}`
+                          : ""}
+                      </td>
+                      <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                        {/* deviId.acteEffectues[{acteId.nom}] */}
+                        {devi.deviId &&
+                          devi.deviId.acteEffectues.map((acte) => (
+                            <div key={acte.acteId._id}>- {acte.acteId.nom}</div>
+                          ))}
+                      </td>
+                      <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                        <div className="w-max">{`${devi.montant} Dh`}</div>
+                      </td>
+                      <td className="px-1 text-xs font-medium text-[#2f2f2f]">
+                        {/* {devi.deviId &&
                         devi.deviId.mutuelle &&
                         devi.deviId.mutuelle.numBordereau} */}
-                      {` ${devi.deviId && devi.deviId.mutuelle && devi.deviId.mutuelle.numBordereau ? "Bodereau N° :" + devi.deviId.mutuelle.numBordereau : ""}  ${devi.deviId && devi.deviId.mutuelle && devi.deviId.mutuelle.signatureDate ? `du ${new Date(devi.deviId.mutuelle.signatureDate).getDate()}/${new Date(devi.deviId.mutuelle.signatureDate).getMonth()}/${new Date(devi.deviId.mutuelle.signatureDate).getFullYear()}` : ""}`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        {` ${devi.deviId && devi.deviId.mutuelle && devi.deviId.mutuelle.numBordereau ? "Bodereau N° :" + devi.deviId.mutuelle.numBordereau : ""}  ${devi.deviId && devi.deviId.mutuelle && devi.deviId.mutuelle.signatureDate ? `du ${new Date(devi.deviId.mutuelle.signatureDate).getDate()}/${new Date(devi.deviId.mutuelle.signatureDate).getMonth()}/${new Date(devi.deviId.mutuelle.signatureDate).getFullYear()}` : ""}`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <div className="m-auto my-4 ml-2">
+              <p className=" font-bold text-[#474a52]">Aucun Devi</p>
+            </div>
           )}
           <ReactModal
             isOpen={isModalOpen}

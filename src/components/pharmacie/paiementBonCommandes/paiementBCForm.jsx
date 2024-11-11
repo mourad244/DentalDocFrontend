@@ -52,8 +52,6 @@ class PaiementBCForm extends Form {
     this.setState({ loading: true });
     const paiementBCId = this.props.match.params.paiementBCId;
     const bonCommandeId = this.props.match.params.bonCommandeid;
-    console.log("paiementBCId", paiementBCId);
-    console.log("bonCommandeId", bonCommandeId);
     if (paiementBCId === "new" || paiementBCId === undefined) {
       if (bonCommandeId) {
         const { data: bonCommande } = await getBonCommande(bonCommandeId);

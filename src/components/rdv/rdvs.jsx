@@ -84,6 +84,22 @@ function Rdvs() {
     setSortColumn(sortColumn);
   };
 
+  const handleHonnoreNonChecked = (rdvId) => {
+    let newRdvs = [...filteredRdvs];
+    newRdvs.map(async (e, index) => {
+      if (e._id === rdvId) {
+        newRdvs[index].isHonnore = false;
+        await saveRdv({
+          _id: e._id,
+          patientId: e.patientId._id,
+          datePrevu: e.datePrevu,
+          isHonnore: e.isHonnore,
+        });
+      }
+    });
+    setFilteredRdvs(newRdvs);
+  };
+
   const handleHonnoreChecked = (rdvId) => {
     let newRdvs = [...filteredRdvs];
     newRdvs.map(async (e, index) => {
@@ -231,7 +247,8 @@ function Rdvs() {
             rdvs={filteredRdvs}
             sortColumn={sortColumn}
             onSort={handleSort}
-            onCheck={handleHonnoreChecked}
+            onRdvOn={handleHonnoreChecked}
+            onRdvOff={handleHonnoreNonChecked}
             onItemSelect={handleSelectRdv}
             onItemsSelect={handleSelectRdvs}
             onAddDevi={

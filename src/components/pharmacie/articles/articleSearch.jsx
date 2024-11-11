@@ -120,8 +120,6 @@ function ArticleSearch(props) {
 
   const handleSelectArticle = (article) => {
     let newSelectedArticles = [...selectedArticles];
-    console.log("article", article);
-    console.log("selectedArticles", selectedArticles);
     let isSelected = selectedArticles.some(
       (selectedArticle) => selectedArticle._id === article._id,
     );

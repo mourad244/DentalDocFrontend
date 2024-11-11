@@ -16,6 +16,7 @@ class ActeDentaireForm extends Form {
   state = {
     data: {
       nom: "",
+      abreviation: "",
       natureId: "",
       code: "",
       prix: "",
@@ -30,17 +31,19 @@ class ActeDentaireForm extends Form {
     fields: [
       { order: 1, name: "select", label: "Select", isActivated: false },
       { order: 2, name: "nom", label: "Nom" },
-      { order: 3, name: "code", label: "Code" },
-      { order: 4, name: "lotId", label: "Lot" },
-      { order: 5, name: "stockInitial", label: "Stock Initial" },
-      { order: 6, name: "stockAlerte", label: "Stock Alerte" },
-      { order: 7, name: "uniteMesureId", label: "Unite Mesure" },
-      { order: 8, name: "uniteReglementaireId", label: "Unite Reglementaire" },
-      { order: 9, name: "prixHT", label: "Prix HT" },
-      { order: 10, name: "tauxTVA", label: "Taux TVA" },
-      { order: 11, name: "isExpiration", label: "Expiration" },
-      { order: 12, name: "prixTTC", label: "Prix TTC" },
-      { order: 13, name: "stockActuel", label: "Stock Actuel" },
+      { order: 3, name: "abreviation", label: "Abréviation" },
+
+      { order: 4, name: "code", label: "Code" },
+      { order: 5, name: "lotId", label: "Lot" },
+      { order: 6, name: "stockInitial", label: "Stock Initial" },
+      { order: 7, name: "stockAlerte", label: "Stock Alerte" },
+      { order: 8, name: "uniteMesureId", label: "Unite Mesure" },
+      { order: 9, name: "uniteReglementaireId", label: "Unite Reglementaire" },
+      { order: 10, name: "prixHT", label: "Prix HT" },
+      { order: 11, name: "tauxTVA", label: "Taux TVA" },
+      { order: 12, name: "isExpiration", label: "Expiration" },
+      { order: 13, name: "prixTTC", label: "Prix TTC" },
+      { order: 14, name: "stockActuel", label: "Stock Actuel" },
     ],
     articleFields: [
       // code, designation, qte a utiliser
@@ -85,6 +88,8 @@ class ActeDentaireForm extends Form {
         });
         return errors;
       }),
+    abreviation: Joi.string().allow(""),
+
     natureId: Joi.string().allow(""),
     code: Joi.number().allow(""),
     prix: Joi.number().allow(""),
@@ -147,6 +152,7 @@ class ActeDentaireForm extends Form {
       this.setState({
         data: {
           nom: "",
+          abreviation: "",
           natureId: "",
           code: "",
           prix: "",
@@ -192,6 +198,7 @@ class ActeDentaireForm extends Form {
     return {
       _id: acteDentaire._id,
       nom: acteDentaire.nom,
+      abreviation: acteDentaire.abreviation,
       natureId: acteDentaire.natureId ? acteDentaire.natureId._id : "",
       code: acteDentaire.code,
       prix: acteDentaire.prix,
@@ -228,6 +235,7 @@ class ActeDentaireForm extends Form {
     this.setState({
       data: {
         nom: "",
+        abreviation: "",
         natureId: "",
         code: "",
         prix: "",
@@ -254,6 +262,10 @@ class ActeDentaireForm extends Form {
               onSubmit={this.handleSubmit}
             >
               <div className="mt-3">{this.renderInput("nom", "Nom acte")}</div>
+              <div className="mt-3">
+                {this.renderInput("abreviation", "Abréviation")}
+              </div>
+
               <div className="mt-3">
                 {this.renderSelect(
                   "natureId",

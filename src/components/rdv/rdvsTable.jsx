@@ -85,13 +85,15 @@ function RdvsTable(props) {
       label: "Acte",
       content: (rdv) => {
         return (
-          <label key={rdv._id}>
-            {rdv.acteId && rdv.acteId.nom
-              ? rdv.acteId.nom.length > 50
-                ? rdv.acteId.nom.substring(0, 50) + "..."
-                : rdv.acteId.nom
-              : ""}
-          </label>
+          <div className="m-auto max-w-52" key={rdv._id}>
+            {rdv.acteId && rdv.acteId.abreviation
+              ? rdv.acteId.abreviation
+              : rdv.acteId.nom
+                ? rdv.acteId.nom.length > 30
+                  ? rdv.acteId.nom.substring(0, 30) + "..."
+                  : rdv.acteId.nom
+                : ""}
+          </div>
         );
       },
     },
@@ -114,7 +116,7 @@ function RdvsTable(props) {
     },
     {
       path: "isHonnore",
-      label: "Honnoré?",
+      label: "Honnoré",
       content: (rdv) => {
         if (rdv.isAnnule) return <label key={rdv._id}>Annulé</label>;
         if (rdv.isReporte) {
@@ -137,12 +139,34 @@ function RdvsTable(props) {
               // rdv.isHonnore
             }
             onChange={() => {
-              props.onCheck(rdv._id);
+              props.onRdvOn(rdv._id);
             }}
           />
         );
       },
     },
+    {
+      label: "Non honnoré",
+      content: (rdv) => {
+        return (
+          <input
+            key={rdv._id}
+            type="checkbox"
+            checked={
+              // si le rdv a  un devis, il est donc obligatoirement honoré sinon
+              // on voit la valeur de isHonnore is false
+              rdv.deviId && rdv.deviId._id ? false : rdv.isHonnore === false
+
+              // rdv.isHonnore
+            }
+            onChange={() => {
+              props.onRdvOff(rdv._id);
+            }}
+          />
+        );
+      },
+    },
+
     {
       path: "deviId.numOrdre",
       label: "N° Devis",
