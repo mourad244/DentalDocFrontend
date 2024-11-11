@@ -253,9 +253,7 @@ function Patients({ user }) {
             onItemsSelect={handleSelectPatients}
             selectedItems={selectedPatients}
             selectedItem={selectedPatient}
-            onPrint={() => {
-              console.log("print");
-            }}
+            // onPrint={selectedPatient ? generatePdf : undefined}
             onEdit={selectedPatient ? handleEdit : undefined}
             onDelete={
               selectedPatient !== null || selectedPatients.length !== 0

@@ -8,6 +8,7 @@ class DentForm extends Form {
     data: {
       numeroFDI: "",
       description: "",
+      code: "",
     },
     formDisplay: false,
     errors: {},
@@ -25,6 +26,7 @@ class DentForm extends Form {
         return errors;
       }),
     description: Joi.string(),
+    code: Joi.string(),
   };
 
   async populateDents() {
@@ -45,7 +47,13 @@ class DentForm extends Form {
   }
   async componentDidUpdate(prevProps, prevState) {
     if (!this.props.selectedDent && prevState.data._id) {
-      this.setState({ data: { numeroFDI: "" } });
+      this.setState({
+        data: {
+          numeroFDI: "",
+          description: "",
+          code: "",
+        },
+      });
     }
     if (
       this.props.selectedDent &&
@@ -63,12 +71,13 @@ class DentForm extends Form {
       _id: dent._id,
       numeroFDI: dent.numeroFDI,
       description: dent.description,
+      code: dent.code,
     };
   }
   doSubmit = async () => {
     let { data } = this.state;
     await saveDent(data);
-    this.setState({ data: { numeroFDI: "" } });
+    this.setState({ data: { numeroFDI: "", description: "", code: "" } });
     this.props.updateData();
   };
 
@@ -84,8 +93,14 @@ class DentForm extends Form {
               className="mb-6 ml-2 mr-2.5 mt-2 flex w-[100%] flex-wrap justify-start"
               onSubmit={this.handleSubmit}
             >
-              {this.renderInput("numeroFDI", "N° FDI dent")}
-              {this.renderInput("description", "Description")}
+              <div className="mt-3">
+                {this.renderInput("numeroFDI", "N° FDI dent")}
+              </div>
+              <div className="mt-3">
+                {this.renderInput("description", "Description")}
+              </div>
+              <div className="mt-3">{this.renderInput("code", "Code")}</div>
+
               {this.renderButton("Sauvegarder")}
             </form>
           </div>

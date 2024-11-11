@@ -27,6 +27,12 @@ export async function saveDevi(devi) {
   return http.post(apiEndpoint, devi);
 }
 
+export async function saveDeviIsCovered(devi) {
+  const body = { ...devi };
+  delete body._id;
+  return http.put(`${apiEndpoint}/mutuelle/${devi._id}`, body);
+}
+
 export function deleteDevi(deviId) {
   return http.delete(deviUrl(deviId));
 }

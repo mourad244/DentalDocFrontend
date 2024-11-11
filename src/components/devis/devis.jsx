@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
+import DevisTable from "./devisTable";
+
 import { deleteDevi } from "../../services/deviService";
 import { getMedecins } from "../../services/medecinService";
 import { getDevis } from "../../services/deviPaginateService";
-
-import DevisTable from "./devisTable";
 
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
@@ -232,6 +232,7 @@ function Devis({ user }) {
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);
   };
+
   const handlePageClick = (event) => {
     const newCurrentPage = event.selected + 1;
     setCurrentPage(newCurrentPage);
@@ -324,9 +325,7 @@ function Devis({ user }) {
             selectedItems={selectedDevis}
             selectedItem={selectedDevi}
             onAddPaiement={selectedDevi ? handleAddPaiement : undefined}
-            onPrint={() => {
-              console.log("print");
-            }}
+            // onPrint={selectedDevi ? generatePdf : undefined}
             onEdit={selectedDevi ? handleEdit : undefined}
             onDelete={
               selectedDevi !== null || selectedDevis.length !== 0

@@ -37,7 +37,6 @@ export function getCurrentUser() {
 }
 
 export function getJwt() {
-  console.log("getJwt", sessionStorage.getItem(tokenKey));
   return sessionStorage.getItem(tokenKey);
 }
 
