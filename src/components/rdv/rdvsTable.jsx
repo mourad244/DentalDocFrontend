@@ -84,6 +84,7 @@ function RdvsTable(props) {
       path: "patientId.acteId",
       label: "Acte",
       content: (rdv) => {
+        if (!rdv.acteId) return <div></div>;
         return (
           <div className="m-auto max-w-52" key={rdv._id}>
             {rdv.acteId && rdv.acteId.abreviation
@@ -129,7 +130,7 @@ function RdvsTable(props) {
         }
         return (
           <input
-            key={rdv._id}
+            key={rdv._id + 1}
             type="checkbox"
             checked={
               // si le rdv a  un devis, il est donc obligatoirement honoré sinon
@@ -150,7 +151,7 @@ function RdvsTable(props) {
       content: (rdv) => {
         return (
           <input
-            key={rdv._id}
+            key={rdv._id + 2}
             type="checkbox"
             checked={
               // si le rdv a  un devis, il est donc obligatoirement honoré sinon

@@ -1104,78 +1104,83 @@ function PatientForm({
             error={errors.telephone}
           />
         </div> */}
-          <div className="mt-3">
-            <Input
-              name="mutuelle"
-              label="Mutuelle"
-              width={180}
-              height={35}
-              widthLabel={96}
-              type="text"
-              value={data.mutuelle || ""}
-              onChange={handleChange}
-              error={errors.mutuelle}
-            />
-          </div>
-
-          {!isRdvForm && (
-            <>
-              <div className="mt-3">
-                <Input
-                  name="numImmatriculationAssure"
-                  label="N° Immatriculat°"
-                  width={180}
-                  height={35}
-                  widthLabel={96}
-                  type="text"
-                  value={data.numImmatriculationAssure || ""}
-                  onChange={handleChange}
-                  error={errors.numImmatriculationAssure}
-                />
-              </div>
-              <div className="mt-3">
-                <Input
-                  name="numAffiliationAssure"
-                  label="N° Affiliation"
-                  width={180}
-                  height={35}
-                  widthLabel={96}
-                  type="text"
-                  value={data.numAffiliationAssure || ""}
-                  onChange={handleChange}
-                  error={errors.numAffiliationAssure}
-                />
-              </div>
-              {data.isPatientAssure && (
+          {(data.isPatientAssure === true ||
+            data.isPatientAssure === false) && (
+            <div className="mt-3">
+              <Input
+                name="mutuelle"
+                label="Mutuelle"
+                width={180}
+                height={35}
+                widthLabel={96}
+                type="text"
+                value={data.mutuelle || ""}
+                onChange={handleChange}
+                error={errors.mutuelle}
+              />
+            </div>
+          )}
+          {console.log("datra", data.isPatientAssure)}
+          {!isRdvForm &&
+            (data.isPatientAssure === true ||
+              data.isPatientAssure === false) && (
+              <>
                 <div className="mt-3">
                   <Input
-                    name="adresse"
-                    label="Adresse"
+                    name="numImmatriculationAssure"
+                    label="N° Immatriculat°"
                     width={180}
                     height={35}
                     widthLabel={96}
                     type="text"
-                    value={data.adresse || ""}
+                    value={data.numImmatriculationAssure || ""}
                     onChange={handleChange}
-                    error={errors.adresse}
+                    error={errors.numImmatriculationAssure}
                   />
                 </div>
-              )}
-              <div className="mt-3">
-                <Input
-                  name="profession"
-                  label="Profession"
-                  width={180}
-                  height={35}
-                  widthLabel={96}
-                  type="text"
-                  value={data.profession || ""}
-                  onChange={handleChange}
-                  error={errors.profession}
-                />
-              </div>
-            </>
-          )}
+                <div className="mt-3">
+                  <Input
+                    name="numAffiliationAssure"
+                    label="N° Affiliation"
+                    width={180}
+                    height={35}
+                    widthLabel={96}
+                    type="text"
+                    value={data.numAffiliationAssure || ""}
+                    onChange={handleChange}
+                    error={errors.numAffiliationAssure}
+                  />
+                </div>
+                {data.isPatientAssure && (
+                  <div className="mt-3">
+                    <Input
+                      name="adresse"
+                      label="Adresse"
+                      width={180}
+                      height={35}
+                      widthLabel={96}
+                      type="text"
+                      value={data.adresse || ""}
+                      onChange={handleChange}
+                      error={errors.adresse}
+                    />
+                  </div>
+                )}
+                <div className="mt-3">
+                  <Input
+                    name="profession"
+                    label="Profession"
+                    width={180}
+                    height={35}
+                    widthLabel={96}
+                    type="text"
+                    value={data.profession || ""}
+                    onChange={handleChange}
+                    error={errors.profession}
+                  />
+                </div>
+              </>
+            )}
           <div className="mt-3">
             <Input
               name="observations"
