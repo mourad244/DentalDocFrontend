@@ -241,7 +241,6 @@ function RdvsTable(props) {
   return (
     <>
       {itemActions}
-      {console.log("columns", columns)}
       <table className=" my-2 h-fit w-full">
         <TableHeader
           columns={columns}
