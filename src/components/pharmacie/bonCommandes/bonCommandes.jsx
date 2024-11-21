@@ -65,7 +65,6 @@ function BonCommandes() {
           pageSize,
           order: sortColumn.order,
           sortColumn: sortColumn.path,
-          searchQuery,
           dateDebut: selectedDates.dateDebut,
           dateFin: selectedDates.dateFin,
           statut: selectedFilterItems.statut,

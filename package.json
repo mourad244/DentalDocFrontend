@@ -2,6 +2,7 @@
   "name": "dental-doc-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@hookform/resolvers": "^2.5.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -30,7 +31,6 @@
     "react-moment": "^1.1.1",
     "react-paginate": "^8.1.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^5.0.1",
     "react-spinners": "^0.11.0",
     "react-to-print": "^2.13.0",
     "react-toastify": "^4.5.2",
@@ -43,8 +43,8 @@
     "yup": "^0.32.9"
   },
   "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
+    "dev": "vite",
+    "build": "vite build",
     "test": "jest",
     "eject": "react-scripts eject",
     "start": "serve -s build"
@@ -73,12 +73,17 @@
     "@babel/preset-react": "^7.24.1",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
     "babel-jest": "^29.7.0",
     "identity-obj-proxy": "^3.0.0",
     "import-local": "^3.1.0",
     "jest": "^27.5.1",
+    "postcss": "^8.4.49",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.6",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.11",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }

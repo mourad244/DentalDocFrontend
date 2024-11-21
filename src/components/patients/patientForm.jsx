@@ -1394,7 +1394,7 @@ function PatientForm({
                         <div className="flex">
                           <a
                             href={
-                              process.env.REACT_APP_API_IMAGE_URL + "/" + doc
+                              import.meta.env.VITE_API_IMAGE_URL + "/" + doc
                             }
                             target="_blank"
                             rel="noopener noreferrer"

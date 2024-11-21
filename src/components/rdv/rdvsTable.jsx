@@ -9,8 +9,7 @@ import { TiCancel } from "react-icons/ti";
 import { AiFillDelete } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { MdOutlineScheduleSend } from "react-icons/md";
-
-import Moment from "react-moment";
+import moment from "moment";
 const formatTime = (hour, minute) => {
   let hourStr = hour.toString().padStart(2, "0");
   let minuteStr = minute.toString().padStart(2, "0");
@@ -124,7 +123,7 @@ function RdvsTable(props) {
           return (
             <label key={rdv._id}>
               Reporté au{" "}
-              <Moment format="DD/MM/YYYY">{rdv.dateNouveauRdv}</Moment>
+              {moment(new Date(rdv.dateNouveauRdv)).format("DD/MM/YYYY")}
             </label>
           );
         }
@@ -147,6 +146,7 @@ function RdvsTable(props) {
       },
     },
     {
+      path: "isHonnoreNon",
       label: "Non honnoré",
       content: (rdv) => {
         return (
@@ -241,6 +241,7 @@ function RdvsTable(props) {
   return (
     <>
       {itemActions}
+      {console.log("columns", columns)}
       <table className=" my-2 h-fit w-full">
         <TableHeader
           columns={columns}

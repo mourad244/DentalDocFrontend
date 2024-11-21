@@ -1,6 +1,6 @@
 import React from "react";
 import Table from "../../common/table";
-import Moment from "react-moment";
+import moment from "moment";
 
 function PaiementEffectuesTable(props) {
   const columns = [
@@ -9,11 +9,7 @@ function PaiementEffectuesTable(props) {
       label: "Date",
       date: (paiement) => {
         if (paiement.date !== undefined && paiement.date !== null)
-          return (
-            <Moment date={paiement.date} format="DD/MM/YYYY">
-              {paiement.date}
-            </Moment>
-          );
+          return moment(paiement.date).format("DD/MM/YYYY");
       },
     },
     {

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Select from "../../common/select";
 import CustomeTable from "../../common/CustomeTable";
 
-import Moment from "react-moment";
+import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { FaPrint } from "react-icons/fa";
 import { AiTwotoneEdit } from "react-icons/ai";
@@ -135,9 +135,7 @@ function PatientsTable({
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  <Moment date={patient.dateNaissance} format="DD/MM/YYYY">
-                    {patient.dateNaissance}
-                  </Moment>
+                  {moment(patient.dateNaissance).format("DD/MM/YYYY")}
                 </td>
               );
             case "prochainRdv":
@@ -247,8 +245,8 @@ function PatientsTable({
             selectedFilterItems.isMasculin
               ? "masculin"
               : selectedFilterItems.isMasculin === false
-              ? "feminin"
-              : ""
+                ? "feminin"
+                : ""
           }
         />
       </div>

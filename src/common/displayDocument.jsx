@@ -73,7 +73,7 @@ const DisplayDocument = ({
               <div className="flex">
                 {/* access  to the file*/}
                 <a
-                  href={process.env.REACT_APP_API_IMAGE_URL + "/" + doc}
+                  href={import.meta.env.VITE_API_IMAGE_URL + "/" + doc}
                   target="_blank"
                   rel="noopener noreferrer"
                   download

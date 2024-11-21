@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Select from "../../../common/select";
 import CustomeTable from "../../../common/CustomeTable";
 
-import Moment from "react-moment";
 import { v4 as uuidv4 } from "uuid";
 import { FaPrint } from "react-icons/fa";
 import { AiTwotoneEdit } from "react-icons/ai";
@@ -201,8 +200,8 @@ function ArticlesTable({
               selectedFilterItems.isExpiration
                 ? "oui"
                 : selectedFilterItems.isExpiration === false
-                ? "non"
-                : ""
+                  ? "non"
+                  : ""
             }
           />
         )}

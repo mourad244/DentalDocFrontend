@@ -17,8 +17,8 @@ import RevenuByPatientGenreChart from "./revenuByPatientGenreChart";
 import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
 import VerticalDashedLine from "../../assets/verticalDashedLine";
-import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
-import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
+import SuivantButton from "../../assets/icons/suivant-btn.svg";
+import PrecedentButton from "../../assets/icons/precedent-btn.svg";
 
 const calculateAge = (dateOfBirth) => {
   const today = new Date();
@@ -672,20 +672,22 @@ function Accueil() {
       <div className="flex">
         {time.nom !== "tous" && (
           <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
-            <PrecedentButton
+            <img
               className="cursor-pointer"
               onClick={() => {
                 navigateDate(time, -1);
               }}
+              src={PrecedentButton}
             />
             <p className="text-md m-auto mx-3 font-bold leading-5">
               {displayDate(time.nom)}
             </p>
-            <SuivantButton
+            <img
               className="cursor-pointer"
               onClick={() => {
                 navigateDate(time, 1);
               }}
+              src={SuivantButton}
             />
           </div>
         )}

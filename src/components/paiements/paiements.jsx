@@ -9,8 +9,8 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ClipLoader from "react-spinners/ClipLoader";
 import ButtonType from "../../assets/buttons/buttonType";
-import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
-import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import PrecedentButton from "../../assets/icons/precedent-btn.svg";
+import SuivantButton from "../../assets/icons/suivant-btn.svg";
 
 function Paiements({ user }) {
   const date = new Date();
@@ -237,21 +237,23 @@ function Paiements({ user }) {
       </div>
       <div className="flex">
         <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
-          <PrecedentButton
+          <img
             className="cursor-pointer"
             onClick={() => {
               navigateDate(time, -1);
             }}
+            src={PrecedentButton}
           />
           <p className="text-md m-auto mx-3 font-bold leading-5">
             {displayDate(time.nom)}
           </p>
 
-          <SuivantButton
+          <img
             className="cursor-pointer"
             onClick={() => {
               navigateDate(time, 1);
             }}
+            src={SuivantButton}
           />
         </div>
         <div className="mr-2  flex items-center">

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import { ReactComponent as AccueilIconActive } from "../assets/icons/sidebar/accueil-active.svg";
-import { ReactComponent as AccueilIcon } from "../assets/icons/sidebar/accueil.svg";
-import { ReactComponent as PatientIconActive } from "../assets/icons/sidebar/patient-active.svg";
-import { ReactComponent as PatientIcon } from "../assets/icons/sidebar/patient.svg";
-import { ReactComponent as RdvIconActive } from "../assets/icons/sidebar/rdv-active.svg";
-import { ReactComponent as RdvIcon } from "../assets/icons/sidebar/rdv.svg";
-import { ReactComponent as DeviIconActive } from "../assets/icons/sidebar/devi-active.svg";
-import { ReactComponent as DeviIcon } from "../assets/icons/sidebar/devi.svg";
-import { ReactComponent as PaiementIconActive } from "../assets/icons/sidebar/paiement-active.svg";
-import { ReactComponent as PaiementIcon } from "../assets/icons/sidebar/paiement.svg";
-import { ReactComponent as SettingsIcon } from "../assets/icons/sidebar/settings.svg";
-import { ReactComponent as SettingsIconActive } from "../assets/icons/sidebar/settings-active.svg";
-import { ReactComponent as LivraisonIcon } from "../assets/icons/sidebar/livraison.svg";
-import { ReactComponent as LivraisonIconActive } from "../assets/icons/sidebar/livraison-active.svg";
-import { ReactComponent as CommandeIcon } from "../assets/icons/sidebar/commande.svg";
-import { ReactComponent as CommandeIconActive } from "../assets/icons/sidebar/commande-active.svg";
-import { ReactComponent as ArticleIcon } from "../assets/icons/sidebar/article.svg";
-import { ReactComponent as ArticleIconActive } from "../assets/icons/sidebar/article-active.svg";
+import AccueilIconActive from "../assets/icons/sidebar/accueil-active";
+import AccueilIcon from "../assets/icons/sidebar/accueil.jsx";
+import PatientIconActive from "../assets/icons/sidebar/patient-active.jsx";
+import PatientIcon from "../assets/icons/sidebar/patient.jsx";
+import RdvIconActive from "../assets/icons/sidebar/rdv-active.jsx";
+import RdvIcon from "../assets/icons/sidebar/rdv.jsx";
+import DeviIconActive from "../assets/icons/sidebar/devi-active.jsx";
+import DeviIcon from "../assets/icons/sidebar/devi.jsx";
+import PaiementIconActive from "../assets/icons/sidebar/paiement-active.jsx";
+import PaiementIcon from "../assets/icons/sidebar/paiement.jsx";
+import SettingsIcon from "../assets/icons/sidebar/settings.jsx";
+import SettingsIconActive from "../assets/icons/sidebar/settings-active.jsx";
+import LivraisonIcon from "../assets/icons/sidebar/livraison.jsx";
+import LivraisonIconActive from "../assets/icons/sidebar/livraison-active.jsx";
+import CommandeIcon from "../assets/icons/sidebar/commande.jsx";
+import CommandeIconActive from "../assets/icons/sidebar/commande-active.jsx";
+import ArticleIcon from "../assets/icons/sidebar/article.jsx";
+import ArticleIconActive from "../assets/icons/sidebar/article-active.jsx";
 
 const NavBar = ({ user }) => {
   const location = useLocation();

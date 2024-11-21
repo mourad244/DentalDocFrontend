@@ -546,10 +546,10 @@ class DeviForm extends Form {
     this.props.match.params.deviid &&
     this.props.match.params.deviid !== "new"
       ? await axios.put(
-          `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.deviid}`,
+          `${import.meta.env.VITE_API_URL}/${form}/${this.props.match.params.deviid}`,
           fd,
         )
-      : await axios.post(`${process.env.REACT_APP_API_URL}/${form}`, fd);
+      : await axios.post(`${import.meta.env.VITE_API_URL}/${form}`, fd);
     if (this.props.match) this.props.history.push(`/${form}`);
     else {
       window.location.reload();

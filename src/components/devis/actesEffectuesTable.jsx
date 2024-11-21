@@ -1,6 +1,6 @@
 import React from "react";
 import Table from "../../common/table";
-import Moment from "react-moment";
+import moment from "moment";
 import { colorsNatureActe } from "../../utils/colorsNatureActe";
 import SchemaDent from "../../assets/icons/graphs/schemaDent";
 
@@ -18,11 +18,7 @@ function ActesEffectuesTable(props) {
       label: "Date",
       date: (acte) => {
         if (acte.date !== undefined && acte.date !== null)
-          return (
-            <Moment date={acte.date} format="DD/MM/YYYY">
-              {acte.date}
-            </Moment>
-          );
+          return moment(acte.date).format("DD/MM/YYYY");
       },
     },
     { path: "medecin", label: "Medecin" },

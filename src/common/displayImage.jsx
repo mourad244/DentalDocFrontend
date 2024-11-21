@@ -39,7 +39,7 @@ const DisplayImage = ({
                   !indexBluredImage.includes(index) ? "" : "blur-lg"
                 } ml-3 transition-all duration-300 ease-in-out hover:scale-150`}
                 alt={img}
-                src={`${process.env.REACT_APP_API_IMAGE_URL}/${img}`}
+                src={`${import.meta.env.VITE_API_IMAGE_URL}/${img}`}
                 height={height + "px"}
                 width={height + "px"}
               />
@@ -69,7 +69,7 @@ const DisplayImage = ({
             className={`${
               !indexBluredImage.includes(0) ? "" : "blur-sm"
             }  ml-3 transition-all duration-300 ease-in-out hover:scale-150`}
-            src={`${process.env.REACT_APP_API_IMAGE_URL}/${images}`}
+            src={`${import.meta.env.VITE_API_IMAGE_URL}/${images}`}
             alt={label}
             height={height + "px"}
             width={height + "px"}

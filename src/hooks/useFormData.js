@@ -196,7 +196,7 @@ function useFormData(initialValues, schema, onSubmit) {
 
     if (selectedId) {
       await axios({
-        url: `${process.env.REACT_APP_API_URL}/${form}/${selectedId}`,
+        url: `${import.meta.env.VITE_API_URL}/${form}/${selectedId}`,
         data: fd,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -205,7 +205,7 @@ function useFormData(initialValues, schema, onSubmit) {
       });
     } else
       await axios({
-        url: `${process.env.REACT_APP_API_URL}/${form}`,
+        url: `${import.meta.env.VITE_API_URL}/${form}`,
         data: fd,
         headers: {
           "Content-Type": "multipart/form-data",

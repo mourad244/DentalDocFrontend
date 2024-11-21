@@ -1,8 +1,7 @@
 import React /* , { useState } */ from "react";
 
 import CustomeTable from "../../common/CustomeTable";
-
-import Moment from "react-moment";
+import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { FaPrint } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
@@ -97,9 +96,7 @@ function DevisTable({
                   key={uuidv4()}
                   className="px-1 text-xs font-medium text-[#2f2f2f]"
                 >
-                  <Moment date={devi.date} format="DD/MM/YYYY">
-                    {devi.date}
-                  </Moment>
+                  {moment(devi.date).format("DD/MM/YYYY")}
                 </td>
               );
             case "medecinId":

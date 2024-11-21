@@ -4,8 +4,8 @@ import { withRouter } from "react-router-dom";
 import { getRdvs } from "../../services/rdvService";
 
 // import _ from "lodash";
-import { ReactComponent as PrecedentButton } from "../../assets/icons/precedent-btn.svg";
-import { ReactComponent as SuivantButton } from "../../assets/icons/suivant-btn.svg";
+import PrecedentButton from "../../assets/icons/precedent-btn.svg";
+import SuivantButton from "../../assets/icons/suivant-btn.svg";
 const createHourlySegments = (filteredRdvs, selectedRdv, selectedRdvDate) => {
   const workHoursStart = 9;
   const workHoursEnd = 19;
@@ -322,8 +322,8 @@ const AgendaRdv = (props) => {
                       found.isReporte
                         ? "bg-[#e49012]"
                         : found.isAnnule
-                        ? " bg-[#ff6868]"
-                        : "bg-[#506496]"
+                          ? " bg-[#ff6868]"
+                          : "bg-[#506496]"
                     }  text-white shadow-daySelected`}
                     onClick={() => handleSelectedDate(t)}
                   >
@@ -541,8 +541,8 @@ const AgendaRdv = (props) => {
                   segment.available
                     ? "bg-[#caecff] text-zinc-700 shadow-md"
                     : segment.isSelected
-                    ? "bg-[#152961] text-white shadow-inner"
-                    : "bg-gray-300 text-[#363636]"
+                      ? "bg-[#152961] text-white shadow-inner"
+                      : "bg-gray-300 text-[#363636]"
                 }`}
                 style={{
                   width: segmentWidth,
@@ -584,10 +584,11 @@ const AgendaRdv = (props) => {
           <p className="text-md m-auto mx-3 font-bold leading-5">
             {displayDate()}
           </p>
-          <SuivantButton
+          <img
             onClick={() => {
               navigateDate(1);
             }}
+            src={SuivantButton}
             className="cursor-pointer"
           />
         </div>

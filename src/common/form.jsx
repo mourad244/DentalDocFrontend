@@ -7,7 +7,6 @@ import UploadImage from "./uploadImage";
 import { jsonToFormData } from "../utils/jsonToFormData";
 import Select from "./select";
 import moment from "moment";
-import Moment from "react-moment";
 
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
@@ -259,10 +258,10 @@ class Form extends Component {
     this.props.match.params.id &&
     this.props.match.params.id !== "new"
       ? await axios.put(
-          `${process.env.REACT_APP_API_URL}/${form}/${this.props.match.params.id}`,
+          `${import.meta.env.VITE_API_URL}/${form}/${this.props.match.params.id}`,
           fd,
         )
-      : await axios.post(`${process.env.REACT_APP_API_URL}/${form}`, fd);
+      : await axios.post(`${import.meta.env.VITE_API_URL}/${form}`, fd);
     if (this.props.match) this.props.history.push(`/${form}`);
     else {
       window.location.reload();
@@ -881,12 +880,7 @@ class Form extends Component {
             <td key={"dateDebut" + index1}>
               <div className="p-2 text-center text-xs font-bold">
                 {data[name][index1].dateDebut ? (
-                  <Moment
-                    date={data[name][index1].dateDebut}
-                    format="DD/MM/YYYY"
-                  >
-                    {data[name][index1].dateDebut}
-                  </Moment>
+                  moment(data[name][index1].dateDebut).format("DD/MM/YYYY")
                 ) : (
                   <Input
                     type="date"
@@ -912,9 +906,7 @@ class Form extends Component {
             <td key={"dateFin" + index1}>
               <div className="p-2 text-center text-xs font-bold">
                 {data[name][index1].dateDebut && data[name][index1].dateFin ? (
-                  <Moment date={data[name][index1].dateFin} format="DD/MM/YYYY">
-                    {data[name][index1].dateFin}
-                  </Moment>
+                  moment(data[name][index1].dateFin).format("DD/MM/YYYY")
                 ) : (
                   <Input
                     type="date"
