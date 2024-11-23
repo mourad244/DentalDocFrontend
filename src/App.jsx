@@ -113,7 +113,7 @@ function App() {
       <div className="w-auto min-w-fit">
         <div className="m-0 flex h-24  bg-gradient-radial p-1 shadow-xl ">
           <p className=" ml-5 flex w-48 items-center text-center text-xl font-bold text-[#424746]">
-            Cabinet dentairee
+            Cabinet dentaireee
           </p>
           <img
             // i want that the image be at the center of the header even if the screen is small
