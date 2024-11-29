@@ -47,7 +47,7 @@
     "build": "vite build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "start": "serve -s build"
+    "start": "serve -s build -l 3001"
   },
   "eslintConfig": {
     "extends": [
