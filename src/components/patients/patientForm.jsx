@@ -28,8 +28,8 @@ import { FaFilePdf } from "react-icons/fa6";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
 
-import mutuelle1 from "../../assets/images/mutuelle1.jpg";
-import mutuelle2 from "../../assets/images/mutuelle2.jpg";
+import mutuelle1 from "/images/mutuelle1.jpg";
+import mutuelle2 from "/images/mutuelle2.jpg";
 
 function PatientForm({
   match,
@@ -1120,7 +1120,6 @@ function PatientForm({
               />
             </div>
           )}
-          {console.log("datra", data.isPatientAssure)}
           {!isRdvForm &&
             (data.isPatientAssure === true ||
               data.isPatientAssure === false) && (

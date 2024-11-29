@@ -331,7 +331,7 @@ class PaiementForm extends Form {
                     <div className="mt-3">
                       {this.renderInput(
                         "montant",
-                        "Montant",
+                        "Montant en Dh",
                         170,
                         35,
                         "number",

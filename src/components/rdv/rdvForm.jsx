@@ -375,7 +375,7 @@ function RdvForm(props) {
               <div className="mt-3 w-max">
                 <Input
                   name="duree"
-                  label="Durée"
+                  label="Durée en min *"
                   value={
                     selectedRdv && selectedRdv.duree
                       ? selectedRdv.duree
@@ -396,7 +396,7 @@ function RdvForm(props) {
               <div className="mt-3 w-max">
                 <Checkbox
                   name={"moments"}
-                  label={"Moments"}
+                  label={"Moments *"}
                   widthLabel={96}
                   width={206}
                   listItems={["matin", "apres-midi", "soir"]}
@@ -440,7 +440,7 @@ function RdvForm(props) {
                       }}
                       className="mr-3 text-right text-xs font-bold leading-9 text-[#72757c]"
                     >
-                      Début
+                      Début *
                     </label>
                     <select
                       className=" rounded-md	border-0 bg-[#D6E1E3] pl-3 pr-3 text-xs font-bold text-[#1f2037] shadow-inner "

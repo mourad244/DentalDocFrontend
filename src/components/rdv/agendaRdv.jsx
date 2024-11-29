@@ -575,7 +575,8 @@ const AgendaRdv = (props) => {
     <div className="flex flex-wrap">
       <div className="m-auto my-2  flex h-fit w-fit min-w-fit flex-col rounded-5px border border-white bg-white shadow-component ">
         <div className=" m-auto my-2 flex items-center rounded-md bg-[#f5f5f5] p-2 shadow-md">
-          <PrecedentButton
+          <img
+            src={PrecedentButton}
             className="cursor-pointer"
             onClick={() => {
               navigateDate(-1);
