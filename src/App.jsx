@@ -168,28 +168,25 @@ function App() {
               <Route
                 path="/"
                 exact
-                render={() =>
-                  user ? <Redirect to="/accueil" /> : <HomePage />
-                }
+                render={(props) => (
+                  <HomePage {...props} isLogged={isLogged} user={user} />
+                )}
               />
 
               {/* Accueil Route */}
               <Route
                 path="/accueil"
                 exact
-                render={() => {
-                  if (!user) {
-                    return <Redirect to="/" />;
-                  }
-                  if (
-                    user.role === "admin" ||
-                    user.role === "assistante médicale" ||
-                    user.role === "visiteur"
-                  ) {
-                    return <Accueil />;
-                  }
-                  return <Redirect to="/" />; // Redirect for unauthorized roles
-                }}
+                render={(props) =>
+                  user &&
+                  ["admin", "assistante médicale", "visiteur"].includes(
+                    user.role,
+                  ) ? (
+                    <Accueil {...props} />
+                  ) : (
+                    <Redirect to="/" />
+                  )
+                }
               />
               {/* Devis */}
               {user &&
