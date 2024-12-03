@@ -1,5 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+import auth from "../services/authService";
+const apiUrl = import.meta.env.VITE_API_URL;
+
 import icondental from "../assets/icons/icon-dental.png";
 import mongodbicon from "../assets/icons/mongodb.png";
 import reacticon from "../assets/icons/react.png";
@@ -29,6 +33,21 @@ const FeatureCard = ({ title, description, imageSrc }) => {
 };
 
 const HomePage = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleDemoClick = async () => {
+    if (apiUrl.includes("demo")) {
+      setLoading(true);
+      try {
+        await auth.login("visiteur", "visiteur"); // Login with predefined credentials
+        window.location.href = "/accueil"; // Force full page reload to the dashboard or home page
+      } catch (error) {
+        console.error("Failed to login to demo", error);
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-login-background">
       {/* Hero Section */}
@@ -48,18 +67,32 @@ const HomePage = () => {
           </p>
         </div>
         <div className="mt-6 flex justify-center space-x-4">
-          <Link
-            className="w-44 rounded-login bg-authenfier-button p-1 text-center text-sm font-medium leading-7 text-white shadow-login-button transition hover:shadow-lg"
-            to="/login"
-          >
-            Se connecter
-          </Link>
-          <Link
-            to="/demo"
-            className="w-44 rounded-login bg-grey-ea p-1 text-center text-sm font-medium leading-7 text-grey-c0 shadow-login-button transition hover:shadow-lg"
-          >
-            Découvrir la démo
-          </Link>
+          {apiUrl.includes("demo") ? (
+            <button
+              onClick={handleDemoClick}
+              className="w-44 rounded-login bg-authenfier-button p-1 text-center text-sm font-medium leading-7 text-white shadow-login-button transition hover:shadow-lg"
+              disabled={loading}
+            >
+              {loading ? "Connexion..." : "Découvrir la démo"}
+            </button>
+          ) : (
+            <>
+              <Link
+                className="w-44 rounded-login bg-authenfier-button p-1 text-center text-sm font-medium leading-7 text-white shadow-login-button transition hover:shadow-lg"
+                to="/login"
+              >
+                Se connecter
+              </Link>
+              <a
+                href="https://demo.dentaldocma.com"
+                className="w-44 rounded-login bg-grey-ea p-1 text-center text-sm font-medium leading-7 text-grey-c0 shadow-login-button transition hover:shadow-lg"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Découvrir la démo
+              </a>
+            </>
+          )}
         </div>
       </header>
 
@@ -110,7 +143,7 @@ const HomePage = () => {
       </section>
 
       {/* Demo Section */}
-      <section className="bg-[#F8F7F1] py-12">
+      {/* <section className="bg-[#F8F7F1] py-12">
         <div className="container mx-auto text-center">
           <h2 className="mb-6 text-2xl font-bold text-[#424746]">
             Essayez notre démo interactive
@@ -119,14 +152,16 @@ const HomePage = () => {
             Découvrez comment DentalDoc peut transformer la gestion de votre
             cabinet avec une version d'essai.
           </p>
-          <Link
-            className=" w-44 rounded-login bg-authenfier-button p-2 text-center text-xs font-medium leading-7 text-white shadow-login-button transition hover:shadow-lg"
-            to="/demo"
+          <a
+            href="https://demo.dentaldocma.com"
+            className="w-44 rounded-login bg-grey-ea p-1 text-center text-sm font-medium leading-7 text-grey-c0 shadow-login-button transition hover:shadow-lg"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Lancer la démo
-          </Link>
+            Découvrir la démo
+          </a>
         </div>
-      </section>
+      </section> */}
 
       {/* Technologies Section */}
       <section className="bg-[#95b0bb] py-12">

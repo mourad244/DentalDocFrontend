@@ -274,7 +274,6 @@ const AgendaRdv = (props) => {
       for (let j = 0; j < days.length; j++) {
         const t = countTotal;
         let d = new Date(time.getFullYear(), time.getMonth(), t + 1);
-        // if (t === 0) console.log("day", days[j]);
         if (
           days[j] === days[d.getDay()] &&
           t < nombreDays &&
@@ -406,18 +405,34 @@ const AgendaRdv = (props) => {
             </div>,
           );
         } else if (d.getDay() === 0 || t >= nombreDays) {
-          arrayDiv.push(
-            <div className=" bg-white  p-1" key={"date-inactif" + j}>
-              <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
-            </div>,
-          );
+          if (countTotal === 0) {
+            arrayDiv.push(
+              <div className="p-1" key={"date-inactif" + j}>
+                <div className=" m-2  flex h-10 w-10 rounded-3xl " />
+              </div>,
+            );
+          } else {
+            arrayDiv.push(
+              <div className=" bg-white  p-1" key={"date-inactif" + j}>
+                <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
+              </div>,
+            );
+          }
           countTotal++;
         } else {
-          arrayDiv.push(
-            <div className="p-1" key={"date-inactif" + j}>
-              <div className=" m-2  flex h-10 w-10 rounded-3xl " />
-            </div>,
-          );
+          if (j === 0) {
+            arrayDiv.push(
+              <div className=" bg-white  p-1" key={"date-inactif" + j}>
+                <div className=" m-2  flex h-10 w-10 rounded-3xl bg-white" />
+              </div>,
+            );
+          } else {
+            arrayDiv.push(
+              <div className="p-1" key={"date-inactif" + j}>
+                <div className=" m-2  flex h-10 w-10 rounded-3xl " />
+              </div>,
+            );
+          }
         }
       }
       totalDiv.push(arrayDiv);

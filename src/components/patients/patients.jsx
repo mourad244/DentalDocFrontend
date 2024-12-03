@@ -35,7 +35,7 @@ function Patients({ user }) {
     { order: 3, name: "nom", label: "Nom" },
     { order: 4, name: "prenom", label: "Prénom" },
     { order: 5, name: "cin", label: "CIN" },
-    { order: 7, name: "telephone", label: "Téléphone" },
+    { order: 7, name: "telephones", label: "Téléphone" },
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ]);
@@ -53,7 +53,7 @@ function Patients({ user }) {
     { order: 4, name: "prenom", label: "Prénom" },
     { order: 5, name: "cin", label: "CIN" },
     { order: 6, name: "dateNaissance", label: "Date de naissance" },
-    { order: 7, name: "telephone", label: "Téléphone" },
+    { order: 7, name: "telephones", label: "Téléphone" },
     { order: 8, name: "provinceId", label: "Province" },
     { order: 9, name: "age", label: "Age" },
   ];

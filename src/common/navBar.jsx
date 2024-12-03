@@ -71,7 +71,9 @@ const NavBar = ({ user }) => {
 
   return (
     <nav className="flex flex-col gap-2 bg-gradient-navbar ">
-      {user.role === "admin" || user.role === "assistante médicale" ? (
+      {user.role === "admin" ||
+      user.role === "assistante médicale" ||
+      user.role === "visiteur" ? (
         <ul className="flex w-20">
           <li className=" m-auto my-1 w-fit">
             <Link
@@ -91,7 +93,9 @@ const NavBar = ({ user }) => {
           </li>
         </ul>
       ) : null}
-      {user.role === "admin" || user.role === "assistante médicale" ? (
+      {user.role === "admin" ||
+      user.role === "assistante médicale" ||
+      user.role === "visiteur" ? (
         <>
           <ul className="flex w-20">
             <li className=" m-auto my-1 w-fit">
@@ -131,7 +135,9 @@ const NavBar = ({ user }) => {
           </ul>
         </>
       ) : null}
-      {user.role === "admin" || user.role === "assistante médicale" ? (
+      {user.role === "admin" ||
+      user.role === "assistante médicale" ||
+      user.role === "visiteur" ? (
         <>
           <ul className="flex w-20">
             <li className=" m-auto my-1 w-fit">
@@ -172,7 +178,9 @@ const NavBar = ({ user }) => {
         </>
       ) : null}
 
-      {user.role === "admin" || user.role === "assistante médicale" ? (
+      {user.role === "admin" ||
+      user.role === "assistante médicale" ||
+      user.role === "visiteur" ? (
         <>
           <ul className="flex w-20">
             <li className=" m-auto my-1 w-fit">

@@ -160,6 +160,19 @@ function PatientsTable({
                 </td>
               );
 
+            case "telephones":
+              if (patient.telephones === undefined)
+                return <td key={uuidv4()} />;
+              return (
+                <td
+                  key={uuidv4()}
+                  className="px-1 text-xs font-medium text-[#2f2f2f]"
+                >
+                  {patient.telephones.map((tel) => (
+                    <div key={uuidv4()}>- {tel}</div>
+                  ))}
+                </td>
+              );
             case "genre":
               return (
                 <td

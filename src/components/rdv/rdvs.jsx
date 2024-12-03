@@ -12,7 +12,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import SuivantButton from "../../assets/icons/suivant-btn.svg";
 import PrecedentButton from "../../assets/icons/precedent-btn.svg";
 
-function Rdvs() {
+function Rdvs({ user }) {
   const [rdvs, setRdvs] = useState([]);
   const [selectedRdv, setSelectedRdv] = useState(null);
   const [selectedRdvs, setSelectedRdvs] = useState([]);
@@ -40,7 +40,6 @@ function Rdvs() {
     };
     fetchData();
   }, [time]);
-
   useEffect(() => {
     let filtered = rdvs;
     const filterRdvs = async () => {
@@ -287,6 +286,7 @@ function Rdvs() {
                 : undefined
             }
             onCancel={
+              user.role !== "visiteur" &&
               selectedRdv &&
               (!selectedRdv.isHonnore ||
                 !selectedRdv.deviId ||
@@ -324,7 +324,8 @@ function Rdvs() {
                 : undefined
             }
             onDelete={
-              selectedRdv !== null || selectedRdvs.length !== 0
+              user.role !== "visiteur" &&
+              (selectedRdv !== null || selectedRdvs.length !== 0)
                 ? handleDelete
                 : undefined
             }

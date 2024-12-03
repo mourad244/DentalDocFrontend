@@ -894,14 +894,20 @@ class DeviForm extends Form {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-3 w-full  ">
-                    {this.renderUpload("image", "Photo radio", "file", 140)}
-                  </div>
+                  {(!this.props.user ||
+                    (this.props.user &&
+                      this.props.user.role !== "visiteur")) && (
+                    <>
+                      <div className="mt-3 w-full  ">
+                        {this.renderUpload("image", "Photo radio", "file", 140)}
+                      </div>
 
-                  <div className="  mt-3 flex w-full flex-wrap">
-                    {data.images.length !== 0 &&
-                      this.renderImage("images", "Images", 200)}
-                  </div>
+                      <div className="  mt-3 flex w-full flex-wrap">
+                        {data.images.length !== 0 &&
+                          this.renderImage("images", "Images", 200)}
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="mx-2 flex justify-between ">
                   <table className="my-0 mr-2 h-fit w-fit rounded-md border-2 border-white">

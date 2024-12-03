@@ -23,7 +23,6 @@ import Joi from "joi-browser";
 import { v4 as uuidv4 } from "uuid";
 import { PDFDocument, rgb } from "pdf-lib";
 
-import { FaPrint } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
 import ClipLoader from "react-spinners/ClipLoader";
 import { IoChevronBackCircleSharp } from "react-icons/io5";
@@ -37,6 +36,7 @@ function PatientForm({
   selectedPatient,
   onPatientChange,
   dataIsValid,
+  user,
 }) {
   const [regions, setRegions] = useState([]);
   const [provinces, setProvinces] = useState([]);
@@ -64,7 +64,6 @@ function PatientForm({
   const history = useHistory();
   const params = useParams();
   const form = "patients";
-
   const schema = {
     isPatientAssure: Joi.boolean()
       .allow("")
@@ -1283,7 +1282,7 @@ function PatientForm({
                 ))}
             </div>
           </div>
-          {!isRdvForm && (
+          {!isRdvForm && user.role !== "visiteur" && (
             <>
               <div className="mt-3 w-full">
                 <UploadImage
@@ -1339,103 +1338,7 @@ function PatientForm({
                 </div>
               )} */}
               </div>
-              {/* <div className="mt-3 w-full">
-              <div className={` flex  `}>
-                <label
-                  className="mr-3  text-right text-xs font-bold leading-9 text-[#72757c]"
-                  style={{ width: 96 }}
-                >
-                  Documents
-                </label>
-                <div>
-                  {data.documents.map((doc, index) => {
-                    let i = data.documentsDeletedIndex.findIndex(
-                      (i) => i === index,
-                    );
 
-                    // if (i !== -1) return null;
-                    const docName = doc.split("/")[1].split("-")[0];
-                    const docType = doc.split("/")[1].split("-")[1];
-                    const docDate = doc.split("/")[1].split("-")[2];
-
-                    if (i !== -1) {
-                      return (
-                        <div key={index} className="mt-3 flex  flex-row">
-                          <div className="flex">
-                            <label
-                              htmlFor=""
-                              className="m-auto ml-1 text-[11px] text-slate-500 line-through"
-                            >
-                              {`${docName}.${docType}`}
-                            </label>
-                            <label
-                              htmlFor=""
-                              className="m-auto ml-1 text-[11px] text-slate-500 line-through"
-                            >
-                              {`${new Date(parseInt(docDate)).getDate()}-${
-                                new Date(parseInt(docDate)).getMonth() + 1
-                              }-${new Date(parseInt(docDate)).getFullYear()}`}
-                            </label>
-                            <button
-                              className="m-auto   ml-1 h-7 w-6 rounded-md bg-green-500 font-bold text-white"
-                              onClick={(e) => {
-                                handleDeleteDoc(doc, e, index);
-                              }}
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={index} className="mt-3 flex  flex-row">
-                        <div className="flex">
-                          <a
-                            href={
-                              import.meta.env.VITE_API_IMAGE_URL + "/" + doc
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
-                            className="flex"
-                          >
-                            <img
-                              src={docType === "pdf" ? pdfIcon : wordIcon}
-                              alt="file"
-                              className="h-10 w-10"
-                            />
-                            <label
-                              htmlFor=""
-                              className="m-auto ml-1 cursor-pointer"
-                            >
-                              {`${docName}.${docType}`}
-                            </label>
-                          </a>
-
-                          <label
-                            htmlFor=""
-                            className="m-auto ml-1 text-[11px] text-slate-500"
-                          >
-                            {`${new Date(parseInt(docDate)).getDate()}-${
-                              new Date(parseInt(docDate)).getMonth() + 1
-                            }-${new Date(parseInt(docDate)).getFullYear()}`}
-                          </label>
-                          <button
-                            className="m-auto   ml-1 h-7 w-6 rounded-md bg-red-500 font-bold text-white"
-                            onClick={(e) => {
-                              handleDeleteDoc(doc, e, index);
-                            }}
-                          >
-                            x
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div> */}
               <DisplayDocument
                 name="documents"
                 widthLabel={96}
