@@ -172,15 +172,25 @@ function App() {
                   user ? <Redirect to="/accueil" /> : <HomePage />
                 }
               />
-              {/* Accueil */}
-              {user &&
-                (user.role === "admin" ||
-                user.role === "assistante médicale" ||
-                user.role === "visiteur" ? (
-                  <Route path="/accueil" exact component={Accueil} />
-                ) : (
-                  ""
-                ))}
+
+              {/* Accueil Route */}
+              <Route
+                path="/accueil"
+                exact
+                render={() => {
+                  if (!user) {
+                    return <Redirect to="/" />;
+                  }
+                  if (
+                    user.role === "admin" ||
+                    user.role === "assistante médicale" ||
+                    user.role === "visiteur"
+                  ) {
+                    return <Accueil />;
+                  }
+                  return <Redirect to="/" />; // Redirect for unauthorized roles
+                }}
+              />
               {/* Devis */}
               {user &&
                 (user.role === "admin" ||
