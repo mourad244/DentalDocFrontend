@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import auth from "../services/authService";
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -34,19 +34,25 @@ const FeatureCard = ({ title, description, imageSrc }) => {
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
 
   const handleDemoClick = async () => {
-    if (apiUrl.includes("demo")) {
+    if (apiUrl.includes("demo") || apiUrl.includes("localhost")) {
       setLoading(true);
       try {
         await auth.login("visiteur", "visiteur"); // Login with predefined credentials
-        window.location.href = "/accueil"; // Force full page reload to the dashboard or home page
+        setRedirect(true); // Set redirect to true after successful login
       } catch (error) {
         console.error("Failed to login to demo", error);
         setLoading(false);
       }
     }
   };
+
+  // Redirect to the dashboard if login is successful
+  if (redirect) {
+    return <Redirect to="/accueil" />;
+  }
 
   return (
     <div className="min-h-screen bg-login-background">
