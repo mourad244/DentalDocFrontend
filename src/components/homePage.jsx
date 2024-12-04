@@ -86,14 +86,14 @@ const HomePage = ({ isLogged, user }) => {
               >
                 Se connecter
               </Link>
-              <a
+              {/*  <a
                 href="https://demo.dentaldocma.com"
                 className="w-44 rounded-login bg-grey-ea p-1 text-center text-sm font-medium leading-7 text-grey-c0 shadow-login-button transition hover:shadow-lg"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Découvrir la démo
-              </a>
+              </a> */}
             </>
           )}
         </div>
