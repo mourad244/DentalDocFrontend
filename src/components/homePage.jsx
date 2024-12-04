@@ -98,7 +98,7 @@ const HomePage = ({ isLogged, user }) => {
           )}
         </div>
       </header>
-
+      {/*  */}
       {/* Features Section */}
       <section className="py-16">
         <div className="container mx-auto text-center">
