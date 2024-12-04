@@ -84,7 +84,7 @@ const HomePage = ({ isLogged, user }) => {
                 className="w-44 rounded-login bg-authenfier-button p-1 text-center text-sm font-medium leading-7 text-white shadow-login-button transition hover:shadow-lg"
                 to="/login"
               >
-                Se connecter
+                S'authentifier
               </Link>
               {/*  <a
                 href="https://demo.dentaldocma.com"
