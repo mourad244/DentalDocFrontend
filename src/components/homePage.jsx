@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Redirect, useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import auth from "../services/authService";
 const apiUrl = import.meta.env.VITE_API_URL;

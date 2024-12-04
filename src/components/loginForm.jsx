@@ -119,7 +119,7 @@ class LoginForm extends Form {
                 : "pointer-events-none my-4 h-10 w-44 cursor-not-allowed rounded-login bg-grey-ea text-xs  leading-7 text-grey-c0 shadow-login-button focus:outline-none"
             }
           >
-            S'Authentifier
+            Se connecter
           </button>
           <ToastContainer />
         </form>
