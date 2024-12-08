@@ -1,70 +1,82 @@
-# Getting Started with Create React App
+# Dental Management System - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository contains the frontend for **DentalDoc**, a comprehensive dental management system that streamlines clinic operations, such as managing appointments, dental procedures, payments, and inventory.
 
-## Available Scripts
+## Demonstration
 
-In the project directory, you can run:
+### **Key Features**
 
-### `npm start`
+- **User Management**: Simplifies managing patients and appointments.
+- **Inventory Tracking**: Monitors clinic materials and generates purchase orders for restocking.
+- **Dynamic Dashboard**: Displays clinic operations in real-time with charts and summaries.
+- **Responsive Design**: Works seamlessly across desktop and mobile devices.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### **Technologies Used**
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **Vite**: A fast development build tool.
+- **React**: For building the user interface.
+- **React Router**: For seamless navigation.
+- **Axios**: To handle API calls.
+- **Tailwind CSS**: For styling and responsive design.
+- **Nginx**: For deployment with HTTPS and reverse proxy.
+- **AWS**: For hosting the application.
 
-### `npm test`
+## Project Setup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Follow the steps below to set up the project locally:
 
-### `npm run build`
+### **1. Clone the Repository**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+git clone [Frontend GitHub URL]
+cd DentalDocFrontend
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### \*\*2. Create .env, .env.production, and .env.development files in the project root and define the following variables:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+.env
+VITE_API_URL=http://localhost:3900/dentaldoc
+VITE_API_IMAGE_URL=http://localhost:3900
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+.env.development
+VITE_API_URL=http://localhost:3900/dentaldoc
+VITE_API_IMAGE_URL=http://localhost:3900
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+.env.production
+VITE_API_URL=<Production-Backend-URL>/dentaldoc
+VITE_API_IMAGE_URL=<Production-Backend-URL>
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+---
 
-## Learn More
+### **3. Run the Project**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run dev
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### **4. Access the Application**
 
-### Code Splitting
+Open your browser and navigate to `http://localhost:3000`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## **5. Production Deployment**
 
-### Analyzing the Bundle Size
+To deploy the frontend in production, run the following command:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm install -g serve
+npm run build
+npm start
+```
 
-### Making a Progressive Web App
+The production server runs on port 3001 by default.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+<!-- i want to mention that the demo version is deployed in aws instan  give me text -->
 
-### Advanced Configuration
+## **6. Demo**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+A demo version of the application is available at [DentalDoc](https://demo.dentaldocma.com).
